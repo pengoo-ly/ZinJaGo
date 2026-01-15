@@ -1,0 +1,205 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Another.Master.cs" Inherits="Week1_Practical1.Admin" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link href="admin.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="admin-layout">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+              ☰
+            </button>
+            <!-- SIDEBAR -->
+            <aside class="sidebar" role="navigation" aria-label="Admin menu">
+                <div class="brand">
+                    <div class="logo">
+                        <img src="Images/zinjago.png" alt="Zinjago logo" />
+                    </div>
+                    <div class="title">Admin Panel</div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="group-title">Main menu</div>
+                    <ul class="menu" role="menu">
+                        <li role="menuitem"><a href="Dashboard.aspx"><span class="icon">🏠</span><span class="label">Dashboard</span></a></li>
+                        <li role="menuitem"><a href="OrderManagement.aspx"><span class="icon">📦</span><span class="label">Order Management</span></a></li>
+                        <li role="menuitem"><a href="Customers.aspx"><span class="icon">👥</span><span class="label">Customers</span></a></li>
+                        <li role="menuitem"><a href="CouponCode.aspx"><span class="icon">🏷️</span><span class="label">Coupon Code</span></a></li>
+                        <li role="menuitem"><a href="Categories.aspx"><span class="icon">🗂️</span><span class="label">Categories</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <div class="group-title">Product</div>
+                    <ul class="menu" role="menu">
+                        <li role="menuitem"><a href="AddProduct.aspx"><span class="icon">➕</span><span class="label">Add Products</span></a></li>
+                        <li role="menuitem"><a href="ProductMedia.aspx"><span class="icon">🖼️</span><span class="label">Product Media</span></a></li>
+                        <li role="menuitem"><a href="ProductList.aspx"><span class="icon">📋</span><span class="label">Product List</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="menu-section">
+                    <div class="group-title">Admin</div>
+                    <ul class="menu" role="menu">
+                        <li role="menuitem"><a href="AdminRole.aspx"><span class="icon">👤</span><span class="label">Admin role</span></a></li>
+                        <li role="menuitem"><a href="ControlAuthority.aspx"><span class="icon">⚙️</span><span class="label">Control Authority</span></a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-footer">
+                    <a class="profile-link" id="profileFooterLink" href="Profile.aspx" role="button" aria-label="Open profile">
+                        <div class="profile" aria-hidden="false">
+                            <div class="avatar">D</div>
+                            <div>
+                                <div style="font-weight:600;color:var(--text)">Dealport</div>
+                                <div style="font-size:12px;color:var(--muted)">deal@thesignesign.com</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- TOPBAR -->
+            <header class="topbar" role="banner">
+                <div id="hamburger" class="icon" style="display:none;cursor:pointer" title="Toggle menu">☰</div>
+
+                <asp:Label ID="lblPageTitle" runat="server" CssClass="page-title" Text="Admin"></asp:Label>
+
+                <div class="top-icons" aria-hidden="false">
+                    <div class="search" role="search" aria-label="Search admin">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" style="opacity:.6">
+                            <path d="M21 21L15 15" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="11" cy="11" r="6" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="text" placeholder="Search..." aria-label="Search" />
+                    </div>
+
+                    <a id="notifLink" class="icon" href="Notifications.aspx" title="Notifications" aria-label="Open notifications">🔔</a>
+
+                    <div class="theme-switch" title="Toggle theme" id="themeSwitch">
+                        <div style="font-size:13px;color:var(--muted)">Theme</div>
+                        <div id="switch" class="switch" role="switch" aria-checked="false">
+                            <div class="knob"></div>
+                        </div>
+                    </div>
+
+                    <a id="profileTopLink" class="icon profile-btn" href="Profile.aspx" title="Profile" aria-label="Open profile">
+                        <span class="profile-initial" aria-hidden="true">D</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT WRAPPER -->
+            <div class="main-content-wrapper">
+                <main class="main-content" role="main">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server" />
+                </main>
+            </div>
+        </div>
+
+        <!-- FOOTER (starts after sidebar like topbar) -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-content">
+                <span>&copy; 2025 ZinJaGO Admin. All rights reserved.</span>
+                <div class="footer-links">
+                    <a href="Privacy.aspx">Privacy Policy</a>
+                    <a href="Terms.aspx">Terms of Service</a>
+                    <a href="Support.aspx">Support</a>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted)">v1.0.0</div>
+        </footer>
+
+        <script>
+            const btn = document.getElementById('themeToggle');
+            btn.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            });
+            (function () {
+                var btn = document.getElementById('hamburger');
+                var sidebar = document.querySelector('.sidebar');
+                function update() {
+                    if (window.innerWidth <= 900) {
+                        btn.style.display = 'inline-flex';
+                    } else {
+                        btn.style.display = 'none';
+                        sidebar.classList.remove('open');
+                    }
+                }
+                window.addEventListener('resize', update);
+                update();
+                if (btn) btn.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+
+                function setActiveMenu() {
+                    var path = location.pathname.split('/').pop().toLowerCase();
+                    if (!path) path = 'dashboard.aspx';
+                    var links = document.querySelectorAll('.sidebar .menu a');
+                    links.forEach(function (a) {
+                        var href = a.getAttribute('href');
+                        if (!href) return;
+                        var hrefFile = href.split('/').pop().toLowerCase();
+                        if (hrefFile === path) {
+                            a.parentElement.classList.add('active');
+                        } else {
+                            a.parentElement.classList.remove('active');
+                        }
+                    });
+                }
+                document.addEventListener('DOMContentLoaded', setActiveMenu);
+
+                var root = document.documentElement;
+                var switchEl = document.getElementById('switch');
+                var themeSwitch = document.getElementById('themeSwitch');
+
+                function applyTheme(dark) {
+                    if (dark) {
+                        root.classList.add('dark');
+                        switchEl.classList.add('on');
+                        switchEl.setAttribute('aria-checked', 'true');
+                    } else {
+                        root.classList.remove('dark');
+                        switchEl.classList.remove('on');
+                        switchEl.setAttribute('aria-checked', 'false');
+                    }
+                    localStorage.setItem('adminThemeDark', dark ? '1' : '0');
+                }
+
+                var stored = localStorage.getItem('adminThemeDark');
+                if (stored === null) {
+                    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    applyTheme(prefersDark);
+                } else {
+                    applyTheme(stored === '1');
+                }
+
+                if (themeSwitch) {
+                    themeSwitch.addEventListener('click', function () {
+                        var isDark = root.classList.contains('dark');
+                        applyTheme(!isDark);
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    var fullTitle = document.title || '';
+                    var titlePart = fullTitle.split(' - ')[0].trim();
+                    var lbl = document.getElementById('<%= lblPageTitle.ClientID %>');
+                    if (titlePart && titlePart.toLowerCase() !== 'admin') {
+                        try { lbl.innerText = titlePart; } catch (e) { }
+                    }
+                });
+
+                var footerLink = document.getElementById('profileFooterLink');
+                if (footerLink) footerLink.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { window.location = footerLink.href; } });
+            })();
+        </script>
+    </form>
+</body>
+</html>
