@@ -75,7 +75,6 @@
     <Content Include="Categories.aspx" />
     <Content Include="CourierManagement.aspx" />
     <Content Include="Customers.aspx" />
-    <Content Include="Customer\human.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="ForgotPassword.aspx" />
     <Content Include="Images\Hoodie.png" />
@@ -174,13 +173,6 @@
     </Compile>
     <Compile Include="Customers.aspx.designer.cs">
       <DependentUpon>Customers.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Customer\human.aspx.cs">
-      <DependentUpon>human.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Customer\human.aspx.designer.cs">
-      <DependentUpon>human.aspx</DependentUpon>
     </Compile>
     <Compile Include="DeliveryTrackingAdmin.aspx.cs">
       <DependentUpon>DeliveryTrackingAdmin.aspx</DependentUpon>
@@ -324,7 +316,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Customer\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
