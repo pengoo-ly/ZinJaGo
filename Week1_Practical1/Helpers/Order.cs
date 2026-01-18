@@ -8,7 +8,7 @@ using System.Configuration;
 
 namespace Week1_Practical1.Helpers
 {
-    public class Customer
+    public class Order
     {
     }
 }

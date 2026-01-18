@@ -11,6 +11,7 @@ namespace Week1_Practical1.Helpers
     public class Product
     {
         string _connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+        private int _adminID = 0;
         private int _prodID = 0;
         private string _prodName = string.Empty;
         private int _catID = 0;
@@ -24,9 +25,10 @@ namespace Week1_Practical1.Helpers
         {
         }
 
-        public Product(int prodID, string prodName, int catID, string prodDesc,
+        public Product(int adminID, int prodID, string prodName, int catID, string prodDesc,
                        decimal unitPrice, int stockLevel, string prodImage, string status)
         {
+            _adminID = adminID;
             _prodID = prodID;
             _prodName = prodName;
             _catID = catID;
@@ -37,14 +39,20 @@ namespace Week1_Practical1.Helpers
             _status = status;
         }
 
-        public Product(string prodName, int catID, string prodDesc,
+        public Product(int adminID, string prodName, int catID, string prodDesc,
                        decimal unitPrice, int stockLevel, string prodImage, string status)
-            : this(0, prodName, 0, prodDesc, unitPrice, stockLevel, prodImage, "Active")
+            : this(adminID, 0, prodName, catID, prodDesc, unitPrice, stockLevel, prodImage, "Active")
         {
         }
 
+        public int AdminID
+        {
+            get { return _adminID; }
+            set { _adminID = value; }
+        }
+
         public Product(int prodID)
-            : this(prodID, "", 0, "", 0, 0, "", "")
+            : this(0, prodID, "", 0, "", 0, 0, "", "")
         {
         }
 
@@ -89,7 +97,7 @@ namespace Week1_Practical1.Helpers
             set { _status = value; }
         }
 
-        public Product getProduct(int prodID)
+        public Product getProduct(int prodID, int adminID)
         {
 
             Product prodDetail = null;
@@ -100,17 +108,19 @@ namespace Week1_Practical1.Helpers
 
             try
             {
-                string queryStr = "SELECT * FROM Products WHERE ProductID = @prodID";
+                string queryStr = "SELECT * FROM Products WHERE ProductID = @prodID AND AdminID = @AdminID";
 
                 SqlConnection conn = new SqlConnection(_connStr);
                 SqlCommand cmd = new SqlCommand(queryStr, conn);
                 cmd.Parameters.AddWithValue("@prodID", prodID);
+                cmd.Parameters.AddWithValue("@AdminID", adminID);
 
                 conn.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 if (dr.Read())
                 {
+                    adminID = int.Parse(dr["AdminID"].ToString());
                     prod_Name = dr["ProductName"].ToString();
                     catID = int.Parse(dr["CategoryID"].ToString());
                     prod_Desc = dr["Description"].ToString();
@@ -119,7 +129,7 @@ namespace Week1_Practical1.Helpers
                     Prod_Image = dr["Image"].ToString();
                     status = dr["Status"].ToString();
 
-                    prodDetail = new Product(prodID, prod_Name, catID, prod_Desc, unit_Price, stock_Level, Prod_Image, status);
+                    prodDetail = new Product(adminID, prodID, prod_Name, catID, prod_Desc, unit_Price, stock_Level, Prod_Image, status);
                 }
                 else
                 {
@@ -146,7 +156,7 @@ namespace Week1_Practical1.Helpers
             {
                 string prod_Name, prod_Desc, Prod_Image, status;
                 decimal unit_Price;
-                int stock_Level, prod_ID, cat_ID;
+                int stock_Level, prod_ID, cat_ID, adminID;
 
                 string queryStr = "SELECT * FROM Products Order By ProductID";
 
@@ -158,6 +168,7 @@ namespace Week1_Practical1.Helpers
 
                 while (dr.Read())
                 {
+                    adminID = int.Parse(dr["AdminID"].ToString());
                     prod_ID = int.Parse(dr["ProductID"].ToString());
                     prod_Name = dr["ProductName"].ToString();
                     cat_ID = int.Parse(dr["CategoryID"].ToString());
@@ -166,7 +177,7 @@ namespace Week1_Practical1.Helpers
                     stock_Level = int.Parse(dr["StockQuantity"].ToString());
                     Prod_Image = dr["Image"].ToString();
                     status = dr["Status"].ToString();
-                    Product a = new Product(prod_ID, prod_Name, cat_ID, prod_Desc, unit_Price, stock_Level, Prod_Image, status);
+                    Product a = new Product(adminID,prod_ID, prod_Name, cat_ID, prod_Desc, unit_Price, stock_Level, Prod_Image, status);
                     prodList.Add(a);
                 }
 
@@ -187,13 +198,14 @@ namespace Week1_Practical1.Helpers
             // string msg = null;
             int result = 0;
 
-            string queryStr = "INSERT INTO Products(ProductID, ProductName, CategoryID, Description, Unit_Price, StockQuantity,Image, Status)"
-                + " values (@Product_ID,@Product_Name,@Category_ID, @Product_Desc, @Unit_Price,@Stock_Level, @Product_Image, @Product_Status)";
+            string queryStr = "INSERT INTO Products(AdminID, ProductID, ProductName, CategoryID, Description, Unit_Price, StockQuantity,Image, Status)"
+                + " values (@AdminID,@Product_ID,@Product_Name,@Category_ID, @Product_Desc, @Unit_Price,@Stock_Level, @Product_Image, @Product_Status)";
             //+ "values (@Product_ID, @Product_Name, @Product_Desc, @Unit_Price, @Product_Image,@Stock_Level)";
             try
             {
                 SqlConnection conn = new SqlConnection(_connStr);
                 SqlCommand cmd = new SqlCommand(queryStr, conn);
+                cmd.Parameters.AddWithValue("@AdminID", this.AdminID);
                 cmd.Parameters.AddWithValue("@Product_ID", this.ProductID);
                 cmd.Parameters.AddWithValue("@Product_Name", this.ProductName);
                 cmd.Parameters.AddWithValue("@Category_ID", this.CategoryID);
@@ -389,6 +401,38 @@ namespace Week1_Practical1.Helpers
 
             return nextID;
         }
+        public List<Product> GetProductsByAdmin(int adminId)
+        {
+            List<Product> prodList = new List<Product>();
+
+            string queryStr = "SELECT * FROM Products WHERE AdminID = @AdminID";
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(queryStr, conn))
+            {
+                cmd.Parameters.AddWithValue("@AdminID", adminId);
+                conn.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    prodList.Add(new Product(
+                        int.Parse(dr["AdminID"].ToString()),
+                        int.Parse(dr["ProductID"].ToString()),
+                        dr["ProductName"].ToString(),
+                        int.Parse(dr["CategoryID"].ToString()),
+                        dr["Description"].ToString(),
+                        decimal.Parse(dr["Unit_Price"].ToString()),
+                        int.Parse(dr["StockQuantity"].ToString()),
+                        dr["Image"].ToString(),
+                        dr["Status"].ToString()
+                    ));
+                }
+            }
+
+            return prodList;
+        }
+
 
     }
 }
