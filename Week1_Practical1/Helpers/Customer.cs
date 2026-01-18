@@ -10,5 +10,6 @@ namespace Week1_Practical1.Helpers
 {
     public class Customer
     {
+
     }
 }
