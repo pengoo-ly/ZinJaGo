@@ -1,165 +1,215 @@
 ﻿using System;
 using System.Configuration;
-using System.Data;
 using System.Data.SqlClient;
 using System.Web;
 using System.Web.UI;
-using Week1_Practical1.Helpers;
-using Week1_Practical1.SuperAdmin;
 
 namespace Week1_Practical1
 {
     public partial class Admin_Login : System.Web.UI.Page
     {
+        string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            try
+            if (!IsPostBack)
             {
-                if (!IsPostBack)
+                // Check if user is already logged in
+                if (Session["IsAdminLoggedIn"] != null && (bool)Session["IsAdminLoggedIn"])
                 {
-                    if (Request.Cookies["AdminEmail"] != null)
-                    {
-                        txtEmail.Text = Request.Cookies["AdminEmail"].Value;
-                        chkRemember.Checked = true;
-                    }
-                    // Check if user is already logged in
-                    if (Session["IsAdminLoggedIn"] != null && (bool)Session["IsAdminLoggedIn"])
-                    {
-                        RedirectToAdminPanel();
-                    }
+                    RedirectToAdminPanel();
+                }
+
+                // Check for remember me cookie
+                if (Request.Cookies["AdminEmail"] != null)
+                {
+                    txtEmail.Text = Request.Cookies["AdminEmail"].Value;
+                    chkRemember.Checked = true;
                 }
             }
-            catch {
-                ShowError("You are log out!");
-            }   
-
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            try
+            string email = txtEmail.Text.Trim();
+            string password = txtPassword.Text.Trim();
+
+            // Validate inputs
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                if (!Page.IsValid)
-                    return;
+                ShowError("Please enter both email and password.");
+                return;
+            }
 
-                string email = txtEmail.Text.Trim();
-                string password = txtPassword.Text.Trim();
+            // Validate email format
+            if (!IsValidEmail(email))
+            {
+                ShowError("Please enter a valid email address.");
+                return;
+            }
 
-                // Remember email (optional)
-                if (chkRemember.Checked)
+            // Check credentials against database
+            if (ValidateCredentialsFromDatabase(email, password))
+            {
+                // Get admin details
+                AdminDetails adminDetails = GetAdminDetails(email);
+
+                if (adminDetails != null)
                 {
-                    HttpCookie cookie = new HttpCookie("AdminEmail", email);
-                    cookie.Expires = DateTime.Now.AddDays(30);
-                    Response.Cookies.Add(cookie);
-                }
+                    // Update LastLogin timestamp
+                    UpdateLastLogin(email);
 
-                int adminId;
-                string adminName;
-                string role;
-
-                if (ValidateCredentials(email, password, out adminId, out adminName, out role))
-                {
+                    // Set session variables
                     Session["IsAdminLoggedIn"] = true;
-                    Session["AdminID"] = adminId;
-                    Session["AdminName"] = adminName;
-                    Session["AdminRole"] = role;
                     Session["AdminEmail"] = email;
+                    Session["AdminName"] = adminDetails.AdminName;
+                    Session["AdminInitial"] = GetInitials(adminDetails.AdminName);
 
-                    UpdateLastLogin(adminId);
-                    DbLogger.Log("Admin login successful", adminId);
-                    if (role == "SuperAdmin")
+                    // Set remember me cookie if checked
+                    if (chkRemember.Checked)
                     {
-                        Response.Redirect("~/SuperAdmin/ZinJaGODashboard.aspx");
+                        HttpCookie cookie = new HttpCookie("AdminEmail");
+                        cookie.Value = email;
+                        cookie.Expires = DateTime.Now.AddDays(30);
+                        Response.Cookies.Add(cookie);
                     }
                     else
                     {
-                        Response.Redirect("AdminDashboard.aspx");
+                        // Clear remember me cookie if unchecked
+                        if (Request.Cookies["AdminEmail"] != null)
+                        {
+                            HttpCookie cookie = new HttpCookie("AdminEmail");
+                            cookie.Expires = DateTime.Now.AddDays(-1);
+                            Response.Cookies.Add(cookie);
+                        }
                     }
-                }
-                else
-                {
-                    DbLogger.Log("Failed admin login attempt for email: " + email);
-                    ShowError("Invalid email or password.");
-                    txtPassword.Text = "";
+
+                    // Redirect to admin dashboard
+                    RedirectToAdminPanel();
                 }
             }
-            catch(Exception ex)
+            else
             {
-                DbLogger.Log("Admin login error: " + ex.Message);
-                ShowError("An unexpected error occurred. Please try again.");
+                ShowError("Invalid email or password. Please try again.");
+                txtPassword.Text = "";
             }
         }
 
-        private bool ValidateCredentials(string email, string password, out int adminId, out string adminName, out string role)
+        private bool ValidateCredentialsFromDatabase(string email, string password)
         {
-            adminId = 0;
-            adminName = "";
-            role = "";
             try
             {
-                string connStr = ConfigurationManager
-                .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+                // Hash the password to compare
+                string passwordHash = HashPassword(password);
 
-                using (SqlConnection conn = new SqlConnection(connStr))
+                using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    string query = @"SELECT AdminID, AdminName, Role
-                         FROM Admins
-                         WHERE Email = @Email
-                         AND PasswordHash = @Password";
+                    // Query to check if admin exists with matching email and password hash
+                    SqlCommand cmd = new SqlCommand(
+                        "SELECT COUNT(*) FROM Admins WHERE Email = @email AND PasswordHash = @passwordHash", conn);
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@passwordHash", passwordHash);
+
+                    conn.Open();
+                    int result = (int)cmd.ExecuteScalar();
+                    conn.Close();
+
+                    return result > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError("Database error: " + ex.Message);
+                return false;
+            }
+        }
+
+        private AdminDetails GetAdminDetails(string email)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(cs))
+                {
+                    SqlCommand cmd = new SqlCommand(
+                        "SELECT AdminID, AdminName, Email FROM Admins WHERE Email = @email", conn);
+
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
                     {
-                        cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", password);
-
-                        conn.Open();
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        return new AdminDetails
                         {
-                            if (reader.Read())
-                            {
-                                adminId = Convert.ToInt32(reader["AdminID"]);
-                                adminName = reader["AdminName"].ToString();
-                                role = reader["Role"].ToString();
-                                return true;
-                            }
-                        }
+                            AdminID = reader["AdminID"].ToString(),
+                            AdminName = reader["AdminName"].ToString(),
+                            Email = reader["Email"].ToString()
+                        };
                     }
+
+                    conn.Close();
                 }
             }
             catch
             {
-                ShowError("You are log out!");
+                return null;
             }
-            return false;
+
+            return null;
         }
 
-        private void UpdateLastLogin(int adminId)
+        private string GetInitials(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return "A";
+
+            string[] parts = name.Split(' ');
+            if (parts.Length >= 2)
+            {
+                return (parts[0][0].ToString() + parts[parts.Length - 1][0].ToString()).ToUpper();
+            }
+            else if (parts.Length == 1 && parts[0].Length > 0)
+            {
+                return parts[0][0].ToString().ToUpper();
+            }
+
+            return "A";
+        }
+
+        private void UpdateLastLogin(string email)
         {
             try
             {
-                string connStr = ConfigurationManager
-                .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
-
-                using (SqlConnection conn = new SqlConnection(connStr))
+                using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    string query = @"UPDATE Admins
-                         SET LastLogin = GETDATE()
-                         WHERE AdminID = @AdminID";
+                    SqlCommand cmd = new SqlCommand(
+                        "UPDATE Admins SET LastLogin = @lastLogin WHERE Email = @email", conn);
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@AdminID", adminId);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
+                    cmd.Parameters.AddWithValue("@lastLogin", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
                 }
             }
-            catch {
-                ShowError("You have been log out!");
+            catch
+            {
+                // Silently fail if update fails
             }
         }
 
+        // Simple password hashing using SHA256 (must match the hashing in signup)
+        private string HashPassword(string password)
+        {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return System.Convert.ToBase64String(hashedBytes);
+            }
+        }
 
         private bool IsValidEmail(string email)
         {
@@ -182,22 +232,15 @@ namespace Week1_Practical1
 
         private void RedirectToAdminPanel()
         {
-            try
-            {
-                string role = Session["AdminRole"]?.ToString();
-
-                if (role == "SuperAdmin")
-                {
-                    Response.Redirect("~/SuperAdmin/ZinJaGODashboard.aspx");
-                }
-                else
-                {
-                    Response.Redirect("AdminDashboard.aspx");
-                }
-            }
-            catch (Exception) {
-                ShowError("Please try reloading the page!");
-            }
+            Response.Redirect("AdminDashboard.aspx");
         }
+    }
+
+    // Helper class for admin details
+    public class AdminDetails
+    {
+        public string AdminID { get; set; }
+        public string AdminName { get; set; }
+        public string Email { get; set; }
     }
 }

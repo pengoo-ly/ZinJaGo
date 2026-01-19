@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminLogin.aspx.cs" Inherits="Week1_Practical1.Admin_Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CustomerSignup.aspx.cs" Inherits="Week1_Practical1.Customer_Signup" %>
 
 <!DOCTYPE html>
 
@@ -6,7 +6,8 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login - ZinJaGO</title>
+    <title>Sign Up - ZinJaGO</title>
+    <link rel="icon" href="Images/zinjago.png" type="image/png" />
     <style>
         * {
             margin: 0;
@@ -28,7 +29,6 @@
             gap: 0;
         }
 
-        /* Left Side - Form */
         .login-form-section {
             background: #f6efe2;
             display: flex;
@@ -37,6 +37,7 @@
             padding: 60px 50px;
             position: relative;
             z-index: 10;
+            overflow-y: auto;
         }
 
         .logo {
@@ -66,12 +67,12 @@
         .login-form-section p {
             color: #666;
             font-size: 16px;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             line-height: 1.5;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -82,6 +83,7 @@
             margin-bottom: 10px;
         }
 
+        .form-group input[type="text"],
         .form-group input[type="email"],
         .form-group input[type="password"] {
             width: 100%;
@@ -93,6 +95,7 @@
             background: white;
         }
 
+        .form-group input[type="text"]:focus,
         .form-group input[type="email"]:focus,
         .form-group input[type="password"]:focus {
             outline: none;
@@ -100,61 +103,13 @@
             box-shadow: 0 0 0 3px rgba(28, 176, 116, 0.1);
         }
 
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 35px;
-            font-size: 14px;
-            flex-wrap: wrap;
-            gap: 12px;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #1cb074;
-        }
-
-        .checkbox-group label {
-            cursor: pointer;
-            color: #666;
-            margin: 0;
-        }
-
-        .auth-links {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .forgot-password,
-        .sign-up-link {
-            text-decoration: none;
-            color: #1cb074;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-password:hover,
-        .sign-up-link:hover {
-            color: #0f8452;
-        }
-
-        .auth-links .divider {
-            width: 1px;
-            height: 20px;
-            background: #ddd;
-        }
-
-        .login-button {
+        .signup-button {
             width: 100%;
             padding: 16px;
             background: linear-gradient(135deg, #1cb074 0%, #0f8452 100%);
@@ -168,18 +123,32 @@
             box-shadow: 0 4px 15px rgba(28, 176, 116, 0.2);
         }
 
-        .login-button:hover {
+        .signup-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(28, 176, 116, 0.3);
         }
 
-        .login-button:active {
-            transform: translateY(0);
-        }
-
-        .login-button:disabled {
+        .signup-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #1cb074;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #0f8452;
         }
 
         .error-message {
@@ -195,6 +164,35 @@
 
         .error-message.show {
             display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
         }
 
         /* Right Side - Image */
@@ -238,7 +236,6 @@
         @media (max-width: 768px) {
             .login-container {
                 grid-template-columns: 1fr;
-                gap: 0;
             }
 
             .login-image-section {
@@ -249,6 +246,10 @@
                 padding: 40px 30px;
                 justify-content: flex-start;
                 padding-top: 100px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
             }
 
             .logo {
@@ -270,24 +271,7 @@
 
             .login-form-section p {
                 font-size: 14px;
-                margin-bottom: 40px;
-            }
-
-            .form-options {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .auth-links {
-                width: 100%;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .auth-links .divider {
-                display: none;
+                margin-bottom: 30px;
             }
         }
 
@@ -316,13 +300,14 @@
                 font-size: 13px;
             }
 
+            .form-group input[type="text"],
             .form-group input[type="email"],
             .form-group input[type="password"] {
                 padding: 12px 14px;
                 font-size: 14px;
             }
 
-            .login-button {
+            .signup-button {
                 padding: 14px;
                 font-size: 15px;
             }
@@ -332,42 +317,70 @@
 <body>
     <form id="form1" runat="server">
         <div class="login-container">
-            <!-- Left Side - Login Form -->
+            <!-- Left Side - Signup Form -->
             <div class="login-form-section">
                 <div class="logo">
                     <img src="Images/zinjago.png" alt="ZinJaGO Logo" />
                 </div>
 
-                <h1>Admin Login</h1>
-                <p>Enter your credentials to access your account</p>
+                <h1>Create Account</h1>
+                <p>Join us today and start exploring amazing destinations</p>
 
                 <div class="error-message" id="errorMessage" runat="server">
                     <asp:Label ID="lblError" runat="server"></asp:Label>
                 </div>
 
+                <div class="success-message" id="successMessage" runat="server">
+                    <asp:Label ID="lblSuccess" runat="server"></asp:Label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="txtFirstName">First Name</label>
+                        <asp:TextBox ID="txtFirstName" runat="server" placeholder="John"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvFirstName" runat="server" ControlToValidate="txtFirstName" Display="Dynamic" ErrorMessage="First name is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txtLastName">Last Name</label>
+                        <asp:TextBox ID="txtLastName" runat="server" placeholder="Doe"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvLastName" runat="server" ControlToValidate="txtLastName" Display="Dynamic" ErrorMessage="Last name is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="txtEmail">Email address</label>
-                    <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" placeholder="admin@example.com"></asp:TextBox>
+                    <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" placeholder="your@email.com"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvEmail" runat="server" ControlToValidate="txtEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                    <br />
+                    <asp:RegularExpressionValidator ID="revEmail" runat="server" ControlToValidate="txtEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
                 </div>
 
                 <div class="form-group">
                     <label for="txtPassword">Password</label>
-                    <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Enter your password"></asp:TextBox>
+                    <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Enter a strong password"></asp:TextBox>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <asp:RequiredFieldValidator ID="rfvPassword" runat="server" ControlToValidate="txtPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
                 </div>
 
-                <div class="form-options">
-                    <div class="checkbox-group">
-                        <asp:CheckBox ID="chkRemember" runat="server" />
-                        <label for="chkRemember">Remember me for 30 days</label>
-                    </div>
-                    <div class="auth-links">
-                        <a href="AdminSignUp.aspx" class="sign-up-link">Sign Up</a>
-                        <div class="divider"></div>
-                        <a href="ForgotPassword.aspx" class="forgot-password">Forgot password?</a>
-                    </div>
+                <div class="form-group">
+                    <label for="txtConfirmPassword">Confirm Password</label>
+                    <asp:TextBox ID="txtConfirmPassword" runat="server" TextMode="Password" placeholder="Confirm your password"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvConfirmPassword" runat="server" ControlToValidate="txtConfirmPassword" Display="Dynamic" ErrorMessage="Please confirm your password" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                    <br />
+                    <asp:CompareValidator ID="cvPassword" runat="server" ControlToValidate="txtConfirmPassword" ControlToCompare="txtPassword" Display="Dynamic" ErrorMessage="Passwords do not match" ForeColor="#CC0000" Operator="Equal"></asp:CompareValidator>
                 </div>
 
-                <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnLogin_Click" />
+                <asp:Button ID="btnSignup" runat="server" Text="Create Account" CssClass="signup-button" OnClick="btnSignup_Click" />
+                
+                <div class="login-link">
+                    Already have an account? <a href="CustomerLogin.aspx">Sign in here</a>
+                </div>
+
+                <br />
+                <asp:ValidationSummary ID="vsSignup" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" />
             </div>
 
             <!-- Right Side - Image -->
@@ -388,6 +401,25 @@
             }
         }
 
+        function checkPasswordStrength() {
+            var password = document.getElementById('<%= txtPassword.ClientID %>').value;
+            var strengthBar = document.getElementById('passwordStrengthBar');
+            var strength = 0;
+
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 25;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password) && /[!@#$%^&*]/.test(password)) strength += 25;
+
+            strengthBar.style.width = strength + '%';
+            
+            if (strength <= 25) strengthBar.style.backgroundColor = '#cc3333';
+            else if (strength <= 50) strengthBar.style.backgroundColor = '#ffcc00';
+            else if (strength <= 75) strengthBar.style.backgroundColor = '#66cc33';
+            else strengthBar.style.backgroundColor = '#1cb074';
+        }
+
+        document.getElementById('<%= txtPassword.ClientID %>').addEventListener('keyup', checkPasswordStrength);
         window.addEventListener('load', hideErrorAfterDelay);
     </script>
 </body>

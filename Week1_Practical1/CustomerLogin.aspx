@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminLogin.aspx.cs" Inherits="Week1_Practical1.Admin_Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CustomerLogin.aspx.cs" Inherits="Week1_Practical1.Customer_Login" %>
 
 <!DOCTYPE html>
 
@@ -6,7 +6,8 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login - ZinJaGO</title>
+    <title>Customer Login - ZinJaGO</title>
+    <link rel="icon" href="Images/zinjago.png" type="image/png" />
     <style>
         * {
             margin: 0;
@@ -106,8 +107,6 @@
             justify-content: space-between;
             margin-bottom: 35px;
             font-size: 14px;
-            flex-wrap: wrap;
-            gap: 12px;
         }
 
         .checkbox-group {
@@ -129,29 +128,16 @@
             margin: 0;
         }
 
-        .auth-links {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .forgot-password,
-        .sign-up-link {
-            text-decoration: none;
+        .forgot-password {
+            cursor: pointer;
             color: #1cb074;
             font-weight: 600;
             transition: color 0.3s ease;
+            text-decoration: none;
         }
 
-        .forgot-password:hover,
-        .sign-up-link:hover {
+        .forgot-password:hover {
             color: #0f8452;
-        }
-
-        .auth-links .divider {
-            width: 1px;
-            height: 20px;
-            background: #ddd;
         }
 
         .login-button {
@@ -180,6 +166,24 @@
         .login-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #1cb074;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #0f8452;
         }
 
         .error-message {
@@ -278,17 +282,6 @@
                 align-items: flex-start;
                 gap: 15px;
             }
-
-            .auth-links {
-                width: 100%;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .auth-links .divider {
-                display: none;
-            }
         }
 
         @media (max-width: 480px) {
@@ -338,7 +331,7 @@
                     <img src="Images/zinjago.png" alt="ZinJaGO Logo" />
                 </div>
 
-                <h1>Admin Login</h1>
+                <h1>Welcome Back</h1>
                 <p>Enter your credentials to access your account</p>
 
                 <div class="error-message" id="errorMessage" runat="server">
@@ -347,12 +340,16 @@
 
                 <div class="form-group">
                     <label for="txtEmail">Email address</label>
-                    <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" placeholder="admin@example.com"></asp:TextBox>
+                    <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" placeholder="your@email.com"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvEmail" runat="server" ControlToValidate="txtEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                    <br />
+                    <asp:RegularExpressionValidator ID="revEmail" runat="server" ControlToValidate="txtEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
                 </div>
 
                 <div class="form-group">
                     <label for="txtPassword">Password</label>
                     <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Enter your password"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="rfvPassword" runat="server" ControlToValidate="txtPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
                 </div>
 
                 <div class="form-options">
@@ -360,14 +357,17 @@
                         <asp:CheckBox ID="chkRemember" runat="server" />
                         <label for="chkRemember">Remember me for 30 days</label>
                     </div>
-                    <div class="auth-links">
-                        <a href="AdminSignUp.aspx" class="sign-up-link">Sign Up</a>
-                        <div class="divider"></div>
-                        <a href="ForgotPassword.aspx" class="forgot-password">Forgot password?</a>
-                    </div>
+                    <asp:LinkButton ID="lnkForgotPassword" runat="server" CssClass="forgot-password" OnClick="lnkForgotPassword_Click" CausesValidation="false">Forgot password?</asp:LinkButton>
                 </div>
 
                 <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnLogin_Click" />
+                
+                <div class="signup-link">
+                    Don't have an account? <a href="CustomerSignup.aspx">Sign up here</a>
+                </div>
+
+                <br />
+                <asp:ValidationSummary ID="vsLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" />
             </div>
 
             <!-- Right Side - Image -->
