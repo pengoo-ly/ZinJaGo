@@ -61,6 +61,7 @@ namespace Week1_Practical1
 
                     // Set session variables
                     Session["IsAdminLoggedIn"] = true;
+                    Session["AdminID"] = adminDetails.AdminID;
                     Session["AdminEmail"] = email;
                     Session["AdminName"] = adminDetails.AdminName;
                     Session["AdminInitial"] = GetInitials(adminDetails.AdminName);
@@ -144,7 +145,7 @@ namespace Week1_Practical1
                     {
                         return new AdminDetails
                         {
-                            AdminID = reader["AdminID"].ToString(),
+                            AdminID = Convert.ToInt32(reader["AdminID"]),
                             AdminName = reader["AdminName"].ToString(),
                             Email = reader["Email"].ToString()
                         };
@@ -263,7 +264,7 @@ namespace Week1_Practical1
     // Helper class for admin details
     public class AdminDetails
     {
-        public string AdminID { get; set; }
+        public int AdminID { get; set; }
         public string AdminName { get; set; }
         public string Email { get; set; }
     }

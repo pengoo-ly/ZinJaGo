@@ -74,6 +74,7 @@
     <Content Include="AdminSignUp.aspx" />
     <Content Include="Categories.aspx" />
     <Content Include="CourierManagement.aspx" />
+    <Content Include="Customers.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="ForgotPassword.aspx" />
     <Content Include="Images\Hoodie.png" />
@@ -165,6 +166,13 @@
     </Compile>
     <Compile Include="CourierManagement.aspx.designer.cs">
       <DependentUpon>CourierManagement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customers.aspx.cs">
+      <DependentUpon>Customers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customers.aspx.designer.cs">
+      <DependentUpon>Customers.aspx</DependentUpon>
     </Compile>
     <Compile Include="DeliveryTrackingAdmin.aspx.cs">
       <DependentUpon>DeliveryTrackingAdmin.aspx</DependentUpon>
