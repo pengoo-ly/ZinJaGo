@@ -141,13 +141,30 @@ namespace Week1_Practical1
 
         protected void btnAddCategory_Click(object sender, EventArgs e)
         {
-            try 
+            try
             {
                 Category cat = new Category();
-                cat.CategoryID = Convert.ToInt32(txtCatID.Text);
-                cat.CategoryName = txtCatName.Text;
-                cat.Description = txtCatDesc.Text;
+                if (string.IsNullOrWhiteSpace(txtCatID.Text))
+                {
+                    cat.CategoryID = 0; // triggers auto-generate in CategoryInsert
+                }
+                else
+                {
+                    cat.CategoryID = Convert.ToInt32(txtCatID.Text);
+                }
+
+                cat.CategoryName = txtCatName.Text.Trim();
+                cat.Description = txtCatDesc.Text.Trim();
+
+                // Optional: check for duplicates
+                if (cat.CategoryID != 0 && cat.CategoryExists(cat.CategoryID))
+                {
+                    Response.Write("<script>alert('Category ID already exists');</script>");
+                    return;
+                }
+
                 int result = cat.CategoryInsert();
+
                 if (result > 0)
                 {
                     Response.Write("<script>alert('Category added successfully');</script>");
