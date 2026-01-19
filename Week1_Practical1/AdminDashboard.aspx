@@ -70,7 +70,10 @@
         <div class="col-md-4">
             <div class="dashboard-panel">
                 <h5>Top Selling Products</h5>
-
+                <div class="list-row list-header">
+                    <span><strong>Product Name</strong></span>
+                    <strong>Total Sold</strong>
+                </div>
                 <asp:Repeater ID="rptTopProducts" runat="server">
                     <ItemTemplate>
                         <div class="list-row">
@@ -95,6 +98,10 @@
                     <asp:Button ID="btnAddProduct" runat="server" Text="+ Add Product" CssClass="btn-add" PostBackUrl="~/AddProducts.aspx" />
 
 
+                </div>
+                <div class="list-row list-header">
+                    <span><strong>Category Name</strong></span>
+                    <strong>Total Sales</strong>
                 </div>
 
                 <asp:Repeater ID="rptTopCategories" runat="server">

@@ -116,15 +116,18 @@ namespace Week1_Practical1
         {
             try
             {
+                int adminId = Convert.ToInt32(Session["AdminID"]);
                 using (SqlConnection con = new SqlConnection(cs))
                 {
                     SqlDataAdapter da = new SqlDataAdapter(
                         @"SELECT TOP 5 P.ProductName,
                              SUM(OI.Quantity) AS TotalSold
-                      FROM OrderItems OI
-                      JOIN Products P ON OI.ProductID = P.ProductID
-                      GROUP BY P.ProductName
-                      ORDER BY TotalSold DESC", con);
+                          FROM OrderItems OI
+                          JOIN Products P ON OI.ProductID = P.ProductID
+                          WHERE P.AdminID=@AdminID
+                          GROUP BY P.ProductName
+                          ORDER BY TotalSold DESC", con);
+                    da.SelectCommand.Parameters.AddWithValue("@AdminID", adminId);
 
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -144,16 +147,19 @@ namespace Week1_Practical1
         {
             try
             {
+                int adminId = Convert.ToInt32(Session["AdminID"]);
                 using (SqlConnection con = new SqlConnection(cs))
                 {
                     SqlDataAdapter da = new SqlDataAdapter(
                         @"SELECT TOP 5 C.CategoryName,
                              SUM(OI.Quantity * OI.UnitPrice) AS TotalSales
-                      FROM OrderItems OI
-                      JOIN Products P ON OI.ProductID = P.ProductID
-                      JOIN Categories C ON P.CategoryID = C.CategoryID
-                      GROUP BY C.CategoryName
-                      ORDER BY TotalSales DESC", con);
+                          FROM OrderItems OI
+                          JOIN Products P ON OI.ProductID = P.ProductID
+                          JOIN Categories C ON P.CategoryID = C.CategoryID
+                          WHERE P.AdminID=@AdminID
+                          GROUP BY C.CategoryName
+                          ORDER BY TotalSales DESC", con);
+                    da.SelectCommand.Parameters.AddWithValue("@AdminID", adminId);
 
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -174,21 +180,35 @@ namespace Week1_Practical1
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     conn.Open();
+                    int adminId = Convert.ToInt32(Session["AdminID"]);
                     // Total Users
                     SqlCommand cmdUsers = new SqlCommand("SELECT COUNT(*) FROM Users", conn);
                     lblUsers.Text = cmdUsers.ExecuteScalar().ToString();
 
                     // Total Orders
-                    SqlCommand cmdOrders = new SqlCommand("SELECT COUNT(*) FROM Orders", conn);
+                    SqlCommand cmdOrders = new SqlCommand(
+                        @"SELECT COUNT(*) 
+                          FROM Orders O
+                          JOIN OrderItems OI ON O.OrderID = OI.OrderID
+                          JOIN Products P ON OI.ProductID = P.ProductID
+                          WHERE P.AdminID=@AdminID", conn);
+                    cmdOrders.Parameters.AddWithValue("@AdminID", adminId);
                     lblOrders.Text = cmdOrders.ExecuteScalar().ToString();
 
                     // Total Products
-                    SqlCommand cmdProducts = new SqlCommand("SELECT COUNT(*) FROM Products", conn);
+                    SqlCommand cmdProducts = new SqlCommand(
+                        "SELECT COUNT(*) FROM Products WHERE AdminID=@AdminID", conn);
+                    cmdProducts.Parameters.AddWithValue("@AdminID", adminId);
                     lblProducts.Text = cmdProducts.ExecuteScalar().ToString();
 
                     // Total Revenue
                     SqlCommand cmdRevenue = new SqlCommand(
-                        "SELECT ISNULL(SUM(TotalAmount), 0) FROM Orders WHERE PaymentStatus = 'Paid'", conn);
+                        @"SELECT ISNULL(SUM(OI.Quantity * OI.UnitPrice), 0)
+                          FROM Orders O
+                          JOIN OrderItems OI ON O.OrderID = OI.OrderID
+                          JOIN Products P ON OI.ProductID = P.ProductID
+                          WHERE P.AdminID=@AdminID AND O.PaymentStatus='Paid'", conn);
+                    cmdRevenue.Parameters.AddWithValue("@AdminID", adminId);
                     lblRevenue.Text = Convert.ToDecimal(cmdRevenue.ExecuteScalar()).ToString("0.00");
 
                 }
