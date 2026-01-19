@@ -141,30 +141,13 @@ namespace Week1_Practical1
 
         protected void btnAddCategory_Click(object sender, EventArgs e)
         {
-            try
+            try 
             {
                 Category cat = new Category();
-                if (string.IsNullOrWhiteSpace(txtCatID.Text))
-                {
-                    cat.CategoryID = 0; // triggers auto-generate in CategoryInsert
-                }
-                else
-                {
-                    cat.CategoryID = Convert.ToInt32(txtCatID.Text);
-                }
-
-                cat.CategoryName = txtCatName.Text.Trim();
-                cat.Description = txtCatDesc.Text.Trim();
-
-                // Optional: check for duplicates
-                if (cat.CategoryID != 0 && cat.CategoryExists(cat.CategoryID))
-                {
-                    Response.Write("<script>alert('Category ID already exists');</script>");
-                    return;
-                }
-
+                cat.CategoryID = Convert.ToInt32(txtCatID.Text);
+                cat.CategoryName = txtCatName.Text;
+                cat.Description = txtCatDesc.Text;
                 int result = cat.CategoryInsert();
-
                 if (result > 0)
                 {
                     Response.Write("<script>alert('Category added successfully');</script>");
@@ -187,21 +170,7 @@ namespace Week1_Practical1
 
         protected void btnShowAdd_Click(object sender, EventArgs e)
         {
-            try
-            {
-                // Generate next ID
-                int nextID = aCategory.GetNextCategoryID();
-
-                // Prefill textbox with next ID
-                txtCatID.Text = nextID.ToString();
-
-                // Show panel
-                pnlAddCategory.Visible = true;
-            }
-            catch (Exception ex)
-            {
-                Response.Write("<script>alert('Error showing add category: " + ex.Message + "');</script>");
-            }
+            pnlAddCategory.Visible = true;
         }
 
         protected void btnCancelAdd_Click(object sender, EventArgs e)

@@ -6,7 +6,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Week1_Practical1.Helpers;
 
 namespace Week1_Practical1
 {

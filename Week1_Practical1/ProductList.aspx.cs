@@ -25,15 +25,8 @@ namespace Week1_Practical1
         {
             try
             {
-                if (Session["AdminID"] == null)
-                {
-                    Response.Redirect("AdminLogin.aspx");
-                    return;
-                }
-
-                int adminId = Convert.ToInt32(Session["AdminID"]);
-                List<Product> prodList = aProd.GetProductsByAdmin(adminId);
-
+                List<Product> prodList = new List<Product>();
+                prodList = aProd.getProductAll();
                 gvProducts.DataSource = prodList;
                 gvProducts.DataBind();
             }
@@ -42,7 +35,6 @@ namespace Week1_Practical1
                 Response.Write("<script>alert('Error loading products: " + ex.Message + "');</script>");
             }
         }
-
 
         protected void gvProducts_SelectedIndexChanged(object sender, EventArgs e)
         {
