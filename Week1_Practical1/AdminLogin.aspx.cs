@@ -236,6 +236,28 @@ namespace Week1_Practical1
             Response.Redirect("AdminDashboard.aspx");
         }
 
+        private void UpdateAllAdminHashes()
+        {
+            string newPassword = "admin123"; // your global password
+            string newHash = HashPassword(newPassword);
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                SqlCommand cmd = new SqlCommand(
+                    "UPDATE Admins SET PasswordHash = @hash", conn);
+                cmd.Parameters.AddWithValue("@hash", newHash);
+
+                conn.Open();
+                int rows = cmd.ExecuteNonQuery();
+                conn.Close();
+
+                Response.Write("Updated hashes for " + rows + " admins.<br>");
+            }
+
+            // Stop page execution so you don’t log in accidentally
+            Response.End();
+        }
+
     }
 
     // Helper class for admin details
