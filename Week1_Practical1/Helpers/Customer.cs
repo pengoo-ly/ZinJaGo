@@ -55,8 +55,8 @@ namespace Week1_Practical1.Helpers
 
                 if (dr.Read())
                 {
-                    cat_Name = dr["CategoryName"].ToString();
-                    cat_Desc = dr["Description"].ToString();
+                    cust_Name = dr["CategoryName"].ToString();
+                    cust_Status = dr["Description"].ToString();
 
                     catDetail = new Category(catID, cat_Name, cat_Desc);
                 }
