@@ -130,31 +130,39 @@ namespace Week1_Practical1.Helpers
         }
         public int CategoryInsert()
         {
-
-            // string msg = null;
-            int result = 0;
-
-            string queryStr = "INSERT INTO Categories(CategoryID,CategoryName, Description)"
-                + " values (@Category_ID,@Category_Name, @Category_Desc)";
             try
             {
-                SqlConnection conn = new SqlConnection(_connStr);
-                SqlCommand cmd = new SqlCommand(queryStr, conn);
-                cmd.Parameters.AddWithValue("@Category_ID", this.CategoryID);
-                cmd.Parameters.AddWithValue("@Category_Name", this.CategoryName);
-                cmd.Parameters.AddWithValue("@Category_Desc", this.Description);
+                int catID = this.CategoryID;
 
-                conn.Open();
-                result += cmd.ExecuteNonQuery(); // Returns no. of rows affected. Must be > 0
-                conn.Close();
+                // If CategoryID is 0, generate next ID
+                if (catID == 0)
+                {
+                    catID = GetNextCategoryID();
+                }
 
-                return result;
+                string queryStr = "INSERT INTO Categories(CategoryID,CategoryName, Description)"
+                                + " VALUES (@Category_ID,@Category_Name, @Category_Desc)";
+
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(queryStr, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Category_ID", catID);
+                    cmd.Parameters.AddWithValue("@Category_Name", this.CategoryName);
+                    cmd.Parameters.AddWithValue("@Category_Desc", this.Description);
+
+                    conn.Open();
+                    int result = cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    return result;
+                }
             }
-            catch (Exception ex) 
+            catch
             {
                 return 0;
             }
         }
+
         public int CategoryDelete(int catID)
         {
             try
@@ -243,6 +251,59 @@ namespace Week1_Practical1.Helpers
             }
 
             return catList;
+        }
+        public bool CategoryExists(int categoryId)
+        {
+            try
+            {
+                bool exists = false;
+                string query = "SELECT COUNT(*) FROM Categories WHERE CategoryID = @CategoryID";
+
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@CategoryID", categoryId);
+                    conn.Open();
+                    int count = (int)cmd.ExecuteScalar();
+                    exists = count > 0;
+                    conn.Close();
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                // Optionally log the exception somewhere
+                // Console.WriteLine(ex.Message);
+
+                // Return false if there is an error
+                return false;
+            }
+        }
+
+        public int GetNextCategoryID()
+        {
+            int nextID = 1;
+            string query = "SELECT MAX(CategoryID) FROM Categories";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result != DBNull.Value)
+                        nextID = Convert.ToInt32(result) + 1;
+                    conn.Close();
+                }
+            }
+            catch
+            {
+                nextID = 1; // fallback
+            }
+
+            return nextID;
         }
     }
 }
