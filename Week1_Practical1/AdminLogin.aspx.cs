@@ -32,7 +32,7 @@ namespace Week1_Practical1
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             string email = txtEmail.Text.Trim();
-            string password = txtPassword.Text.Trim();
+            string password = txtPassword.Text;
 
             // Validate inputs
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
@@ -101,6 +101,7 @@ namespace Week1_Practical1
             {
                 // Hash the password to compare
                 string passwordHash = HashPassword(password);
+                ShowError("DEBUG HASH: " + passwordHash);
 
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
@@ -234,6 +235,7 @@ namespace Week1_Practical1
         {
             Response.Redirect("AdminDashboard.aspx");
         }
+
     }
 
     // Helper class for admin details
