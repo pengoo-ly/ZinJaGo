@@ -25,8 +25,15 @@ namespace Week1_Practical1
         {
             try
             {
-                List<Product> prodList = new List<Product>();
-                prodList = aProd.getProductAll();
+                if (Session["AdminID"] == null)
+                {
+                    Response.Redirect("Login.aspx");
+                    return;
+                }
+
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                List<Product> prodList = aProd.GetProductsByAdmin(adminId);
+
                 gvProducts.DataSource = prodList;
                 gvProducts.DataBind();
             }
