@@ -32,7 +32,7 @@ namespace Week1_Practical1
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             string email = txtEmail.Text.Trim();
-            string password = txtPassword.Text;
+            string password = txtPassword.Text.Trim();
 
             // Validate inputs
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
@@ -61,7 +61,6 @@ namespace Week1_Practical1
 
                     // Set session variables
                     Session["IsAdminLoggedIn"] = true;
-                    Session["AdminID"] = adminDetails.AdminID;
                     Session["AdminEmail"] = email;
                     Session["AdminName"] = adminDetails.AdminName;
                     Session["AdminInitial"] = GetInitials(adminDetails.AdminName);
@@ -102,7 +101,6 @@ namespace Week1_Practical1
             {
                 // Hash the password to compare
                 string passwordHash = HashPassword(password);
-                ShowError("DEBUG HASH: " + passwordHash);
 
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
@@ -145,7 +143,7 @@ namespace Week1_Practical1
                     {
                         return new AdminDetails
                         {
-                            AdminID = Convert.ToInt32(reader["AdminID"]),
+                            AdminID = reader["AdminID"].ToString(),
                             AdminName = reader["AdminName"].ToString(),
                             Email = reader["Email"].ToString()
                         };
@@ -236,35 +234,12 @@ namespace Week1_Practical1
         {
             Response.Redirect("AdminDashboard.aspx");
         }
-
-        private void UpdateAllAdminHashes()
-        {
-            string newPassword = "admin123"; // your global password
-            string newHash = HashPassword(newPassword);
-
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                SqlCommand cmd = new SqlCommand(
-                    "UPDATE Admins SET PasswordHash = @hash", conn);
-                cmd.Parameters.AddWithValue("@hash", newHash);
-
-                conn.Open();
-                int rows = cmd.ExecuteNonQuery();
-                conn.Close();
-
-                Response.Write("Updated hashes for " + rows + " admins.<br>");
-            }
-
-            // Stop page execution so you don’t log in accidentally
-            Response.End();
-        }
-
     }
 
     // Helper class for admin details
     public class AdminDetails
     {
-        public int AdminID { get; set; }
+        public string AdminID { get; set; }
         public string AdminName { get; set; }
         public string Email { get; set; }
     }

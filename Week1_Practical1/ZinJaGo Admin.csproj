@@ -74,7 +74,10 @@
     <Content Include="AdminSignUp.aspx" />
     <Content Include="Categories.aspx" />
     <Content Include="CourierManagement.aspx" />
+    <Content Include="CustomerLogin.aspx" />
+    <Content Include="CustomerPasswordReset.aspx" />
     <Content Include="Customers.aspx" />
+    <Content Include="CustomerSignup.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="ForgotPassword.aspx" />
     <Content Include="Images\Hoodie.png" />
@@ -168,12 +171,33 @@
     <Compile Include="CourierManagement.aspx.designer.cs">
       <DependentUpon>CourierManagement.aspx</DependentUpon>
     </Compile>
+    <Compile Include="CustomerLogin.aspx.cs">
+      <DependentUpon>CustomerLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomerLogin.aspx.designer.cs">
+      <DependentUpon>CustomerLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CustomerPasswordReset.aspx.cs">
+      <DependentUpon>CustomerPasswordReset.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomerPasswordReset.aspx.designer.cs">
+      <DependentUpon>CustomerPasswordReset.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Customers.aspx.cs">
       <DependentUpon>Customers.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Customers.aspx.designer.cs">
       <DependentUpon>Customers.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CustomerSignup.aspx.cs">
+      <DependentUpon>CustomerSignup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CustomerSignup.aspx.designer.cs">
+      <DependentUpon>CustomerSignup.aspx</DependentUpon>
     </Compile>
     <Compile Include="DeliveryTrackingAdmin.aspx.cs">
       <DependentUpon>DeliveryTrackingAdmin.aspx</DependentUpon>
