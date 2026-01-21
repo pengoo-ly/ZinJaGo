@@ -193,7 +193,7 @@ namespace Week1_Practical1
                     Session["AdminRole"] = role;
                     Session["AdminEmail"] = email;
 
-                    //UpdateAdminLastLogin(adminId);
+                    UpdateAdminLastLogin(adminId);
                     DbLogger.Log("Admin login successful", adminId);
 
                     if (role == "SuperAdmin")
