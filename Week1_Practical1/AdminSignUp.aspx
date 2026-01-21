@@ -359,7 +359,7 @@
                 <asp:Button ID="btnSignUp" runat="server" Text="Create Account" CssClass="signup-button" OnClick="btnSignUp_Click" />
 
                 <div class="login-link">
-                    Already have an account? <a href="AdminLogin.aspx">Login here</a>
+                    Already have an account? <a href="Login.aspx">Login here</a>
                 </div>
             </div>
 
@@ -387,7 +387,7 @@
                     successDiv.classList.remove('show');
                 }, 3000);
                 setTimeout(function () {
-                    window.location.href = 'AdminLogin.aspx';
+                    window.location.href = 'Login.aspx';
                 }, 3500);
             }
         }

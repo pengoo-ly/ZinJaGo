@@ -11,7 +11,7 @@ namespace Week1_Practical1
 {
 
 
-    public partial class Customer_Signup
+    public partial class CustomerSignup
     {
 
         /// <summary>

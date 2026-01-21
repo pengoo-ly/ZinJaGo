@@ -437,7 +437,7 @@
                 </div>
 
                 <div class="back-link">
-                    <a href="CustomerLogin.aspx">Back to Login</a>
+                    <a href="Login.aspx">Back to Login</a>
                 </div>
 
                 <br />

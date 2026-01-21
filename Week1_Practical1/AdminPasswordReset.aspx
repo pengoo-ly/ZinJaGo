@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ForgotPassword.aspx.cs" Inherits="Week1_Practical1.ForgotPassword" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminPasswordReset.aspx.cs" Inherits="Week1_Practical1.ForgotPassword" %>
 
 <!DOCTYPE html>
 
@@ -192,7 +192,7 @@
             <asp:Button ID="btnSendReset" runat="server" Text="Send Reset Link" CssClass="btn-reset" OnClick="btnSendReset_Click" />
 
             <div class="back-to-login">
-                <a href="AdminLogin.aspx">← Back to Login</a>
+                <a href="Login.aspx">← Back to Login</a>
             </div>
         </div>
     </form>

@@ -70,16 +70,14 @@
   <ItemGroup>
     <Content Include="AddProducts.aspx" />
     <Content Include="AdminCupon.aspx" />
-    <Content Include="AdminLogin.aspx" />
     <Content Include="AdminSignUp.aspx" />
     <Content Include="Categories.aspx" />
     <Content Include="CourierManagement.aspx" />
-    <Content Include="CustomerLogin.aspx" />
     <Content Include="CustomerPasswordReset.aspx" />
     <Content Include="Customers.aspx" />
     <Content Include="CustomerSignup.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
-    <Content Include="ForgotPassword.aspx" />
+    <Content Include="AdminPasswordReset.aspx" />
     <Content Include="Images\Hoodie.png" />
     <Content Include="Images\Lamp.png" />
     <Content Include="Images\login.png" />
@@ -143,13 +141,6 @@
     <Compile Include="AdminDashboard.aspx.designer.cs">
       <DependentUpon>AdminDashboard.aspx</DependentUpon>
     </Compile>
-    <Compile Include="AdminLogin.aspx.cs">
-      <DependentUpon>AdminLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="AdminLogin.aspx.designer.cs">
-      <DependentUpon>AdminLogin.aspx</DependentUpon>
-    </Compile>
     <Compile Include="AdminSignUp.aspx.cs">
       <DependentUpon>AdminSignUp.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -170,13 +161,6 @@
     </Compile>
     <Compile Include="CourierManagement.aspx.designer.cs">
       <DependentUpon>CourierManagement.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="CustomerLogin.aspx.cs">
-      <DependentUpon>CustomerLogin.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="CustomerLogin.aspx.designer.cs">
-      <DependentUpon>CustomerLogin.aspx</DependentUpon>
     </Compile>
     <Compile Include="CustomerPasswordReset.aspx.cs">
       <DependentUpon>CustomerPasswordReset.aspx</DependentUpon>
@@ -206,12 +190,12 @@
     <Compile Include="DeliveryTrackingAdmin.aspx.designer.cs">
       <DependentUpon>DeliveryTrackingAdmin.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ForgotPassword.aspx.cs">
-      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+    <Compile Include="AdminPasswordReset.aspx.cs">
+      <DependentUpon>AdminPasswordReset.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="ForgotPassword.aspx.designer.cs">
-      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+    <Compile Include="AdminPasswordReset.aspx.designer.cs">
+      <DependentUpon>AdminPasswordReset.aspx</DependentUpon>
     </Compile>
     <Compile Include="Guess_the_number.aspx.cs">
       <DependentUpon>Guess_the_number.aspx</DependentUpon>

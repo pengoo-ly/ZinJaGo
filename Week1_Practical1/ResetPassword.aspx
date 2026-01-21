@@ -203,7 +203,7 @@
             <asp:Button ID="btnResetPassword" runat="server" Text="Reset Password" CssClass="btn-reset" OnClick="btnResetPassword_Click" />
 
             <div class="back-to-login">
-                <a href="AdminLogin.aspx">← Back to Login</a>
+                <a href="Login.aspx">← Back to Login</a>
             </div>
         </div>
     </form>
