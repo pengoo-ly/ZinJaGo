@@ -27,12 +27,17 @@ namespace Week1_Practical1
             {
                 if (Session["AdminID"] == null)
                 {
-                    Response.Redirect("Login.aspx");
+                    Response.Write("<script>alert('Admin session missing!');</script>");
                     return;
                 }
 
                 int adminId = Convert.ToInt32(Session["AdminID"]);
                 List<Product> prodList = aProd.GetProductsByAdmin(adminId);
+
+                if (prodList.Count == 0)
+                {
+                    Response.Write("<script>alert('No products found for this admin.');</script>");
+                }
 
                 gvProducts.DataSource = prodList;
                 gvProducts.DataBind();
