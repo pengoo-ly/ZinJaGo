@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Web;
 using System.Web.UI;
+using Week1_Practical1.Helpers;
 
 namespace Week1_Practical1
 {
@@ -341,11 +342,6 @@ namespace Week1_Practical1
                 string expireDate = txtCardExpiry.Text.Trim();
                 string cvv = txtCardCVV.Text.Trim();
 
-                System.Diagnostics.Debug.WriteLine($"Card Name: {cardName}");
-                System.Diagnostics.Debug.WriteLine($"Card Number: {cardNumber}");
-                System.Diagnostics.Debug.WriteLine($"Expire Date: {expireDate}");
-                System.Diagnostics.Debug.WriteLine($"CVV: {cvv}");
-
                 // Validation
                 if (string.IsNullOrEmpty(cardName) || string.IsNullOrEmpty(cardNumber) ||
                     string.IsNullOrEmpty(expireDate) || string.IsNullOrEmpty(cvv))
@@ -399,8 +395,6 @@ namespace Week1_Practical1
                         int result = cmd.ExecuteNonQuery();
                         conn.Close();
 
-                        System.Diagnostics.Debug.WriteLine($"Update result: {result}");
-
                         if (result > 0)
                         {
                             ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
@@ -420,7 +414,6 @@ namespace Week1_Practical1
                     }
                     catch (SqlException sqlEx)
                     {
-                        System.Diagnostics.Debug.WriteLine($"SQL Error: {sqlEx.Message}");
                         ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
                             "showMessage('Error adding card: " + sqlEx.Message.Replace("'", "\\'") + "', false);", true);
                     }
@@ -428,7 +421,6 @@ namespace Week1_Practical1
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"General Error: {ex.Message}");
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
                     "showMessage('Error: " + ex.Message.Replace("'", "\\'") + "', false);", true);
             }
@@ -607,28 +599,6 @@ namespace Week1_Practical1
             {
                 System.Diagnostics.Debug.WriteLine("Error deleting account: " + ex.Message);
                 return false;
-            }
-        }
-
-        private string GetAdminIdByEmail(string email)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    SqlCommand cmd = new SqlCommand("SELECT AdminID FROM Admins WHERE Email = @email", conn);
-                    cmd.Parameters.AddWithValue("@email", email);
-
-                    conn.Open();
-                    object result = cmd.ExecuteScalar();
-                    conn.Close();
-
-                    return result != null ? result.ToString() : "";
-                }
-            }
-            catch
-            {
-                return "";
             }
         }
 

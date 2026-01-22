@@ -104,35 +104,10 @@
             transform: translateY(-2px);
         }
 
-        .logout-section {
+        .delete-account-section {
             margin-top: 24px;
             padding-top: 24px;
             border-top: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn-logout {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #dc4d4d 0%, #a83a3a 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-logout:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-logout:active {
-            transform: translateY(0);
         }
 
         .btn-delete-account {
@@ -146,7 +121,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 8px;
         }
 
         .btn-delete-account:hover {
@@ -696,9 +670,8 @@
                 </div>
             </div>
 
-            <!-- Logout Section -->
-            <div class="logout-section">
-                <asp:Button ID="btnLogout" runat="server" Text="🚪 Logout" CssClass="btn-logout" OnClick="btnLogout_Click" />
+            <!-- Delete Account Section -->
+            <div class="delete-account-section">
                 <asp:Button ID="btnDeleteAccount" runat="server" Text="⚠️ Delete Account" CssClass="btn-delete-account" OnClick="btnDeleteAccount_Click" />
             </div>
 

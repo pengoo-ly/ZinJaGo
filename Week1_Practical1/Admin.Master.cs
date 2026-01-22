@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
+using System.Web;
 using System.Web.Services;
+using Week1_Practical1.Helpers;
 
 namespace Week1_Practical1
 {
     public partial class Admin : System.Web.UI.MasterPage
     {
         protected bool IsDarkMode { get; private set; }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            try {
+            try
+            {
                 // Protect admin pages
                 if (Session["IsAdminLoggedIn"] == null)
                 {
@@ -27,10 +31,8 @@ namespace Week1_Practical1
 
                     lblAdminName.Text = adminName;
                     lblAdminEmail.Text = adminEmail;
-                    lblAvatar.Text = adminName.Substring(0, 1).ToUpper();
-
-                    // First letter for avatar
-                    lblTopAvatar.Text = adminName.Substring(0, 1).ToUpper();
+                    lblAvatar.Text = GetInitials(adminName);
+                    lblTopAvatar.Text = GetInitials(adminName);
                 }
 
                 // Prefer Page.Title (set in content pages). If not set, derive from file name.
@@ -52,8 +54,70 @@ namespace Week1_Practical1
                 // Optionally, display a user-friendly message or redirect to an error page
                 lblPageTitle.Text = "Error loading page";
             }
+        }
 
+        /// <summary>
+        /// Handle logout - called from JavaScript
+        /// </summary>
+        public void LogoutUser()
+        {
+            try
+            {
+                int adminId = 0;
+                if (Session["AdminID"] != null && int.TryParse(Session["AdminID"].ToString(), out adminId))
+                {
+                    DbLogger.Log("Admin logout", adminId);
+                }
 
+                // Clear all session variables
+                Session["IsAdminLoggedIn"] = null;
+                Session["AdminID"] = null;
+                Session["AdminName"] = null;
+                Session["AdminRole"] = null;
+                Session["AdminEmail"] = null;
+                Session["AdminInitial"] = null;
+                Session["AdminProfileImage"] = null;
+
+                // Clear admin email cookie
+                if (Request.Cookies["AdminEmail"] != null)
+                {
+                    HttpCookie cookie = new HttpCookie("AdminEmail");
+                    cookie.Expires = DateTime.Now.AddDays(-1);
+                    Response.Cookies.Add(cookie);
+                }
+
+                // Abandon session
+                Session.Abandon();
+
+                // Redirect to login page
+                Response.Redirect("Login.aspx");
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Admin logout error: " + ex.Message);
+                Response.Redirect("Login.aspx");
+            }
+        }
+
+        /// <summary>
+        /// Get initials from admin name for avatar
+        /// </summary>
+        private string GetInitials(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return "A";
+
+            string[] parts = name.Split(' ');
+            if (parts.Length >= 2)
+            {
+                return (parts[0][0].ToString() + parts[parts.Length - 1][0].ToString()).ToUpper();
+            }
+            else if (parts.Length == 1 && parts[0].Length > 0)
+            {
+                return parts[0][0].ToString().ToUpper();
+            }
+
+            return "A";
         }
 
         [WebMethod]
@@ -82,10 +146,10 @@ namespace Week1_Practical1
                 }
                 return results;
             }
-            catch { 
+            catch
+            {
                 return null;
             }
-            
         }
     }
 }

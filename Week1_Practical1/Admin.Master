@@ -11,6 +11,113 @@
     <asp:ContentPlaceHolder ID="head" runat="server" />
     <link href="Styles/admin.css" rel="stylesheet" />
     <link rel="icon" href="Images/zinjago.png" type="image/png" />
+    <style>
+        /* Profile Dropdown Menu */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .profile-dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-items-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .profile-dropdown-menu a,
+        .profile-dropdown-menu button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 12px;
+            color: var(--text);
+            text-decoration: none;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-dropdown-menu a {
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-dropdown-menu a:hover {
+            background: rgba(28, 176, 116, 0.08);
+            color: #1cb074;
+        }
+
+        .profile-dropdown-menu button:hover {
+            color: #dc4d4d;
+            background: rgba(220, 77, 77, 0.08);
+        }
+
+        .profile-dropdown-menu a:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .profile-dropdown-menu button:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .profile-dropdown-menu a:last-child {
+            border-radius: 0 0 0 8px;
+        }
+
+        .profile-dropdown-menu button:first-child {
+            border-radius: 0 0 8px 0;
+        }
+
+        .profile-dropdown-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .profile-dropdown-label {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .top-icons .profile-btn {
+            position: relative;
+        }
+    </style>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -99,11 +206,26 @@
                         </div>
                     </div>
 
-                    <a id="profileTopLink" class="icon profile-btn" href="#" title="Profile" aria-label="Open profile">
-                        <span class="profile-initial" aria-hidden="true">
-                            <asp:Label ID="lblTopAvatar" runat="server" />
-                        </span>
-                    </a>
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown">
+                        <a id="profileTopLink" class="icon profile-btn" href="#" title="Profile" aria-label="Open profile menu">
+                            <span class="profile-initial" aria-hidden="true">
+                                <asp:Label ID="lblTopAvatar" runat="server" />
+                            </span>
+                        </a>
+                        <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                            <div class="dropdown-items-container">
+                                <a href="Profile.aspx" class="dropdown-item">
+                                    <span class="profile-dropdown-icon">⚙️</span>
+                                    <span class="profile-dropdown-label">Settings</span>
+                                </a>
+                                <button type="button" class="dropdown-item logout-btn" id="btnLogout" onclick="performLogout();">
+                                    <span class="profile-dropdown-icon">🚪</span>
+                                    <span class="profile-dropdown-label">Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -205,6 +327,31 @@
 
                 var footerLink = document.getElementById('profileFooterLink');
                 if (footerLink) footerLink.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { window.location = footerLink.href; } });
+
+                // Profile Dropdown Menu
+                var profileBtn = document.getElementById('profileTopLink');
+                var dropdownMenu = document.getElementById('profileDropdownMenu');
+
+                if (profileBtn && dropdownMenu) {
+                    profileBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        dropdownMenu.classList.toggle('active');
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function (e) {
+                        if (!e.target.closest('.profile-dropdown')) {
+                            dropdownMenu.classList.remove('active');
+                        }
+                    });
+
+                    // Close dropdown when pressing Escape
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') {
+                            dropdownMenu.classList.remove('active');
+                        }
+                    });
+                }
             })();
 
             const hamburgerBtn = document.getElementById('hamburger');
@@ -218,6 +365,14 @@
             closeBtn.addEventListener('click', () => {
                 sidebar.classList.remove('open');
             });
+
+            // Logout function
+            function performLogout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    var logoutBtn = document.getElementById('btnLogout');
+                    logoutBtn.form.submit();
+                }
+            }
         </script>
     </form>
 </body>
