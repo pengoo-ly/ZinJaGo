@@ -443,16 +443,16 @@
 
                     <div class="form-group">
                         <label for="txtCustomerEmail">Email address</label>
-                        <asp:TextBox ID="txtCustomerEmail" runat="server" TextMode="Email" placeholder="your@email.com"></asp:TextBox>
-                        <asp:RequiredFieldValidator ID="rfvCustomerEmail" runat="server" ControlToValidate="txtCustomerEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                        <asp:TextBox ID="txtCustomerEmail" runat="server" TextMode="Email" placeholder="your@email.com" ValidationGroup="Customer"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvCustomerEmail" runat="server" ControlToValidate="txtCustomerEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000" ValidationGroup="Customer"></asp:RequiredFieldValidator>
                         <br />
-                        <asp:RegularExpressionValidator ID="revCustomerEmail" runat="server" ControlToValidate="txtCustomerEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
+                        <asp:RegularExpressionValidator ID="revCustomerEmail" runat="server" ControlToValidate="txtCustomerEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" ValidationGroup="Customer"></asp:RegularExpressionValidator>
                     </div>
 
                     <div class="form-group">
                         <label for="txtCustomerPassword">Password</label>
-                        <asp:TextBox ID="txtCustomerPassword" runat="server" TextMode="Password" placeholder="Enter your password"></asp:TextBox>
-                        <asp:RequiredFieldValidator ID="rfvCustomerPassword" runat="server" ControlToValidate="txtCustomerPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                        <asp:TextBox ID="txtCustomerPassword" runat="server" TextMode="Password" placeholder="Enter your password" ValidationGroup="Customer"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvCustomerPassword" runat="server" ControlToValidate="txtCustomerPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000" ValidationGroup="Customer"></asp:RequiredFieldValidator>
                     </div>
 
                     <div class="form-options">
@@ -465,13 +465,13 @@
                         </div>
                     </div>
 
-                    <asp:Button ID="btnCustomerLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnCustomerLogin_Click" />
+                    <asp:Button ID="btnCustomerLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnCustomerLogin_Click" ValidationGroup="Customer" />
                     
                     <div class="signup-link-text">
                         Don't have an account? <a href="CustomerSignup.aspx">Sign up here</a>
                     </div>
 
-                    <asp:ValidationSummary ID="vsCustomerLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" />
+                    <asp:ValidationSummary ID="vsCustomerLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" ValidationGroup="Customer" />
                 </div>
 
                 <!-- Seller Login Tab -->
@@ -485,16 +485,16 @@
 
                     <div class="form-group">
                         <label for="txtSellerEmail">Email address</label>
-                        <asp:TextBox ID="txtSellerEmail" runat="server" TextMode="Email" placeholder="admin@example.com"></asp:TextBox>
-                        <asp:RequiredFieldValidator ID="rfvSellerEmail" runat="server" ControlToValidate="txtSellerEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                        <asp:TextBox ID="txtSellerEmail" runat="server" TextMode="Email" placeholder="admin@example.com" ValidationGroup="Seller"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvSellerEmail" runat="server" ControlToValidate="txtSellerEmail" Display="Dynamic" ErrorMessage="Email is required" ForeColor="#CC0000" ValidationGroup="Seller"></asp:RequiredFieldValidator>
                         <br />
-                        <asp:RegularExpressionValidator ID="revSellerEmail" runat="server" ControlToValidate="txtSellerEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
+                        <asp:RegularExpressionValidator ID="revSellerEmail" runat="server" ControlToValidate="txtSellerEmail" Display="Dynamic" ErrorMessage="Invalid email format" ForeColor="#CC0000" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" ValidationGroup="Seller"></asp:RegularExpressionValidator>
                     </div>
 
                     <div class="form-group">
                         <label for="txtSellerPassword">Password</label>
-                        <asp:TextBox ID="txtSellerPassword" runat="server" TextMode="Password" placeholder="Enter your password"></asp:TextBox>
-                        <asp:RequiredFieldValidator ID="rfvSellerPassword" runat="server" ControlToValidate="txtSellerPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000"></asp:RequiredFieldValidator>
+                        <asp:TextBox ID="txtSellerPassword" runat="server" TextMode="Password" placeholder="Enter your password" ValidationGroup="Seller"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rfvSellerPassword" runat="server" ControlToValidate="txtSellerPassword" Display="Dynamic" ErrorMessage="Password is required" ForeColor="#CC0000" ValidationGroup="Seller"></asp:RequiredFieldValidator>
                     </div>
 
                     <div class="form-options">
@@ -507,7 +507,7 @@
                         </div>
                     </div>
 
-                    <asp:Button ID="btnSellerLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnSellerLogin_Click" />
+                    <asp:Button ID="btnSellerLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnSellerLogin_Click" ValidationGroup="Seller" />
                     
                     <div class="signup-link-text">
                         Don't have an account? <a href="AdminSignUp.aspx">Sign up here</a>
