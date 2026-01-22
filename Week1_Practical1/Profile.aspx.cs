@@ -18,7 +18,7 @@ namespace Week1_Practical1
             // Check if user is logged in
             if (Session["IsAdminLoggedIn"] == null || !(bool)Session["IsAdminLoggedIn"])
             {
-                Response.Redirect("AdminLogin.aspx");
+                Response.Redirect("Login.aspx");
                 return;
             }
 
@@ -543,7 +543,7 @@ namespace Week1_Practical1
 
                 Session.Abandon();
 
-                Response.Redirect("AdminLogin.aspx");
+                Response.Redirect("Login.aspx");
             }
             catch (Exception ex)
             {
@@ -574,7 +574,7 @@ namespace Week1_Practical1
                     Session.Abandon();
 
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "redirect",
-                        "setTimeout(function() { window.location = 'AdminLogin.aspx'; }, 2000);", true);
+                        "setTimeout(function() { window.location = 'Login.aspx'; }, 2000);", true);
 
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
                         "alert('Your account has been deleted successfully. Redirecting to login page...');", true);
