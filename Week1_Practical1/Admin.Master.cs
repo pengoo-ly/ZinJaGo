@@ -57,9 +57,9 @@ namespace Week1_Practical1
         }
 
         /// <summary>
-        /// Handle logout - called from JavaScript
+        /// Handle logout button click from the profile dropdown
         /// </summary>
-        public void LogoutUser()
+        protected void btnLogout_Click(object sender, EventArgs e)
         {
             try
             {

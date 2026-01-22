@@ -36,6 +36,11 @@
             overflow: hidden;
         }
 
+        .logout-btn:hover {
+            background-color: #f0a799;
+            color: white;
+            box-shadow: 0 2px 5px rgb(232, 123, 104);
+        }
         .profile-dropdown-menu.active {
             opacity: 1;
             visibility: visible;
@@ -73,7 +78,8 @@
             border-right: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .profile-dropdown-menu a:hover {
+        .profile-dropdown-menu a:hover,
+        .profile-dropdown-menu button:hover {
             background: rgba(28, 176, 116, 0.08);
             color: #1cb074;
         }
@@ -219,10 +225,7 @@
                                     <span class="profile-dropdown-icon">⚙️</span>
                                     <span class="profile-dropdown-label">Settings</span>
                                 </a>
-                                <button type="button" class="dropdown-item logout-btn" id="btnLogout" onclick="performLogout();">
-                                    <span class="profile-dropdown-icon">🚪</span>
-                                    <span class="profile-dropdown-label">Logout</span>
-                                </button>
+                                <asp:Button ID="btnLogout" runat="server" CssClass="dropdown-item logout-btn" Text="🚪 Logout" OnClick="btnLogout_Click" />
                             </div>
                         </div>
                     </div>
@@ -365,14 +368,6 @@
             closeBtn.addEventListener('click', () => {
                 sidebar.classList.remove('open');
             });
-
-            // Logout function
-            function performLogout() {
-                if (confirm('Are you sure you want to logout?')) {
-                    var logoutBtn = document.getElementById('btnLogout');
-                    logoutBtn.form.submit();
-                }
-            }
         </script>
     </form>
 </body>
