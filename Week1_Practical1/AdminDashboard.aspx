@@ -38,33 +38,35 @@
 
             </div>
     <br />
-        <!-- Revenue Chart -->
-        <div class="col-md-8">
-            <div class="dashboard-panel">
-                <h5>Revenue Overview</h5>
-                <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlYear_SelectedIndexChanged" CssClass="form-select">
-                </asp:DropDownList>
-                <br />
-                <asp:Chart ID="RevenueChart" runat="server" Width="670px" BorderlineColor="Transparent" Height="329px">
-                    <Series>
-                        <asp:Series Name="Revenue" ChartType="Line" />
-                    </Series>
-                    <ChartAreas>
-                        <asp:ChartArea Name="MainArea" BackColor="Transparent" BackGradientStyle="TopBottom" BorderColor="Transparent" >
-                            <AxisY IsLabelAutoFit="False" Title="Revenue" TitleFont="Segoe UI, 10.2pt, style=Bold" LineColor="DarkGray">
-                                <MajorGrid LineColor="DarkGray" />
-                                <LabelStyle Font="Segoe UI, 7.8pt" ForeColor="DarkSlateGray" />
-                            </AxisY>
-                            <AxisX Title="Month" TitleFont="Segoe UI, 10.2pt, style=Bold" InterlacedColor="DarkGray" LineColor="DarkGray">
-                                <MajorGrid LineColor="DarkGray" />
-                                <MajorTickMark LineColor="DarkGray" />
-                                <LabelStyle ForeColor="DarkSlateGray" />
-                            </AxisX>
-                        </asp:ChartArea>
-                    </ChartAreas>
-                </asp:Chart>
-            </div>
+
+        <!-- Tabs -->
+        <div class="dashboard-tabs mb-3">
+            <button type="button" class="tab-btn active" data-tab="revenue">Revenue</button>
+            <button type="button" class="tab-btn" data-tab="logistics">Logistics</button>
         </div>
+
+        <!-- Revenue tab -->
+        <div id="revenue-tab" class="tab-content">
+            <label for="ddlYear">Select Year:</label>
+            <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlYear_SelectedIndexChanged" CssClass="form-select"></asp:DropDownList>
+            <canvas id="revenueChart" height="350"></canvas>
+        </div>
+
+    <br />
+
+    <!-- Logistics tab -->
+    <div id="logistics-tab" class="tab-content" style="display:none">
+        <asp:Repeater ID="rptLogistics" runat="server">
+            <ItemTemplate>
+                <div class="list-row">
+                    <span><%# Eval("ShipmentID") %></span>
+                    <span><%# Eval("Status") %></span>
+                    <span><%# Eval("ShippedDate", "{0:dd MMM yyyy}") %></span>
+                </div>
+            </ItemTemplate>
+        </asp:Repeater>
+    </div>
+
     <br />
     <!-- Top Selling Products -->
         <div class="col-md-4">
@@ -117,4 +119,55 @@
         </div>
 
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // Revenue Chart
+    const labels = <%= RevenueLabels %>;
+    const data = <%= RevenueData %>;
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue (SGD)',
+                data: data,
+                borderColor: 'var(--accent)',
+                backgroundColor: 'rgba(79, 163, 146, 0.2)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + parseFloat(context.raw).toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true },
+                x: { title: { display: true, text: 'Month' } }
+            }
+        }
+    });
+
+    // Tabs JS
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            let tab = btn.getAttribute('data-tab');
+            document.getElementById('revenue-tab').style.display = (tab==='revenue') ? 'block' : 'none';
+            document.getElementById('logistics-tab').style.display = (tab==='logistics') ? 'block' : 'none';
+        });
+    });
+</script>
 </asp:Content>

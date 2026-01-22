@@ -28,6 +28,7 @@ namespace Week1_Practical1
                     LoadRevenueChart();
                     LoadTopProducts();
                     LoadTopCategories();
+                    LoadLogistics();
                 }
             }
             catch
@@ -49,68 +50,82 @@ namespace Week1_Practical1
 
         private void LoadYears()
         {
-            using (SqlConnection con = new SqlConnection(cs))
+            try
             {
-                try {
-                    SqlCommand cmd = new SqlCommand("SELECT DISTINCT YEAR(OrderDate) AS OrderYear FROM Orders ORDER BY OrderYear DESC", con);
+                ddlYear.Items.Clear();
+
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlCommand cmd = new SqlCommand(
+                        @"SELECT DISTINCT YEAR(OrderDate) AS OrderYear
+                          FROM Orders
+                          WHERE PaymentStatus = 'Paid'
+                          ORDER BY OrderYear DESC", con);
+
                     con.Open();
                     SqlDataReader dr = cmd.ExecuteReader();
-                    ddlYear.Items.Clear();
+
                     while (dr.Read())
                     {
                         ddlYear.Items.Add(dr["OrderYear"].ToString());
                     }
                 }
-                catch {
-                    ShowError("Unable to load years for revenue chart.");
-                }
+            }
+            catch
+            {
+                ShowError("Unable to load years for revenue chart.");
             }
         }
+
         void LoadRevenueChart()
         {
-
-            try {
-                RevenueChart.Series["Revenue"].Points.Clear();
-                int year = ddlYear.SelectedValue != "" ? Convert.ToInt32(ddlYear.SelectedValue) : DateTime.Now.Year;
+            try
+            {
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                int year = ddlYear.SelectedValue != ""
+                    ? Convert.ToInt32(ddlYear.SelectedValue)
+                    : DateTime.Now.Year;
 
                 using (SqlConnection con = new SqlConnection(cs))
                 {
                     SqlCommand cmd = new SqlCommand(
-                        @"SELECT FORMAT(OrderDate,'MMM') AS Month,
-                             SUM(TotalAmount) AS Revenue
-                      FROM Orders
-                      WHERE PaymentStatus='Paid'
-                      GROUP BY FORMAT(OrderDate,'MMM'), MONTH(OrderDate)
-                      ORDER BY MONTH(OrderDate)", con);
+                        @"SELECT DATENAME(MONTH, O.OrderDate) AS MonthName,
+                         MONTH(O.OrderDate) AS MonthNo,
+                         SUM(OI.Quantity * OI.UnitPrice) AS Revenue
+                          FROM Orders O
+                          JOIN OrderItems OI ON O.OrderID = OI.OrderID
+                          JOIN Products P ON OI.ProductID = P.ProductID
+                          WHERE O.PaymentStatus = 'Paid'
+                            AND YEAR(O.OrderDate) = @Year
+                            AND P.AdminID = @AdminID
+                          GROUP BY DATENAME(MONTH, O.OrderDate), MONTH(O.OrderDate)
+                          ORDER BY MonthNo", con);
+
+                    cmd.Parameters.AddWithValue("@Year", year);
+                    cmd.Parameters.AddWithValue("@AdminID", adminId);
 
                     con.Open();
                     SqlDataReader dr = cmd.ExecuteReader();
 
-                    StringBuilder labels = new StringBuilder("[");
-                    StringBuilder data = new StringBuilder("[");
+                    List<string> labels = new List<string>();
+                    List<decimal> values = new List<decimal>();
 
                     while (dr.Read())
                     {
-                        string month = dr["Month"].ToString();
-                        decimal revenue = Convert.ToDecimal(dr["Revenue"]);
-
-                        // Add to Chart control
-                        RevenueChart.Series["Revenue"].Points.AddXY(month, revenue);
-                        RevenueChart.Series["Revenue"].Points[RevenueChart.Series["Revenue"].Points.Count - 1].ToolTip =
-                   $"{month}: {revenue:0.00} SGD";
-                        // Add for JS charts (optional)
-                        labels.Append($"'{month}',");
-                        data.Append($"{revenue},");
+                        labels.Add(dr["MonthName"].ToString());
+                        values.Add(Convert.ToDecimal(dr["Revenue"]));
                     }
 
-                    RevenueLabels = labels.Append("]").ToString();
-                    RevenueData = data.Append("]").ToString();
+                    RevenueLabels = "[" + string.Join(",", labels.Select(m => $"'{m}'")) + "]";
+                    RevenueData = "[" + string.Join(",", values) + "]";
                 }
             }
-            catch {
+            catch
+            {
                 ShowError("Unable to load revenue chart.");
             }
         }
+
 
         void LoadTopProducts()
         {
@@ -182,16 +197,22 @@ namespace Week1_Practical1
                     conn.Open();
                     int adminId = Convert.ToInt32(Session["AdminID"]);
                     // Total Users
-                    SqlCommand cmdUsers = new SqlCommand("SELECT COUNT(*) FROM Users", conn);
+                    SqlCommand cmdUsers = new SqlCommand(
+                        @"SELECT COUNT(DISTINCT O.UserID)
+                            FROM Orders O
+                            JOIN OrderItems OI ON O.OrderID = OI.OrderID
+                            JOIN Products P ON OI.ProductID = P.ProductID
+                            WHERE P.AdminID = @AdminID", conn);
+                    cmdUsers.Parameters.AddWithValue("@AdminID", adminId);
                     lblUsers.Text = cmdUsers.ExecuteScalar().ToString();
 
                     // Total Orders
                     SqlCommand cmdOrders = new SqlCommand(
-                        @"SELECT COUNT(*) 
-                          FROM Orders O
-                          JOIN OrderItems OI ON O.OrderID = OI.OrderID
-                          JOIN Products P ON OI.ProductID = P.ProductID
-                          WHERE P.AdminID=@AdminID", conn);
+                        @"SELECT COUNT(DISTINCT O.OrderID)
+                            FROM Orders O
+                            JOIN OrderItems OI ON O.OrderID = OI.OrderID
+                            JOIN Products P ON OI.ProductID = P.ProductID
+                            WHERE P.AdminID=@AdminID", conn);
                     cmdOrders.Parameters.AddWithValue("@AdminID", adminId);
                     lblOrders.Text = cmdOrders.ExecuteScalar().ToString();
 
@@ -231,5 +252,34 @@ namespace Week1_Practical1
                 ShowError("Unable to update revenue chart for selected year.");
             }
         }
+        void LoadLogistics()
+        {
+            try
+            {
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(@"
+                SELECT OS.ShipmentID, OS.Status, OS.ShippedDate
+                FROM OrderShipments OS
+                JOIN OrderItems OI ON OS.OrderID = OI.OrderID
+                JOIN Products P ON OI.ProductID = P.ProductID
+                WHERE P.AdminID=@AdminID
+                ORDER BY OS.ShippedDate DESC", con);
+                    da.SelectCommand.Parameters.AddWithValue("@AdminID", adminId);
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    rptLogistics.DataSource = dt;
+                    rptLogistics.DataBind();
+                }
+            }
+            catch
+            {
+                ShowError("Unable to load logistics.");
+            }
+        }
+
     }
 }

@@ -513,7 +513,7 @@
                         Don't have an account? <a href="AdminSignUp.aspx">Sign up here</a>
                     </div>
 
-                    <asp:ValidationSummary ID="vsSellerLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" />
+                    <asp:ValidationSummary ID="vsSellerLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" ValidationGroup="Seller" />
                 </div>
             </div>
 

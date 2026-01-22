@@ -67,7 +67,7 @@ namespace Week1_Practical1
                     return;
 
                 string email = txtCustomerEmail.Text.Trim();
-                string password = txtCustomerPassword.Text.Trim();
+                string password = txtCustomerPassword.Text;
 
                 // Remember email (optional)
                 if (chkCustomerRemember.Checked)
@@ -171,7 +171,7 @@ namespace Week1_Practical1
                     return;
 
                 string email = txtSellerEmail.Text.Trim();
-                string password = txtSellerPassword.Text.Trim();
+                string password = txtSellerPassword.Text;
 
                 // Remember email (optional)
                 if (chkSellerRemember.Checked)

@@ -16,7 +16,7 @@ namespace Week1_Practical1
                 // Protect admin pages
                 if (Session["IsAdminLoggedIn"] == null)
                 {
-                    Response.Redirect("AdminLogin.aspx");
+                    Response.Redirect("Login.aspx");
                     return;
                 }
 
