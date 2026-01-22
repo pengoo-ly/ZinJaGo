@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using Week1_Practical1.Helpers;
@@ -130,7 +132,7 @@ namespace Week1_Practical1
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", password);
+                        cmd.Parameters.AddWithValue("@Password", HashPassword(password));
 
                         conn.Open();
 
@@ -244,7 +246,7 @@ namespace Week1_Practical1
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", password);
+                        cmd.Parameters.AddWithValue("@Password", HashPassword(password));
 
                         conn.Open();
 
@@ -333,5 +335,44 @@ namespace Week1_Practical1
         }
 
         #endregion
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in bytes) sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
+        }
+        private void UpdateAdminHashes()
+        {
+            string newPassword = "admin123"; // your global password
+            string newHash = HashPassword(newPassword);
+
+            string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                SqlCommand cmd = new SqlCommand(
+                    "UPDATE Admins SET PasswordHash = @hash", conn);
+
+                cmd.Parameters.AddWithValue("@hash", newHash);
+
+                conn.Open();
+                int rows = cmd.ExecuteNonQuery();
+                conn.Close();
+
+                // Optional: show a message
+                Response.Write("Updated hashes for " + rows + " admins.<br>");
+            }
+
+            // Stop page execution so you don't log in accidentally
+            Response.End();
+        }
+
+
     }
+
+
 }

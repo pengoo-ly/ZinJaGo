@@ -15,7 +15,31 @@ namespace Week1_Practical1.SuperAdmin
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            try
+            {
+                if (Session["IsAdminLoggedIn"] == null ||
+                    Session["AdminRole"] == null ||
+                    Session["AdminRole"].ToString() != "SuperAdmin")
+                {
+                    Response.Redirect("~/Login.aspx");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError("Error in Page_Load of ZinJaGODashboard: " + ex.Message);
+                Response.Redirect("~/Login.aspx");
+            }
+        }
+        protected void ShowError(string message)
+        {
+            ScriptManager.RegisterStartupScript(
+                this,
+                this.GetType(),
+                "popupError",
+                $"alert('{message.Replace("'", "\\'")}');",
+                true
+            );
         }
     }
 }
