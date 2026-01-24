@@ -78,6 +78,10 @@
     <Content Include="CustomerSignup.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="AdminPasswordReset.aspx" />
+    <Content Include="Images\DogFood.png" />
+    <Content Include="Images\Dumbbell.png" />
+    <Content Include="Images\FakeTree.png" />
+    <Content Include="Images\HarryPotter1.jpeg" />
     <Content Include="Images\Hoodie.png" />
     <Content Include="Images\Lamp.png" />
     <Content Include="Images\login.png" />
@@ -205,8 +209,10 @@
       <DependentUpon>Guess_the_number.aspx</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Category.cs" />
+    <Compile Include="Helpers\Cupon.cs" />
     <Compile Include="Helpers\Customer.cs" />
     <Compile Include="Helpers\DbLogger.cs" />
+    <Compile Include="Helpers\Order.cs" />
     <Compile Include="Helpers\Product.cs" />
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>

@@ -440,6 +440,40 @@
                 padding: 10px 6px;
             }
         }
+        /* Make period selector flexible */
+        .period-selector {
+            display: flex;
+            gap: 8px; /* space between buttons and dropdowns */
+            flex-wrap: wrap; /* wrap on small screens */
+            align-items: center;
+        }
+
+        /* Style the ASP.NET DropDownList to match theme */
+        .period-selector .form-select {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-selector .form-select:hover {
+            border-color: var(--accent);
+            background: rgba(79,163,146,0.05);
+        }
+
+        .period-selector .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79,163,146,0.2);
+        }
+        #ddlYear, #ddlMonth {
+            margin-bottom: 0; /* no extra gap */
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -491,6 +525,12 @@
                 <div class="period-selector">
                     <button type="button" class="period-btn active" data-period="week">This week</button>
                     <button type="button" class="period-btn" data-period="month">Last week</button>
+
+                    <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    </asp:DropDownList>
+
+                    <asp:DropDownList ID="ddlMonth" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    </asp:DropDownList>
                 </div>
             </div>
 
@@ -535,7 +575,6 @@
                         <th>Order Count</th>
                         <th>Total Spent</th>
                         <th>Status</th>
-                        <th style="width: 80px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="customersTableBody">
@@ -552,13 +591,6 @@
                                         <span class="status-dot <%# Eval("Status").ToString() == "Active" ? "status-active" : (Eval("Status").ToString() == "VIP" ? "status-vip" : "status-inactive") %>"></span>
                                         <%# Eval("Status") %>
                                     </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button type="button" class="action-btn" title="View">👁️</button>
-                                        <button type="button" class="action-btn" title="Edit">✎</button>
-                                        <button type="button" class="action-btn" title="Delete">🗑️</button>
-                                    </div>
                                 </td>
                             </tr>
                         </ItemTemplate>
