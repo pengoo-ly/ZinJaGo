@@ -871,3 +871,14 @@ body {
         background: rgba(79,163,146,0.08);
     }
 
+/* Logistics header row */
+#logistics-tab .list-header {
+    font-weight: 600;
+    background-color: rgba(79,163,146,0.1);
+    border-bottom: 2px solid var(--accent);
+}
+/* Responsive chart height */
+#revenueChart {
+    width: 100%;
+    max-height: 300px; /* reduce the huge height */
+}

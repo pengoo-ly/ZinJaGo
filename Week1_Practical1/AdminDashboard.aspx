@@ -49,19 +49,25 @@
         <div id="revenue-tab" class="tab-content">
             <label for="ddlYear">Select Year:</label>
             <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlYear_SelectedIndexChanged" CssClass="form-select"></asp:DropDownList>
-            <canvas id="revenueChart" height="350"></canvas>
+            <canvas id="revenueChart"></canvas>
         </div>
 
     <br />
 
     <!-- Logistics tab -->
     <div id="logistics-tab" class="tab-content" style="display:none">
+        <div class="list-row list-header">
+            <span><strong>Shipment ID</strong></span>
+            <span><strong>Status</strong></span>
+            <span><strong>Shipped Date</strong></span>
+        </div>
+
         <asp:Repeater ID="rptLogistics" runat="server">
             <ItemTemplate>
                 <div class="list-row">
                     <span><%# Eval("ShipmentID") %></span>
-                    <span><%# Eval("Status") %></span>
-                    <span><%# Eval("ShippedDate", "{0:dd MMM yyyy}") %></span>
+                    <span><%# Eval("Status") != DBNull.Value ? Eval("Status") : "-" %></span>
+                    <span><%# Eval("ShippedDate") != DBNull.Value ? string.Format("{0:dd MMM yyyy}", Eval("ShippedDate")) : "-" %></span>
                 </div>
             </ItemTemplate>
         </asp:Repeater>
