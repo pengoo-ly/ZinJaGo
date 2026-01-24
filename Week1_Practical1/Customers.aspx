@@ -474,6 +474,7 @@
         #ddlYear, #ddlMonth {
             margin-bottom: 0; /* no extra gap */
         }
+
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -615,12 +616,25 @@
     <script>
         let chartInstance = null;
 
+        function getCssVariable(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        function hexToRgba(hex, alpha = 0.1) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+
         function renderChart(labels, data) {
             const ctx = document.getElementById('customerChart').getContext('2d');
 
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            const accent = getCssVariable('--accent');
+            const textColor = getCssVariable('--text');
+            const mutedColor = getCssVariable('--muted');
+
+            if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -629,12 +643,12 @@
                     datasets: [{
                         label: 'Customers',
                         data: data,
-                        borderColor: '#1cb074',
-                        backgroundColor: 'rgba(28, 176, 116, 0.1)',
+                        borderColor: accent,
+                        backgroundColor: hexToRgba(accent, 0.1),
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#1cb074',
-                        pointBorderColor: '#fff',
+                        pointBackgroundColor: accent,
+                        pointBorderColor: textColor,
                         pointBorderWidth: 2,
                         pointRadius: 5,
                         pointHoverRadius: 7
@@ -644,34 +658,11 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: 'var(--text)',
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
+                        legend: { labels: { color: textColor } }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: 'var(--muted)'
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: 'var(--muted)'
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { ticks: { color: mutedColor }, grid: { color: hexToRgba(mutedColor, 0.1) } },
+                        x: { ticks: { color: mutedColor }, grid: { display: false } }
                     }
                 }
             });
