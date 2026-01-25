@@ -585,8 +585,110 @@
         let currentFilter = 'all';
         let sortOrder = 'desc'; // desc = newest first, asc = oldest first
 
+        // Initialize data from table
+        function initializeData() {
+            const rows = document.querySelectorAll('.order-row');
+            allOrders = Array.from(rows).map((row, index) => ({
+                index: index,
+                element: row,
+                orderStatus: row.dataset.orderStatus,
+                paymentStatus: row.dataset.paymentStatus,
+                price: parseFloat(row.dataset.price),
+                date: parseInt(row.dataset.date),
+                orderNumber: index + 1
+            }));
+            filteredOrders = [...allOrders];
+            renderTable();
+            updatePagination();
+        }
+
+        // Filter orders
+        function filterOrders(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+
+            if (filter === 'all') {
+                filteredOrders = [...allOrders];
+            } else if (filter === 'completed') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'paid');
+            } else if (filter === 'pending') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'unpaid');
+            }
+
+            renderTable();
+            updatePagination();
+            applySearch();
+        }
+
+        // Sort orders
+        function sortOrders(action) {
+            switch (action) {
+                case 'price-asc':
+                    filteredOrders.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    filteredOrders.sort((a, b) => b.price - a.price);
+                    break;
+                case 'date-newest':
+                    filteredOrders.sort((a, b) => b.date - a.date);
+                    break;
+                case 'date-oldest':
+                    filteredOrders.sort((a, b) => a.date - b.date);
+                    break;
+                case 'paid':
+                    currentFilter = 'paid';
+                    filteredOrders = allOrders.filter(o => o.paymentStatus === 'paid');
+                    break;
+                case 'unpaid':
+                    currentFilter = 'unpaid';
+                    filteredOrders = allOrders.filter(o => o.paymentStatus === 'unpaid');
+                    break;
+            }
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // Render table with pagination
+        function renderTable() {
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageOrders = filteredOrders.slice(start, end);
+
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            pageOrders.forEach((order, index) => {
+                const row = order.element.cloneNode(true);
+                row.querySelector('.row-number').textContent = start + index + 1;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) || 1;
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+
+            // Update prev/next buttons
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+
+            if (currentPage === 1) {
+                prevBtn.classList.add('disabled');
+            } else {
+                prevBtn.classList.remove('disabled');
+            }
+
+            if (currentPage >= totalPages) {
+                nextBtn.classList.add('disabled');
+            } else {
+                nextBtn.classList.remove('disabled');
+            }
+
             // Generate page numbers
-        const paginationList = document.getElementById('paginationList');
+            const paginationList = document.getElementById('paginationList');
             paginationList.innerHTML = '';
 
             for (let i = 1; i <= totalPages; i++) {
@@ -624,6 +726,12 @@
                 this.classList.add('active');
                 filterOrders(this.dataset.filter);
             });
+        });
+
+        document.getElementById('searchOrders').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
         });
 
         document.getElementById('searchOrders').addEventListener('input', applySearch);

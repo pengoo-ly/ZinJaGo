@@ -54,7 +54,11 @@ namespace Week1_Practical1.Helpers
                     SELECT 
                         o.OrderID,
                         p.ProductName,
-                        p.Image AS ImageUrl,
+                        CASE 
+                            WHEN p.Image IS NULL OR p.Image = '' 
+                            THEN '/Images/default.png'
+                            ELSE '/Images/' + p.Image
+                        END AS ImageUrl,
                         o.OrderDate,
                         oi.UnitPrice AS Price,
                         o.PaymentStatus,
