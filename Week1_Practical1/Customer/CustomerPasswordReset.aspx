@@ -355,7 +355,7 @@
             <!-- Left Side - Password Reset Form -->
             <div class="login-form-section">
                 <div class="logo">
-                    <img src="Images/zinjago.png" alt="ZinJaGO Logo" />
+                    <img src="../Images/zinjago.png" alt="ZinJaGO Logo" />
                 </div>
 
                 <h1>Reset Password</h1>
@@ -437,7 +437,7 @@
                 </div>
 
                 <div class="back-link">
-                    <a href="Login.aspx">Back to Login</a>
+                    <a href="../Login.aspx">Back to Login</a>
                 </div>
 
                 <br />

@@ -468,7 +468,7 @@
                     <asp:Button ID="btnCustomerLogin" runat="server" Text="Login" CssClass="login-button" OnClick="btnCustomerLogin_Click" ValidationGroup="Customer" />
                     
                     <div class="signup-link-text">
-                        Don't have an account? <a href="CustomerSignup.aspx">Sign up here</a>
+                        Don't have an account? <a href="Customer/CustomerSignup.aspx">Sign up here</a>
                     </div>
 
                     <asp:ValidationSummary ID="vsCustomerLogin" runat="server" ForeColor="#CC0000" HeaderText="Please fix the following errors:" ValidationGroup="Customer" />
