@@ -503,21 +503,41 @@
             ➕ Create Coupon
         </button>
     </div>
-    <div id="addCouponPanel" class="modal-panel" style="display:none;">
-        <h3>Add Coupon</h3>
+    <div id="addCouponPanel" class="modal-panel">
+        <div class="modal-content">
+            <h3>Add Coupon</h3>
 
-        <input id="txtCode" placeholder="Code" />
-        <input id="txtDiscount" type="number" />
-        <input id="txtExpiry" type="date" />
+            <div class="form-group">
+                <label for="txtCode">Code</label>
+                <input id="txtCode" placeholder="Enter coupon code" />
+            </div>
 
-        <select id="ddlType">
-            <option value="Percentage">Percentage</option>
-            <option value="Fixed">Fixed</option>
-        </select>
+            <div class="form-group">
+                <label for="txtDiscount">Discount Value</label>
+                <input id="txtDiscount" type="number" placeholder="Enter discount" />
+            </div>
 
-        <button onclick="saveCoupon()">Save</button>
-        <button onclick="closeAddPanel()">Cancel</button>
+            <div class="form-group">
+                <label for="txtExpiry">Expiry Date</label>
+                <input id="txtExpiry" type="date" />
+            </div>
+
+            <div class="form-group">
+                <label for="ddlType">Discount Type</label>
+                <select id="ddlType">
+                    <option value="Percentage">Percentage</option>
+                    <option value="Fixed">Fixed</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="save-btn" onclick="saveCoupon()">Save</button>
+                <button class="cancel-btn" onclick="closeAddPanel()">Cancel</button>
+            </div>
+        </div>
     </div>
+
+    <br />
 
 
     <!-- Coupon Statistics -->
@@ -587,7 +607,12 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button type="button" class="btn-sm edit-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Edit</button>
+                                    <button type="button" class="btn-sm edit-coupon" data-voucher-id="<%# Eval("VoucherID") %>" onclick="editCoupon(
+                                        '<%# Eval("VoucherID") %>',
+                                        '<%# Eval("Code") %>',
+                                        '<%# Eval("DiscountType") %>',
+                                        '<%# Eval("DiscountValue") %>',
+                                        '<%# Eval("ExpiryDate","{0:yyyy-MM-dd}") %>')">Edit</button>
                                     <button type="button" class="btn-sm danger delete-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Delete</button>
                                 </div>
                             </td>
@@ -724,6 +749,16 @@
                     }
                 });
         }
+
+        function editCoupon(id, code, type, value, expiry) {
+            openAddPanel();
+            document.getElementById("hdnVoucherID").value = id;
+            txtCode.value = code;
+            ddlType.value = type;
+            txtDiscount.value = value;
+            txtExpiry.value = expiry;
+        }
+
 
         // Show alert message
         function showAlert(message, type = 'error') {

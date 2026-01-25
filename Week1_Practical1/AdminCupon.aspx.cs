@@ -168,9 +168,11 @@ namespace Week1_Practical1
         private void LoadCoupons()
         {
             int adminId = Convert.ToInt32(Session["AdminID"]);
-            rptCoupons.DataSource = Cupon.GetCouponsByAdmin(adminId);
+            DataTable dt = Cupon.GetCouponsByAdmin(adminId);
+            rptCoupons.DataSource = dt;
             rptCoupons.DataBind();
         }
+
 
         private void LoadStatistics()
         {

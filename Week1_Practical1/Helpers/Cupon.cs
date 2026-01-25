@@ -159,31 +159,30 @@ namespace Week1_Practical1.Helpers
             catch { return false; }
         }
 
-        public static DataTable GetCouponsByAdmin(int adminId, string search = "")
+        public static int GetTotalCouponsByAdmin(int adminId)
         {
-            DataTable dt = new DataTable();
             try
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT DISTINCT V.*
-                    FROM Vouchers V
-                    LEFT JOIN AuditTrail A 
-                        ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-                    WHERE (A.AdminID = @AdminID OR A.AdminID IS NULL)
-                    AND (@Search = '' OR V.Code LIKE '%' + @Search + '%')
-                    ORDER BY V.VoucherID DESC", con))
+            SELECT COUNT(DISTINCT V.VoucherID)
+            FROM Vouchers V
+            LEFT JOIN AuditTrail A
+                ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
+            WHERE A.AdminID = @AdminID OR A.AdminID IS NULL", con))
                 {
                     cmd.Parameters.AddWithValue("@AdminID", adminId);
-                    cmd.Parameters.AddWithValue("@Search", search);
-                    new SqlDataAdapter(cmd).Fill(dt);
+                    con.Open();
+                    return (int)cmd.ExecuteScalar();
                 }
             }
-            catch { }
-            return dt;
+            catch
+            {
+                return 0;
+            }
         }
 
-
+        // Add this inside your Cupon class
         public static DataRow GetCouponStatisticsByAdmin(int adminId)
         {
             DataTable dt = new DataTable();
@@ -204,6 +203,38 @@ namespace Week1_Practical1.Helpers
 
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
+
+
+        public static DataTable GetCouponsByAdmin(int adminId)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                using (SqlConnection con = new SqlConnection(cs))
+                using (SqlCommand cmd = new SqlCommand(@"
+            SELECT 
+                V.VoucherID,
+                V.Code,
+                V.VoucherType,
+                V.DiscountType,
+                V.DiscountValue,
+                V.CoinCost,
+                V.ExpiryDate,
+                V.Status
+            FROM Vouchers V
+            INNER JOIN AuditTrail A
+                ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
+            WHERE A.AdminID = @AdminID
+            ORDER BY V.VoucherID DESC", con))
+                {
+                    cmd.Parameters.AddWithValue("@AdminID", adminId);
+                    new SqlDataAdapter(cmd).Fill(dt);
+                }
+            }
+            catch { }
+            return dt;
+        }
+        
 
         public static bool DeleteCoupon(int id)
         {
