@@ -55,7 +55,6 @@ namespace Week1_Practical1.Helpers
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
-        // 🔹 Create coupon + audit
         public static bool CreateCoupon(
             int adminId,
             string code,
@@ -167,13 +166,13 @@ namespace Week1_Practical1.Helpers
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(@"
-                        SELECT V.*
-                        FROM Vouchers V
-                        INNER JOIN AuditTrail A 
-                            ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-                        WHERE A.AdminID = @AdminID
-                        AND (@Search = '' OR V.Code LIKE '%' + @Search + '%')
-                        ORDER BY V.VoucherID DESC", con))
+                    SELECT DISTINCT V.*
+                    FROM Vouchers V
+                    LEFT JOIN AuditTrail A 
+                        ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
+                    WHERE (A.AdminID = @AdminID OR A.AdminID IS NULL)
+                    AND (@Search = '' OR V.Code LIKE '%' + @Search + '%')
+                    ORDER BY V.VoucherID DESC", con))
                 {
                     cmd.Parameters.AddWithValue("@AdminID", adminId);
                     cmd.Parameters.AddWithValue("@Search", search);
@@ -184,40 +183,39 @@ namespace Week1_Practical1.Helpers
             return dt;
         }
 
-        public static bool AddCoupon(
-    int adminId, string code, string type,
-    string discountType, decimal discount,
-    int coinCost, DateTime expiry)
+
+        public static DataRow GetCouponStatisticsByAdmin(int adminId)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection con = new SqlConnection(cs))
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT
+                    COUNT(*) AS TotalCoupons,
+                    SUM(CASE WHEN Status='Active' AND ExpiryDate > GETDATE() THEN 1 ELSE 0 END) AS ActiveCoupons,
+                    ISNULL(SUM(CASE WHEN Status='Active' THEN DiscountValue ELSE 0 END),0) AS TotalDiscount
+                FROM Vouchers V
+                INNER JOIN AuditTrail A
+                    ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
+                WHERE A.AdminID=@AdminID", con))
+            {
+                cmd.Parameters.AddWithValue("@AdminID", adminId);
+                new SqlDataAdapter(cmd).Fill(dt);
+            }
+
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+        }
+
+        public static bool DeleteCoupon(int id)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(cs))
+                using (SqlCommand cmd = new SqlCommand(
+                    "DELETE FROM Vouchers WHERE VoucherID=@ID", con))
                 {
+                    cmd.Parameters.AddWithValue("@ID", id);
                     con.Open();
-
-                    SqlCommand insert = new SqlCommand(@"
-                        INSERT INTO Vouchers
-                        VALUES ((SELECT ISNULL(MAX(VoucherID),0)+1 FROM Vouchers),
-                        @Code,@Type,@Coin,@DT,@DV,@Exp,'Active')", con);
-
-                    insert.Parameters.AddWithValue("@Code", code);
-                    insert.Parameters.AddWithValue("@Type", type);
-                    insert.Parameters.AddWithValue("@Coin", coinCost);
-                    insert.Parameters.AddWithValue("@DT", discountType);
-                    insert.Parameters.AddWithValue("@DV", discount);
-                    insert.Parameters.AddWithValue("@Exp", expiry);
-
-                    insert.ExecuteNonQuery();
-
-                    SqlCommand audit = new SqlCommand(@"
-                        INSERT INTO AuditTrail
-                        VALUES ((SELECT ISNULL(MAX(AuditID),0)+1 FROM AuditTrail),
-                        @Admin,'CREATE_VOUCHER_' + 
-                        CAST((SELECT MAX(VoucherID) FROM Vouchers) AS NVARCHAR),
-                        GETDATE())", con);
-
-                    audit.Parameters.AddWithValue("@Admin", adminId);
-                    audit.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
                 }
                 return true;
             }

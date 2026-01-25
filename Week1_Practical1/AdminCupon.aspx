@@ -499,10 +499,26 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-        <button type="button" class="btn-primary-custom" id="btnCreateCoupon">
+        <button type="button" class="btn-primary-custom" id="btnCreateCoupon" onclick="openAddPanel()">
             ➕ Create Coupon
         </button>
     </div>
+    <div id="addCouponPanel" class="modal-panel" style="display:none;">
+        <h3>Add Coupon</h3>
+
+        <input id="txtCode" placeholder="Code" />
+        <input id="txtDiscount" type="number" />
+        <input id="txtExpiry" type="date" />
+
+        <select id="ddlType">
+            <option value="Percentage">Percentage</option>
+            <option value="Fixed">Fixed</option>
+        </select>
+
+        <button onclick="saveCoupon()">Save</button>
+        <button onclick="closeAddPanel()">Cancel</button>
+    </div>
+
 
     <!-- Coupon Statistics -->
     <div class="coupon-stats">
@@ -675,6 +691,39 @@
         const dropdownMenu = document.getElementById('dropdownMenu');
         const moreBtn = document.querySelector('.more-btn');
         const alertMessage = document.getElementById('alertMessage');
+
+        function openAddPanel() {
+            document.getElementById("addCouponPanel").style.display = "block";
+        }
+        function closeAddPanel() {
+            document.getElementById("addCouponPanel").style.display = "none";
+        }
+
+        function saveCoupon() {
+            const formData = new FormData();
+            formData.append("action", "create");
+            formData.append("code", txtCode.value);
+            formData.append("voucherType", "Discount");
+            formData.append("discountType", ddlType.value);
+            formData.append("discountValue", txtDiscount.value);
+            formData.append("coinCost", 0);
+            formData.append("expiryDate", txtExpiry.value);
+            formData.append("status", "Active");
+
+            fetch("AdminCupon.aspx", {
+                method: "POST",
+                body: formData
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        closeAddPanel();
+                        location.reload();
+                    } else {
+                        alert(res.message);
+                    }
+                });
+        }
 
         // Show alert message
         function showAlert(message, type = 'error') {
