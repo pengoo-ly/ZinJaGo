@@ -471,9 +471,6 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 2px rgba(79,163,146,0.2);
         }
-        #ddlYear, #ddlMonth {
-            margin-bottom: 0; /* no extra gap */
-        }
 
     </style>
 </asp:Content>
