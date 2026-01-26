@@ -279,6 +279,8 @@
             max-height: 90vh;
             overflow-y: auto;
             padding: 28px;
+            position: relative;
+            margin: auto;
         }
 
         .modal-header {
@@ -503,7 +505,7 @@
             ➕ Create Coupon
         </button>
     </div>
-    <div id="addCouponPanel" class="modal-panel">
+    <div id="addCouponPanel" class="modal-backdrop">
         <div class="modal-content">
             <h3>Add Coupon</h3>
 
@@ -530,9 +532,9 @@
                 </select>
             </div>
 
-            <div class="modal-actions">
-                <button class="save-btn" onclick="saveCoupon()">Save</button>
-                <button class="cancel-btn" onclick="closeAddPanel()">Cancel</button>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="saveCoupon()">Save</button>
+                <button class="btn-primary" onclick="closeAddPanel()">Cancel</button>
             </div>
         </div>
     </div>
