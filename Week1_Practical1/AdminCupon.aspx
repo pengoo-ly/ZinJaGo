@@ -344,7 +344,7 @@
         .dark .form-group input,
         .dark .form-group select {
             border-color: rgba(255,255,255,0.1);
-            background: #1e1e1e;
+            background: #0f1720;
             color: #ffffff;
         }
 

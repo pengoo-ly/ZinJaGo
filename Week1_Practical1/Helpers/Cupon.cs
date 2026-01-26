@@ -73,9 +73,10 @@ namespace Week1_Practical1.Helpers
 
                     SqlCommand insert = new SqlCommand(@"
                         INSERT INTO Vouchers
+                        (VoucherID, Code, VoucherType, CoinCost, DiscountType, DiscountValue, ExpiryDate, Status, CreatedBy)
                         VALUES
                         ((SELECT ISNULL(MAX(VoucherID),0)+1 FROM Vouchers),
-                         @Code,@VT,@CC,@DT,@DV,@ED,@Status)", con);
+                         @Code, @VT, @CC, @DT, @DV, @ED, @Status, @AdminID)", con);
 
                     insert.Parameters.AddWithValue("@Code", code);
                     insert.Parameters.AddWithValue("@VT", voucherType);
@@ -84,6 +85,8 @@ namespace Week1_Practical1.Helpers
                     insert.Parameters.AddWithValue("@DV", discountValue);
                     insert.Parameters.AddWithValue("@ED", expiry);
                     insert.Parameters.AddWithValue("@Status", status);
+                    insert.Parameters.AddWithValue("@AdminID", adminId);
+
 
                     insert.ExecuteNonQuery();
 
@@ -190,12 +193,12 @@ namespace Week1_Practical1.Helpers
             using (SqlCommand cmd = new SqlCommand(@"
                 SELECT
                     COUNT(*) AS TotalCoupons,
-                    SUM(CASE WHEN Status='Active' AND ExpiryDate > GETDATE() THEN 1 ELSE 0 END) AS ActiveCoupons,
-                    ISNULL(SUM(CASE WHEN Status='Active' THEN DiscountValue ELSE 0 END),0) AS TotalDiscount
-                FROM Vouchers V
-                INNER JOIN AuditTrail A
-                    ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-                WHERE A.AdminID=@AdminID", con))
+                    SUM(CASE 
+                        WHEN Status='Active' AND ExpiryDate >= CAST(GETDATE() AS DATE)
+                        THEN 1 ELSE 0 END) AS ActiveCoupons,
+                    ISNULL(SUM(DiscountValue),0) AS TotalDiscount
+                FROM Vouchers
+                WHERE CreatedBy = @AdminID", con))
             {
                 cmd.Parameters.AddWithValue("@AdminID", adminId);
                 new SqlDataAdapter(cmd).Fill(dt);
@@ -203,6 +206,7 @@ namespace Week1_Practical1.Helpers
 
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
+
 
 
         public static DataTable GetCouponsByAdmin(int adminId)
@@ -213,19 +217,17 @@ namespace Week1_Practical1.Helpers
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(@"
             SELECT 
-                V.VoucherID,
-                V.Code,
-                V.VoucherType,
-                V.DiscountType,
-                V.DiscountValue,
-                V.CoinCost,
-                V.ExpiryDate,
-                V.Status
-            FROM Vouchers V
-            INNER JOIN AuditTrail A
-                ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-            WHERE A.AdminID = @AdminID
-            ORDER BY V.VoucherID DESC", con))
+                VoucherID,
+                Code,
+                VoucherType,
+                DiscountType,
+                DiscountValue,
+                CoinCost,
+                ExpiryDate,
+                Status
+            FROM Vouchers
+            WHERE CreatedBy = @AdminID
+            ORDER BY VoucherID DESC", con))
                 {
                     cmd.Parameters.AddWithValue("@AdminID", adminId);
                     new SqlDataAdapter(cmd).Fill(dt);
@@ -234,24 +236,26 @@ namespace Week1_Practical1.Helpers
             catch { }
             return dt;
         }
-        
 
-        public static bool DeleteCoupon(int id)
+
+
+        public static bool DeleteCoupon(int id, int adminId)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(
-                    "DELETE FROM Vouchers WHERE VoucherID=@ID", con))
+                    "DELETE FROM Vouchers WHERE VoucherID=@ID AND CreatedBy=@AdminID", con))
                 {
                     cmd.Parameters.AddWithValue("@ID", id);
+                    cmd.Parameters.AddWithValue("@AdminID", adminId);
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return cmd.ExecuteNonQuery() > 0;
                 }
-                return true;
             }
             catch { return false; }
         }
+
 
     }
 }
