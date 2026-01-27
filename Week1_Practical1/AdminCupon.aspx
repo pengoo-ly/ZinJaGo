@@ -643,7 +643,7 @@
                         <select id="discountType" required>
                             <option value="">Select Type</option>
                             <option value="Percentage">Percentage (%)</option>
-                            <option value="FixedAmount">Fixed Amount ($)</option>
+                            <option value="Fixed">Fixed Amount ($)</option>
                         </select>
                     </div>
                 </div>
@@ -656,7 +656,7 @@
 
                     <div class="form-group">
                         <label for="coinCost">Coin Cost *</label>
-                        <input type="number" id="coinCost" placeholder="0.00" step="0.01" min="0" required />
+                        <input type="number" id="coinCost" placeholder="0.00" step="1" min="0"/>
                     </div>
                 </div>
 

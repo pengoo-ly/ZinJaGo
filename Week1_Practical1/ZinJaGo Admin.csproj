@@ -109,6 +109,7 @@
     <Content Include="SuperAdmin\AdminRole.aspx" />
     <Content Include="SuperAdmin\ControlAuthority.aspx" />
     <Content Include="SuperAdmin\ReportsAnalytics.aspx" />
+    <Content Include="SuperAdmin\SuperCupon.aspx" />
     <Content Include="SuperAdmin\SystemSettings.aspx" />
     <Content Include="SuperAdmin\ZinJaGODashboard.aspx" />
     <Content Include="test.aspx" />
@@ -291,6 +292,13 @@
     </Compile>
     <Compile Include="SuperAdmin\SuperAdmin.Master.designer.cs">
       <DependentUpon>SuperAdmin.Master</DependentUpon>
+    </Compile>
+    <Compile Include="SuperAdmin\SuperCupon.aspx.cs">
+      <DependentUpon>SuperCupon.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SuperAdmin\SuperCupon.aspx.designer.cs">
+      <DependentUpon>SuperCupon.aspx</DependentUpon>
     </Compile>
     <Compile Include="SuperAdmin\SystemSettings.aspx.cs">
       <DependentUpon>SystemSettings.aspx</DependentUpon>
