@@ -19,13 +19,27 @@ namespace Week1_Practical1
                 return;
             }
 
-            // 🔴 ADD THIS BLOCK
             string action = Request["action"];
             if (!string.IsNullOrEmpty(action))
             {
-                Response.Clear();
-                Response.Buffer = true;
+                HandleAjaxAction(action);
+                return;
+            }
 
+            if (!IsPostBack)
+            {
+                LoadCoupons();
+                LoadStatistics();
+            }
+        }
+
+        private void HandleAjaxAction(string action)
+        {
+            Response.Clear();
+            Response.Buffer = true;
+
+            try
+            {
                 switch (action)
                 {
                     case "get":
@@ -41,15 +55,11 @@ namespace Week1_Practical1
                         HandleDelete();
                         break;
                 }
-
-                Response.End(); // 🔴 FORCE STOP PAGE PIPELINE
-                return;
             }
-
-            if (!IsPostBack)
+            finally
             {
-                LoadCoupons();
-                LoadStatistics();
+                // ✅ Complete request safely
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
 

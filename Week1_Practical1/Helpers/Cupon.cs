@@ -61,7 +61,7 @@ namespace Week1_Practical1.Helpers
             string voucherType,
             string discountType,
             decimal discountValue,
-            int coinCost,
+            decimal coinCost,
             DateTime expiry,
             string status)
         {
@@ -114,7 +114,7 @@ namespace Week1_Practical1.Helpers
             string voucherType,
             string discountType,
             decimal discountValue,
-            int coinCost,
+            decimal coinCost,
             DateTime expiry,
             string status)
         {
@@ -168,11 +168,11 @@ namespace Week1_Practical1.Helpers
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(@"
-            SELECT COUNT(DISTINCT V.VoucherID)
-            FROM Vouchers V
-            LEFT JOIN AuditTrail A
-                ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-            WHERE A.AdminID = @AdminID OR A.AdminID IS NULL", con))
+                    SELECT COUNT(DISTINCT V.VoucherID)
+                    FROM Vouchers V
+                    LEFT JOIN AuditTrail A
+                        ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
+                    WHERE A.AdminID = @AdminID OR A.AdminID IS NULL", con))
                 {
                     cmd.Parameters.AddWithValue("@AdminID", adminId);
                     con.Open();
@@ -216,18 +216,18 @@ namespace Week1_Practical1.Helpers
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(@"
-            SELECT 
-                VoucherID,
-                Code,
-                VoucherType,
-                DiscountType,
-                DiscountValue,
-                CoinCost,
-                ExpiryDate,
-                Status
-            FROM Vouchers
-            WHERE CreatedBy = @AdminID
-            ORDER BY VoucherID DESC", con))
+                    SELECT 
+                        VoucherID,
+                        Code,
+                        VoucherType,
+                        DiscountType,
+                        DiscountValue,
+                        CoinCost,
+                        ExpiryDate,
+                        Status
+                    FROM Vouchers
+                    WHERE CreatedBy = @AdminID
+                    ORDER BY VoucherID DESC", con))
                 {
                     cmd.Parameters.AddWithValue("@AdminID", adminId);
                     new SqlDataAdapter(cmd).Fill(dt);

@@ -54,7 +54,7 @@
             <asp:BoundField DataField="CategoryID" HeaderText="No." />
             <asp:BoundField DataField="CategoryName" HeaderText="Category Name" />
             <asp:BoundField DataField="Description" HeaderText="Description" />
-            <asp:CommandField AccessibleHeaderText="Action" ItemStyle-CssClass="gv-btn" HeaderText="Action" ShowDeleteButton="True" ShowEditButton="True" ShowSelectButton="True" >
+            <asp:CommandField AccessibleHeaderText="Action" ItemStyle-CssClass="gv-btn" HeaderText="Action" ShowDeleteButton="True" ShowEditButton="True" ShowSelectButton="True" CancelText="🚫" DeleteText="❌" EditText="✏️" SelectText="👆" UpdateText="✔️" >
 <ItemStyle CssClass="gv-btn"></ItemStyle>
             </asp:CommandField>
         </Columns>

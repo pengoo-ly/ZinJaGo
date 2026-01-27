@@ -186,7 +186,7 @@
         table td {
             padding: 14px 8px;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            vertical-align: middle;
+            vertical-align: middle; 
         }
 
         .dark table td {
@@ -493,6 +493,7 @@
 
             .modal-content {
                 max-width: 100%;
+                background:#0f1720;
             }
         }
         .btn-sm {
@@ -507,9 +508,8 @@
         .btn-sm:hover {
             background: rgba(79, 163, 146, 0.08);
         }
-        #couponModal.show {
-            display: flex;
-        }
+
+
 
     </style>
 </asp:Content>
@@ -825,7 +825,7 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
 
-            const formData = new FormData();
+            const formData = new URLSearchParams();
             formData.append('action', voucherId.value ? 'update' : 'create');
             formData.append('voucherId', voucherId.value);
             formData.append('code', document.getElementById('couponCode').value.trim());
@@ -838,8 +838,10 @@
 
             fetch('AdminCupon.aspx', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
             })
+
                 .then(response => {
                     if (!response.ok) throw new Error('Request failed');
                     return response.json();
