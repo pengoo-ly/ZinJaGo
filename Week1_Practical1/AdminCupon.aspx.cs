@@ -19,10 +19,10 @@ namespace Week1_Practical1
                 return;
             }
 
-            string action = Request["action"];
-            if (!string.IsNullOrEmpty(action))
+            if (!string.IsNullOrEmpty(Request["action"]))
             {
-                HandleAjaxAction(action);
+                HandleAjaxAction(Request["action"]);
+                Response.End(); // ✅ STOP PAGE RENDERING
                 return;
             }
 
@@ -35,30 +35,28 @@ namespace Week1_Practical1
 
         private void HandleAjaxAction(string action)
         {
-            try
+            Response.Clear();
+            Response.ContentType = "application/json";
+
+            switch (action.ToLower())
             {
-                switch (action.ToLower())
-                {
-                    case "get":
-                        HandleGet();
-                        break;
-                    case "create":
-                        HandleCreate();
-                        break;
-                    case "update":
-                        HandleUpdate();
-                        break;
-                    case "delete":
-                        HandleDelete();
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                RespondJson(new { success = false, message = ex.Message }, 500);
+                case "get":
+                    HandleGet();
+                    break;
+                case "create":
+                    HandleCreate();
+                    break;
+                case "update":
+                    HandleUpdate();
+                    break;
+                case "delete":
+                    HandleDelete();
+                    break;
+                default:
+                    RespondJson(new { success = false, message = "Unknown action" });
+                    break;
             }
         }
-
 
         private void HandleGet()
         {
@@ -227,8 +225,6 @@ namespace Week1_Practical1
 
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             Response.Write(serializer.Serialize(data));
-
-            Response.End(); // ✅ REQUIRED & SAFE HERE
         }
 
 

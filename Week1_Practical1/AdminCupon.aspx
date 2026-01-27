@@ -282,6 +282,7 @@
             position: relative;
             margin: auto;
             opacity:1;
+            backdrop-filter:none;
         }
 
         .modal-header {
@@ -600,7 +601,7 @@
 
             <div id="alertMessage"></div>
 
-            <form id="couponForm">
+            <form id="couponForm" class="modal-panel">
                 <input type="hidden" id="voucherId" />
 
                 <div class="form-group">
@@ -616,6 +617,7 @@
                             <option value="Discount">Discount</option>
                             <option value="FreeShipping">Free Shipping</option>
                             <option value="Gift">Gift</option>
+                            <option value="Free">Free</option>
                         </select>
                     </div>
 
