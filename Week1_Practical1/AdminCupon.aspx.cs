@@ -40,7 +40,7 @@ namespace Week1_Practical1
 
             try
             {
-                switch (action)
+                switch (action.ToLower())
                 {
                     case "get":
                         HandleGet();
@@ -58,7 +58,7 @@ namespace Week1_Practical1
             }
             finally
             {
-                // ✅ Complete request safely
+                // Complete request safely instead of Response.End()
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
         }
@@ -73,24 +73,24 @@ namespace Week1_Practical1
                     return;
                 }
 
-                DataRow row = Cupon.GetCoupon(id);
+                Cupon coupon = new Cupon().GetCoupon(id);
 
-                if (row == null)
+                if (coupon == null)
                 {
-                    RespondJson(new { success = false, message = "Not found" }, 404);
+                    RespondJson(new { success = false, message = "Coupon not found" }, 404);
                     return;
                 }
 
                 RespondJson(new
                 {
-                    VoucherID = row["VoucherID"],
-                    Code = row["Code"],
-                    VoucherType = row["VoucherType"],
-                    DiscountType = row["DiscountType"],
-                    DiscountValue = row["DiscountValue"],
-                    CoinCost = row["CoinCost"],
-                    ExpiryDate = ((DateTime)row["ExpiryDate"]).ToString("yyyy-MM-dd"),
-                    Status = row["Status"]
+                    VoucherID = coupon.VoucherID,
+                    Code = coupon.Code,
+                    VoucherType = coupon.VoucherType,
+                    DiscountType = coupon.DiscountType,
+                    DiscountValue = coupon.DiscountValue,
+                    CoinCost = coupon.CoinCost,
+                    ExpiryDate = coupon.ExpiryDate.ToString("yyyy-MM-dd"),
+                    Status = coupon.Status
                 });
             }
             catch (Exception ex)
@@ -106,21 +106,24 @@ namespace Week1_Practical1
             {
                 int adminId = Convert.ToInt32(Session["AdminID"]);
 
-                bool ok = Cupon.CreateCoupon(
-                    adminId,
-                    Request.Form["code"],
-                    Request.Form["voucherType"],
-                    Request.Form["discountType"],
-                    decimal.Parse(Request.Form["discountValue"]),
-                    int.Parse(Request.Form["coinCost"]),
-                    DateTime.Parse(Request.Form["expiryDate"]),
-                    Request.Form["status"]
-                );
+                Cupon coupon = new Cupon
+                {
+                    Code = Request.Form["code"],
+                    VoucherType = Request.Form["voucherType"],
+                    DiscountType = Request.Form["discountType"],
+                    DiscountValue = decimal.Parse(Request.Form["discountValue"]),
+                    CoinCost = string.IsNullOrEmpty(Request.Form["coinCost"]) ? (int?)null: int.Parse(Request.Form["coinCost"]),
+                    ExpiryDate = DateTime.Parse(Request.Form["expiryDate"]),
+                    Status = Request.Form["status"],
+                    CreatedBy = adminId
+                };
+
+                bool ok = coupon.Create();
 
                 RespondJson(new
                 {
                     success = ok,
-                    message = ok ? "Coupon created" : "Create failed"
+                    message = ok ? "Coupon created successfully" : "Create failed"
                 });
             }
             catch (Exception ex)
@@ -136,22 +139,24 @@ namespace Week1_Practical1
             {
                 int adminId = Convert.ToInt32(Session["AdminID"]);
 
-                bool ok = Cupon.UpdateCoupon(
-                    adminId,
-                    int.Parse(Request.Form["voucherId"]),
-                    Request.Form["code"],
-                    Request.Form["voucherType"],
-                    Request.Form["discountType"],
-                    decimal.Parse(Request.Form["discountValue"]),
-                    int.Parse(Request.Form["coinCost"]),
-                    DateTime.Parse(Request.Form["expiryDate"]),
-                    Request.Form["status"]
-                );
+                Cupon coupon = new Cupon
+                {
+                    VoucherID = int.Parse(Request.Form["voucherId"]),
+                    Code = Request.Form["code"],
+                    VoucherType = Request.Form["voucherType"],
+                    DiscountType = Request.Form["discountType"],
+                    DiscountValue = decimal.Parse(Request.Form["discountValue"]),
+                    CoinCost = string.IsNullOrEmpty(Request.Form["coinCost"]) ? (int?)null : int.Parse(Request.Form["coinCost"]),
+                    ExpiryDate = DateTime.Parse(Request.Form["expiryDate"]),
+                    Status = Request.Form["status"]
+                };
+
+                bool ok = coupon.Update();
 
                 RespondJson(new
                 {
                     success = ok,
-                    message = ok ? "Coupon updated" : "Update failed"
+                    message = ok ? "Coupon updated successfully" : "Update failed"
                 });
             }
             catch (Exception ex)
@@ -165,13 +170,19 @@ namespace Week1_Practical1
         {
             try
             {
-                int id = int.Parse(Request["id"]);
-                bool ok = Cupon.DeleteCoupon(id, Convert.ToInt32(Session["AdminID"]));
+                if (!int.TryParse(Request["id"], out int id))
+                {
+                    RespondJson(new { success = false, message = "Invalid ID" }, 400);
+                    return;
+                }
+
+                Cupon coupon = new Cupon { VoucherID = id };
+                bool ok = coupon.Delete();
 
                 RespondJson(new
                 {
                     success = ok,
-                    message = ok ? "Deleted" : "Delete failed"
+                    message = ok ? "Coupon deleted successfully" : "Delete failed"
                 });
             }
             catch (Exception ex)
@@ -184,8 +195,9 @@ namespace Week1_Practical1
         private void LoadCoupons()
         {
             int adminId = Convert.ToInt32(Session["AdminID"]);
-            DataTable dt = Cupon.GetCouponsByAdmin(adminId);
-            rptCoupons.DataSource = dt;
+            List<Cupon> coupons = new Cupon().GetCouponsByAdmin(adminId);
+
+            rptCoupons.DataSource = coupons;
             rptCoupons.DataBind();
         }
 
@@ -195,15 +207,15 @@ namespace Week1_Practical1
             try
             {
                 int adminId = Convert.ToInt32(Session["AdminID"]);
-                DataRow r = Cupon.GetCouponStatisticsByAdmin(adminId);
+                List<Cupon> coupons = new Cupon().GetCouponsByAdmin(adminId);
 
-                if (r != null)
-                {
-                    lblTotalCoupons.Text = r["TotalCoupons"].ToString();
-                    lblActiveCoupons.Text = r["ActiveCoupons"].ToString();
-                    lblTotalDiscount.Text = Convert.ToDecimal(r["TotalDiscount"]).ToString("0.00");
-                    lblTimesUsed.Text = "0"; // placeholder unless you add usage table
-                }
+                lblTotalCoupons.Text = coupons.Count.ToString();
+                lblActiveCoupons.Text = coupons.FindAll(c => c.Status == "Active").Count.ToString();
+                decimal totalDiscount = 0;
+                foreach (var c in coupons)
+                    totalDiscount += c.DiscountValue;
+                lblTotalDiscount.Text = totalDiscount.ToString("0.00");
+                lblTimesUsed.Text = "0"; // placeholder if you have a usage table
             }
             catch { }
         }
@@ -220,10 +232,7 @@ namespace Week1_Practical1
             string json = serializer.Serialize(data);
             Response.Write(json);
 
-            // ❌ REMOVE THIS
-            // Response.End();
-
-            // ✅ ADD THIS
+            // ✅ Complete request safely instead of Response.End()
             HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 

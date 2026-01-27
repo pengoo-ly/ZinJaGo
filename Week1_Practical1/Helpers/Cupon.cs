@@ -10,252 +10,240 @@ namespace Week1_Practical1.Helpers
 {
     public class Cupon
     {
-        private static string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+        private string _connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
 
-        public static DataTable GetAllCoupons()
+        // Properties
+        public int VoucherID { get; set; }
+        public string Code { get; set; }
+        public string VoucherType { get; set; }
+        public string DiscountType { get; set; }
+        public decimal DiscountValue { get; set; }
+        public int? CoinCost { get; set; } // Nullable as per DB
+        public DateTime ExpiryDate { get; set; }
+        public string Status { get; set; }
+        public int CreatedBy { get; set; }
+
+        // Optional: Joined info
+        public string AdminName { get; set; } // Only if using join
+
+        // Constructors
+        public Cupon() { }
+
+        public Cupon(int voucherID, string code, string voucherType, string discountType,
+                     decimal discountValue, int? coinCost, DateTime expiryDate, string status, int createdBy,
+                     string adminName = "")
         {
-            DataTable dt = new DataTable();
+            VoucherID = voucherID;
+            Code = code;
+            VoucherType = voucherType;
+            DiscountType = discountType;
+            DiscountValue = discountValue;
+            CoinCost = coinCost;
+            ExpiryDate = expiryDate;
+            Status = status;
+            CreatedBy = createdBy;
+            AdminName = adminName;
+        }
+
+        // --- CRUD METHODS ---
+
+        public Cupon GetCoupon(int voucherID)
+        {
+            Cupon coupon = null;
             try
             {
-                using (SqlConnection con = new SqlConnection(cs))
-                using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT 
-                        V.VoucherID,
-                        V.Code,
-                        V.VoucherType,
-                        V.DiscountType,
-                        V.DiscountValue,
-                        V.CoinCost,
-                        V.ExpiryDate,
-                        V.Status,
-                        A.AdminName AS CreatedBy
-                    FROM Vouchers V
-                    LEFT JOIN AuditTrail AT ON AT.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-                    LEFT JOIN Admins A ON AT.AdminID = A.AdminID
-                    ORDER BY V.VoucherID DESC", con))
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM Vouchers WHERE VoucherID=@ID", conn))
                 {
-                    new SqlDataAdapter(cmd).Fill(dt);
+                    cmd.Parameters.AddWithValue("@ID", voucherID);
+                    conn.Open();
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            coupon = new Cupon(
+                                Convert.ToInt32(dr["VoucherID"]),
+                                dr["Code"].ToString(),
+                                dr["VoucherType"].ToString(),
+                                dr["DiscountType"].ToString(),
+                                Convert.ToDecimal(dr["DiscountValue"]),
+                                dr["CoinCost"] != DBNull.Value ? (int?)Convert.ToInt32(dr["CoinCost"]) : null,
+                                Convert.ToDateTime(dr["ExpiryDate"]),
+                                dr["Status"].ToString(),
+                                dr["CreatedBy"] != DBNull.Value ? Convert.ToInt32(dr["CreatedBy"]) : 0
+                            );
+                        }
+                    }
                 }
             }
             catch { }
-            return dt;
+            return coupon;
         }
 
-        // 🔹 Get single coupon
-        public static DataRow GetCoupon(int voucherId)
+        public List<Cupon> GetCouponsByAdmin(int adminId)
         {
-            DataTable dt = new DataTable();
-            using (SqlConnection con = new SqlConnection(cs))
-            using (SqlCommand cmd = new SqlCommand(
-                "SELECT * FROM Vouchers WHERE VoucherID=@ID", con))
+            List<Cupon> list = new List<Cupon>();
+            try
             {
-                cmd.Parameters.AddWithValue("@ID", voucherId);
-                new SqlDataAdapter(cmd).Fill(dt);
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT * FROM Vouchers WHERE CreatedBy=@AdminID ORDER BY VoucherID DESC", conn))
+                {
+                    cmd.Parameters.AddWithValue("@AdminID", adminId);
+                    conn.Open();
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            list.Add(new Cupon(
+                                Convert.ToInt32(dr["VoucherID"]),
+                                dr["Code"].ToString(),
+                                dr["VoucherType"].ToString(),
+                                dr["DiscountType"].ToString(),
+                                Convert.ToDecimal(dr["DiscountValue"]),
+                                dr["CoinCost"] != DBNull.Value ? (int?)Convert.ToInt32(dr["CoinCost"]) : null,
+                                Convert.ToDateTime(dr["ExpiryDate"]),
+                                dr["Status"].ToString(),
+                                dr["CreatedBy"] != DBNull.Value ? Convert.ToInt32(dr["CreatedBy"]) : 0
+                            ));
+                        }
+                    }
+                }
             }
-            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+            catch { }
+            return list;
         }
 
-        public static bool CreateCoupon(
-            int adminId,
-            string code,
-            string voucherType,
-            string discountType,
-            decimal discountValue,
-            decimal coinCost,
-            DateTime expiry,
-            string status)
+        public bool Create()
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(cs))
+                using (SqlConnection conn = new SqlConnection(_connStr))
                 {
-                    con.Open();
+                    conn.Open();
+                    int nextID = GetNextVoucherID(conn);
 
-                    SqlCommand insert = new SqlCommand(@"
+                    using (SqlCommand cmd = new SqlCommand(@"
                         INSERT INTO Vouchers
-                        (VoucherID, Code, VoucherType, CoinCost, DiscountType, DiscountValue, ExpiryDate, Status, CreatedBy)
+                        (VoucherID, Code, VoucherType, DiscountType, DiscountValue, CoinCost, ExpiryDate, Status, CreatedBy)
                         VALUES
-                        ((SELECT ISNULL(MAX(VoucherID),0)+1 FROM Vouchers),
-                         @Code, @VT, @CC, @DT, @DV, @ED, @Status, @AdminID)", con);
+                        (@ID, @Code, @VT, @DT, @DV, @CC, @ED, @Status, @AdminID)", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ID", nextID);
+                        cmd.Parameters.AddWithValue("@Code", Code);
+                        cmd.Parameters.AddWithValue("@VT", VoucherType);
+                        cmd.Parameters.AddWithValue("@DT", DiscountType);
+                        cmd.Parameters.AddWithValue("@DV", DiscountValue);
+                        cmd.Parameters.AddWithValue("@CC",CoinCost.HasValue ? (object)CoinCost.Value : DBNull.Value);
+                        // Nullable
+                        cmd.Parameters.AddWithValue("@ED", ExpiryDate);
+                        cmd.Parameters.AddWithValue("@Status", Status);
+                        cmd.Parameters.AddWithValue("@AdminID", CreatedBy);
+                        cmd.ExecuteNonQuery();
+                    }
 
-                    insert.Parameters.AddWithValue("@Code", code);
-                    insert.Parameters.AddWithValue("@VT", voucherType);
-                    insert.Parameters.AddWithValue("@CC", coinCost);
-                    insert.Parameters.AddWithValue("@DT", discountType);
-                    insert.Parameters.AddWithValue("@DV", discountValue);
-                    insert.Parameters.AddWithValue("@ED", expiry);
-                    insert.Parameters.AddWithValue("@Status", status);
-                    insert.Parameters.AddWithValue("@AdminID", adminId);
-
-
-                    insert.ExecuteNonQuery();
-
-                    SqlCommand audit = new SqlCommand(@"
-                        INSERT INTO AuditTrail
-                        VALUES
-                        ((SELECT ISNULL(MAX(AuditID),0)+1 FROM AuditTrail),
-                         @AdminID,
-                         CONCAT('CREATE_VOUCHER_', (SELECT MAX(VoucherID) FROM Vouchers)),
-                         GETDATE())", con);
-
-                    audit.Parameters.AddWithValue("@AdminID", adminId);
-                    audit.ExecuteNonQuery();
+                    VoucherID = nextID;
                 }
                 return true;
             }
             catch { return false; }
         }
 
-        // 🔹 Update coupon
-        public static bool UpdateCoupon(
-            int adminId,
-            int voucherId,
-            string code,
-            string voucherType,
-            string discountType,
-            decimal discountValue,
-            decimal coinCost,
-            DateTime expiry,
-            string status)
+        public bool Update()
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(cs))
-                {
-                    con.Open();
-
-                    SqlCommand cmd = new SqlCommand(@"
-                        UPDATE Vouchers SET
-                            Code=@Code,
-                            VoucherType=@VT,
-                            DiscountType=@DT,
-                            DiscountValue=@DV,
-                            CoinCost=@CC,
-                            ExpiryDate=@ED,
-                            Status=@Status
-                        WHERE VoucherID=@ID", con);
-
-                    cmd.Parameters.AddWithValue("@ID", voucherId);
-                    cmd.Parameters.AddWithValue("@Code", code);
-                    cmd.Parameters.AddWithValue("@VT", voucherType);
-                    cmd.Parameters.AddWithValue("@DT", discountType);
-                    cmd.Parameters.AddWithValue("@DV", discountValue);
-                    cmd.Parameters.AddWithValue("@CC", coinCost);
-                    cmd.Parameters.AddWithValue("@ED", expiry);
-                    cmd.Parameters.AddWithValue("@Status", status);
-                    cmd.ExecuteNonQuery();
-
-                    SqlCommand audit = new SqlCommand(@"
-                        INSERT INTO AuditTrail
-                        VALUES
-                        ((SELECT ISNULL(MAX(AuditID),0)+1 FROM AuditTrail),
-                         @AdminID,
-                         CONCAT('UPDATE_VOUCHER_',@VID),
-                         GETDATE())", con);
-
-                    audit.Parameters.AddWithValue("@AdminID", adminId);
-                    audit.Parameters.AddWithValue("@VID", voucherId);
-                    audit.ExecuteNonQuery();
-                }
-                return true;
-            }
-            catch { return false; }
-        }
-
-        public static int GetTotalCouponsByAdmin(int adminId)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(cs))
+                using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT COUNT(DISTINCT V.VoucherID)
-                    FROM Vouchers V
-                    LEFT JOIN AuditTrail A
-                        ON A.Action = CONCAT('CREATE_VOUCHER_', V.VoucherID)
-                    WHERE A.AdminID = @AdminID OR A.AdminID IS NULL", con))
+                    UPDATE Vouchers SET
+                        Code=@Code,
+                        VoucherType=@VT,
+                        DiscountType=@DT,
+                        DiscountValue=@DV,
+                        CoinCost=@CC,
+                        ExpiryDate=@ED,
+                        Status=@Status
+                    WHERE VoucherID=@ID", conn))
                 {
-                    cmd.Parameters.AddWithValue("@AdminID", adminId);
-                    con.Open();
-                    return (int)cmd.ExecuteScalar();
-                }
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
-        // Add this inside your Cupon class
-        public static DataRow GetCouponStatisticsByAdmin(int adminId)
-        {
-            DataTable dt = new DataTable();
-            using (SqlConnection con = new SqlConnection(cs))
-            using (SqlCommand cmd = new SqlCommand(@"
-                SELECT
-                    COUNT(*) AS TotalCoupons,
-                    SUM(CASE 
-                        WHEN Status='Active' AND ExpiryDate >= CAST(GETDATE() AS DATE)
-                        THEN 1 ELSE 0 END) AS ActiveCoupons,
-                    ISNULL(SUM(DiscountValue),0) AS TotalDiscount
-                FROM Vouchers
-                WHERE CreatedBy = @AdminID", con))
-            {
-                cmd.Parameters.AddWithValue("@AdminID", adminId);
-                new SqlDataAdapter(cmd).Fill(dt);
-            }
-
-            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
-        }
-
-
-
-        public static DataTable GetCouponsByAdmin(int adminId)
-        {
-            DataTable dt = new DataTable();
-            try
-            {
-                using (SqlConnection con = new SqlConnection(cs))
-                using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT 
-                        VoucherID,
-                        Code,
-                        VoucherType,
-                        DiscountType,
-                        DiscountValue,
-                        CoinCost,
-                        ExpiryDate,
-                        Status
-                    FROM Vouchers
-                    WHERE CreatedBy = @AdminID
-                    ORDER BY VoucherID DESC", con))
-                {
-                    cmd.Parameters.AddWithValue("@AdminID", adminId);
-                    new SqlDataAdapter(cmd).Fill(dt);
-                }
-            }
-            catch { }
-            return dt;
-        }
-
-
-
-        public static bool DeleteCoupon(int id, int adminId)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(cs))
-                using (SqlCommand cmd = new SqlCommand(
-                    @"DELETE FROM Vouchers WHERE VoucherID=@ID AND CreatedBy=@AdminID", con))
-                {
-                    cmd.Parameters.AddWithValue("@ID", id);
-                    cmd.Parameters.AddWithValue("@AdminID", adminId);
-                    con.Open();
+                    cmd.Parameters.AddWithValue("@ID", VoucherID);
+                    cmd.Parameters.AddWithValue("@Code", Code);
+                    cmd.Parameters.AddWithValue("@VT", VoucherType);
+                    cmd.Parameters.AddWithValue("@DT", DiscountType);
+                    cmd.Parameters.AddWithValue("@DV", DiscountValue);
+                    cmd.Parameters.AddWithValue("@CC", (object)CoinCost ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ED", ExpiryDate);
+                    cmd.Parameters.AddWithValue("@Status", Status);
+                    conn.Open();
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
             catch { return false; }
         }
 
+        public bool Delete()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand("DELETE FROM Vouchers WHERE VoucherID=@ID", conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", VoucherID);
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+            catch { return false; }
+        }
 
+        // --- JOINED METHOD ---
+        public List<Cupon> GetCouponsWithAdmin()
+        {
+            List<Cupon> list = new List<Cupon>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(@"
+                    SELECT v.*, a.AdminName
+                    FROM Vouchers v
+                    LEFT JOIN Admins a ON v.CreatedBy = a.AdminID
+                    ORDER BY v.VoucherID DESC", conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            list.Add(new Cupon(
+                                Convert.ToInt32(dr["VoucherID"]),
+                                dr["Code"].ToString(),
+                                dr["VoucherType"].ToString(),
+                                dr["DiscountType"].ToString(),
+                                Convert.ToDecimal(dr["DiscountValue"]),
+                                dr["CoinCost"] != DBNull.Value ? (int?)Convert.ToInt32(dr["CoinCost"]) : null,
+                                Convert.ToDateTime(dr["ExpiryDate"]),
+                                dr["Status"].ToString(),
+                                dr["CreatedBy"] != DBNull.Value ? Convert.ToInt32(dr["CreatedBy"]) : 0,
+                                dr["AdminName"] != DBNull.Value ? dr["AdminName"].ToString() : ""
+                            ));
+                        }
+                    }
+                }
+            }
+            catch { }
+            return list;
+        }
+
+        // --- HELPER ---
+        private int GetNextVoucherID(SqlConnection conn)
+        {
+            int nextID = 1;
+            using (SqlCommand cmd = new SqlCommand("SELECT ISNULL(MAX(VoucherID),0)+1 FROM Vouchers", conn))
+            {
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                    nextID = Convert.ToInt32(result);
+            }
+            return nextID;
+        }
     }
 }
