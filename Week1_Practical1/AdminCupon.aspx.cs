@@ -23,21 +23,27 @@ namespace Week1_Practical1
             string action = Request["action"];
             if (!string.IsNullOrEmpty(action))
             {
+                Response.Clear();
+                Response.Buffer = true;
+
                 switch (action)
                 {
                     case "get":
                         HandleGet();
-                        return;
+                        break;
                     case "create":
                         HandleCreate();
-                        return;
+                        break;
                     case "update":
                         HandleUpdate();
-                        return;
+                        break;
                     case "delete":
                         HandleDelete();
-                        return;
+                        break;
                 }
+
+                Response.End(); // 🔴 FORCE STOP PAGE PIPELINE
+                return;
             }
 
             if (!IsPostBack)
@@ -150,7 +156,7 @@ namespace Week1_Practical1
             try
             {
                 int id = int.Parse(Request["id"]);
-                bool ok = Cupon.DeleteCoupon(id);
+                bool ok = Cupon.DeleteCoupon(id, Convert.ToInt32(Session["AdminID"]));
 
                 RespondJson(new
                 {

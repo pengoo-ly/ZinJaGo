@@ -245,7 +245,7 @@ namespace Week1_Practical1.Helpers
             {
                 using (SqlConnection con = new SqlConnection(cs))
                 using (SqlCommand cmd = new SqlCommand(
-                    "DELETE FROM Vouchers WHERE VoucherID=@ID AND CreatedBy=@AdminID", con))
+                    @"DELETE FROM Vouchers WHERE VoucherID=@ID AND CreatedBy=@AdminID", con))
                 {
                     cmd.Parameters.AddWithValue("@ID", id);
                     cmd.Parameters.AddWithValue("@AdminID", adminId);

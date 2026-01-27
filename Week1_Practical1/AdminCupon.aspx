@@ -228,7 +228,7 @@
         }
 
         .btn-sm {
-            background: transparent;
+            background: var(--card);
             border: 1px solid rgba(0,0,0,0.1);
             color: var(--text);
             padding: 6px 12px;
@@ -495,6 +495,22 @@
                 max-width: 100%;
             }
         }
+        .btn-sm {
+            background: var(--card);
+        }
+
+        .dark .btn-sm {
+            background: #0f1720;
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .btn-sm:hover {
+            background: rgba(79, 163, 146, 0.08);
+        }
+        #couponModal.show {
+            display: flex;
+        }
+
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -503,46 +519,11 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-        <button type="button" class="btn-primary-custom" id="btnCreateCoupon" onclick="openAddPanel()">
+        <button type="button" class="btn-primary-custom" id="btnCreateCoupon">
             ➕ Create Coupon
         </button>
     </div>
-    <div id="addCouponPanel" class="modal-backdrop">
-        <div class="modal-content">
-            <h3>Add Coupon</h3>
-
-            <div class="form-group">
-                <label for="txtCode">Code</label>
-                <input id="txtCode" placeholder="Enter coupon code" />
-            </div>
-
-            <div class="form-group">
-                <label for="txtDiscount">Discount Value</label>
-                <input id="txtDiscount" type="number" placeholder="Enter discount" />
-            </div>
-
-            <div class="form-group">
-                <label for="txtExpiry">Expiry Date</label>
-                <input id="txtExpiry" type="date" />
-            </div>
-
-            <div class="form-group">
-                <label for="ddlType">Discount Type</label>
-                <select id="ddlType">
-                    <option value="Percentage">Percentage</option>
-                    <option value="Fixed">Fixed</option>
-                </select>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="saveCoupon()">Save</button>
-                <button class="btn-primary" onclick="closeAddPanel()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <br />
-
 
     <!-- Coupon Statistics -->
     <div class="coupon-stats">
@@ -611,12 +592,7 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button type="button" class="btn-sm edit-coupon" data-voucher-id="<%# Eval("VoucherID") %>" onclick="editCoupon(
-                                        '<%# Eval("VoucherID") %>',
-                                        '<%# Eval("Code") %>',
-                                        '<%# Eval("DiscountType") %>',
-                                        '<%# Eval("DiscountValue") %>',
-                                        '<%# Eval("ExpiryDate","{0:yyyy-MM-dd}") %>')">Edit</button>
+                                    <button type="button" class="btn-sm edit-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Edit</button>
                                     <button type="button" class="btn-sm danger delete-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Delete</button>
                                 </div>
                             </td>
@@ -720,49 +696,6 @@
         const dropdownMenu = document.getElementById('dropdownMenu');
         const moreBtn = document.querySelector('.more-btn');
         const alertMessage = document.getElementById('alertMessage');
-
-        function openAddPanel() {
-            document.getElementById("addCouponPanel").style.display = "block";
-        }
-        function closeAddPanel() {
-            document.getElementById("addCouponPanel").style.display = "none";
-        }
-
-        function saveCoupon() {
-            const formData = new FormData();
-            formData.append("action", "create");
-            formData.append("code", txtCode.value);
-            formData.append("voucherType", "Discount");
-            formData.append("discountType", ddlType.value);
-            formData.append("discountValue", txtDiscount.value);
-            formData.append("coinCost", 0);
-            formData.append("expiryDate", txtExpiry.value);
-            formData.append("status", "Active");
-
-            fetch("AdminCupon.aspx", {
-                method: "POST",
-                body: formData
-            })
-                .then(r => r.json())
-                .then(res => {
-                    if (res.success) {
-                        closeAddPanel();
-                        location.reload();
-                    } else {
-                        alert(res.message);
-                    }
-                });
-        }
-
-        function editCoupon(id, code, type, value, expiry) {
-            openAddPanel();
-            document.getElementById("hdnVoucherID").value = id;
-            txtCode.value = code;
-            ddlType.value = type;
-            txtDiscount.value = value;
-            txtExpiry.value = expiry;
-        }
-
 
         // Show alert message
         function showAlert(message, type = 'error') {
@@ -943,7 +876,7 @@
                 if (isVisible) visibleCount++;
             });
 
-            updateEmptyState(visibleCount === 0);
+            setTimeout(updateEmptyState, 100);
         });
 
         // Filter dropdown
