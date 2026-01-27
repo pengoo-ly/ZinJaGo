@@ -35,9 +35,6 @@ namespace Week1_Practical1
 
         private void HandleAjaxAction(string action)
         {
-            Response.Clear();
-            Response.Buffer = true;
-
             try
             {
                 switch (action.ToLower())
@@ -56,12 +53,12 @@ namespace Week1_Practical1
                         break;
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                // Complete request safely instead of Response.End()
-                HttpContext.Current.ApplicationInstance.CompleteRequest();
+                RespondJson(new { success = false, message = ex.Message }, 500);
             }
         }
+
 
         private void HandleGet()
         {
@@ -229,14 +226,13 @@ namespace Week1_Practical1
             Response.TrySkipIisCustomErrors = true;
 
             JavaScriptSerializer serializer = new JavaScriptSerializer();
-            string json = serializer.Serialize(data);
-            Response.Write(json);
+            Response.Write(serializer.Serialize(data));
 
-            // ✅ Complete request safely instead of Response.End()
-            HttpContext.Current.ApplicationInstance.CompleteRequest();
+            Response.End(); // ✅ REQUIRED & SAFE HERE
         }
 
-       
+
+
 
     }
 }
