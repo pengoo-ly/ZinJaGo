@@ -20,6 +20,8 @@ namespace Week1_Practical1
             if (!IsPostBack) 
             {
                 bind();
+                int defaultID = aCategory.GetNextCategoryID();
+                txtCatID.Text = defaultID.ToString();
             }
         }
         protected void bind() 
@@ -144,7 +146,17 @@ namespace Week1_Practical1
             try 
             {
                 Category cat = new Category();
-                cat.CategoryID = Convert.ToInt32(txtCatID.Text);
+                if (!int.TryParse(txtCatID.Text.Trim(), out int catID))
+                {
+                    Response.Write("<script>alert('Invalid Product ID');</script>");
+                    return;
+                }
+                if (cat.CategoryExists(catID))
+                {
+                    Response.Write("<script>alert('This Category ID already exists!');</script>");
+                    return;
+                }
+                
                 cat.CategoryName = txtCatName.Text;
                 cat.Description = txtCatDesc.Text;
                 int result = cat.CategoryInsert();

@@ -27,7 +27,7 @@
                     <asp:Label runat="server" Text="Product ID:" AssociatedControlID="txtProdID"></asp:Label>
                 </td>
                 <td>
-                    <asp:TextBox ID="txtProdID" CssClass="textbox" runat="server"></asp:TextBox>
+                    <asp:TextBox ID="txtProdID" CssClass="textbox" runat="server" OnTextChanged="txtProdID_TextChanged"></asp:TextBox>
                 </td>
             </tr>
             <tr>
