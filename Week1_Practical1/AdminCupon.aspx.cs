@@ -19,13 +19,6 @@ namespace Week1_Practical1
                 return;
             }
 
-            if (!string.IsNullOrEmpty(Request["action"]))
-            {
-                HandleAjaxAction(Request["action"]);
-                Response.End(); // ✅ STOP PAGE RENDERING
-                return;
-            }
-
             if (!IsPostBack)
             {
                 LoadCoupons();
@@ -33,30 +26,6 @@ namespace Week1_Practical1
             }
         }
 
-        private void HandleAjaxAction(string action)
-        {
-            Response.Clear();
-            Response.ContentType = "application/json";
-
-            switch (action.ToLower())
-            {
-                case "get":
-                    HandleGet();
-                    break;
-                case "create":
-                    HandleCreate();
-                    break;
-                case "update":
-                    HandleUpdate();
-                    break;
-                case "delete":
-                    HandleDelete();
-                    break;
-                default:
-                    RespondJson(new { success = false, message = "Unknown action" });
-                    break;
-            }
-        }
 
         private void HandleGet()
         {
