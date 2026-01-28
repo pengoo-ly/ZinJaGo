@@ -73,11 +73,15 @@
     <Content Include="AdminSignUp.aspx" />
     <Content Include="Categories.aspx" />
     <Content Include="CourierManagement.aspx" />
-    <Content Include="CustomerPasswordReset.aspx" />
+    <Content Include="Customer\CustomerPasswordReset.aspx" />
     <Content Include="Customers.aspx" />
-    <Content Include="CustomerSignup.aspx" />
+    <Content Include="Customer\CustomerSignup.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="AdminPasswordReset.aspx" />
+    <Content Include="Images\DogFood.png" />
+    <Content Include="Images\Dumbbell.png" />
+    <Content Include="Images\FakeTree.png" />
+    <Content Include="Images\HarryPotter1.jpeg" />
     <Content Include="Images\Hoodie.png" />
     <Content Include="Images\Lamp.png" />
     <Content Include="Images\login.png" />
@@ -105,6 +109,7 @@
     <Content Include="SuperAdmin\AdminRole.aspx" />
     <Content Include="SuperAdmin\ControlAuthority.aspx" />
     <Content Include="SuperAdmin\ReportsAnalytics.aspx" />
+    <Content Include="SuperAdmin\SuperCupon.aspx" />
     <Content Include="SuperAdmin\SystemSettings.aspx" />
     <Content Include="SuperAdmin\ZinJaGODashboard.aspx" />
     <Content Include="test.aspx" />
@@ -162,11 +167,11 @@
     <Compile Include="CourierManagement.aspx.designer.cs">
       <DependentUpon>CourierManagement.aspx</DependentUpon>
     </Compile>
-    <Compile Include="CustomerPasswordReset.aspx.cs">
+    <Compile Include="Customer\CustomerPasswordReset.aspx.cs">
       <DependentUpon>CustomerPasswordReset.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="CustomerPasswordReset.aspx.designer.cs">
+    <Compile Include="Customer\CustomerPasswordReset.aspx.designer.cs">
       <DependentUpon>CustomerPasswordReset.aspx</DependentUpon>
     </Compile>
     <Compile Include="Customers.aspx.cs">
@@ -176,11 +181,11 @@
     <Compile Include="Customers.aspx.designer.cs">
       <DependentUpon>Customers.aspx</DependentUpon>
     </Compile>
-    <Compile Include="CustomerSignup.aspx.cs">
+    <Compile Include="Customer\CustomerSignup.aspx.cs">
       <DependentUpon>CustomerSignup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="CustomerSignup.aspx.designer.cs">
+    <Compile Include="Customer\CustomerSignup.aspx.designer.cs">
       <DependentUpon>CustomerSignup.aspx</DependentUpon>
     </Compile>
     <Compile Include="DeliveryTrackingAdmin.aspx.cs">
@@ -205,8 +210,10 @@
       <DependentUpon>Guess_the_number.aspx</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Category.cs" />
+    <Compile Include="Helpers\Cupon.cs" />
     <Compile Include="Helpers\Customer.cs" />
     <Compile Include="Helpers\DbLogger.cs" />
+    <Compile Include="Helpers\Order.cs" />
     <Compile Include="Helpers\Product.cs" />
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
@@ -286,6 +293,13 @@
     <Compile Include="SuperAdmin\SuperAdmin.Master.designer.cs">
       <DependentUpon>SuperAdmin.Master</DependentUpon>
     </Compile>
+    <Compile Include="SuperAdmin\SuperCupon.aspx.cs">
+      <DependentUpon>SuperCupon.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SuperAdmin\SuperCupon.aspx.designer.cs">
+      <DependentUpon>SuperCupon.aspx</DependentUpon>
+    </Compile>
     <Compile Include="SuperAdmin\SystemSettings.aspx.cs">
       <DependentUpon>SystemSettings.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -333,9 +347,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Customer\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -186,7 +186,7 @@
         table td {
             padding: 14px 8px;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            vertical-align: middle;
+            vertical-align: middle; 
         }
 
         .dark table td {
@@ -228,7 +228,7 @@
         }
 
         .btn-sm {
-            background: transparent;
+            background: var(--card);
             border: 1px solid rgba(0,0,0,0.1);
             color: var(--text);
             padding: 6px 12px;
@@ -279,6 +279,10 @@
             max-height: 90vh;
             overflow-y: auto;
             padding: 28px;
+            position: relative;
+            margin: auto;
+            opacity:1;
+            backdrop-filter:none;
         }
 
         .modal-header {
@@ -332,7 +336,7 @@
             padding: 10px 12px;
             border: 1px solid rgba(0,0,0,0.1);
             border-radius: 6px;
-            background: transparent;
+            background: var(--card);
             color: var(--text);
             font-size: 13px;
             font-family: inherit;
@@ -342,6 +346,8 @@
         .dark .form-group input,
         .dark .form-group select {
             border-color: rgba(255,255,255,0.1);
+            background: #0f1720;
+            color: #ffffff;
         }
 
         .form-group input:focus,
@@ -486,10 +492,6 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
-
-            .modal-content {
-                max-width: 100%;
-            }
         }
     </style>
 </asp:Content>
@@ -503,6 +505,7 @@
             ➕ Create Coupon
         </button>
     </div>
+    <br />
 
     <!-- Coupon Statistics -->
     <div class="coupon-stats">
@@ -598,7 +601,7 @@
 
             <div id="alertMessage"></div>
 
-            <form id="couponForm">
+            <form id="couponForm" class="modal-panel">
                 <input type="hidden" id="voucherId" />
 
                 <div class="form-group">
@@ -614,6 +617,7 @@
                             <option value="Discount">Discount</option>
                             <option value="FreeShipping">Free Shipping</option>
                             <option value="Gift">Gift</option>
+                            <option value="Free">Free</option>
                         </select>
                     </div>
 
@@ -622,7 +626,7 @@
                         <select id="discountType" required>
                             <option value="">Select Type</option>
                             <option value="Percentage">Percentage (%)</option>
-                            <option value="FixedAmount">Fixed Amount ($)</option>
+                            <option value="Fixed">Fixed Amount ($)</option>
                         </select>
                     </div>
                 </div>
@@ -635,7 +639,7 @@
 
                     <div class="form-group">
                         <label for="coinCost">Coin Cost *</label>
-                        <input type="number" id="coinCost" placeholder="0.00" step="0.01" min="0" required />
+                        <input type="number" id="coinCost" placeholder="0.00" step="1" min="0"/>
                     </div>
                 </div>
 
@@ -661,246 +665,154 @@
         </div>
     </div>
 
-    <script>
-        const modal = document.getElementById('couponModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const couponForm = document.getElementById('couponForm');
-        const voucherId = document.getElementById('voucherId');
-        const btnCreateCoupon = document.getElementById('btnCreateCoupon');
-        const closeModal = document.getElementById('closeModal');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const couponsTableBody = document.getElementById('couponsTableBody');
-        const searchCoupons = document.getElementById('searchCoupons');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const moreBtn = document.querySelector('.more-btn');
-        const alertMessage = document.getElementById('alertMessage');
+   <script>
+       document.addEventListener('DOMContentLoaded', () => {
 
-        // Show alert message
-        function showAlert(message, type = 'error') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            alertMessage.innerHTML = '';
-            alertMessage.appendChild(alertDiv);
+           const modal = document.getElementById('couponModal');
+           const modalTitle = document.getElementById('modalTitle');
+           const couponForm = document.getElementById('couponForm');
+           const voucherId = document.getElementById('voucherId');
+           const btnCreateCoupon = document.getElementById('btnCreateCoupon');
+           const submitBtn = document.getElementById('submitBtn');
+           const alertMessage = document.getElementById('alertMessage');
+           const couponsTableBody = document.getElementById('couponsTableBody');
 
-            if (type === 'success') {
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 3000);
-            }
-        }
+           /* ------------------ Helpers ------------------ */
 
-        // Open modal for creating coupon
-        btnCreateCoupon.addEventListener('click', () => {
-            voucherId.value = '';
-            couponForm.reset();
-            modalTitle.textContent = 'Create Coupon';
-            alertMessage.innerHTML = '';
-            modal.classList.add('show');
-        });
+           function showAlert(msg, type = 'error') {
+               alertMessage.innerHTML =
+                   `<div class="alert alert-${type}">${msg}</div>`;
+           }
 
-        // Close modal
-        closeModal.addEventListener('click', () => {
-            modal.classList.remove('show');
-            alertMessage.innerHTML = '';
-        });
+           function closeModal() {
+               modal.classList.remove('show');
+               alertMessage.innerHTML = '';
+               submitBtn.disabled = false;
+               submitBtn.textContent = 'Save Coupon';
+               couponForm.reset();
+               voucherId.value = '';
+           }
 
-        cancelBtn.addEventListener('click', () => {
-            modal.classList.remove('show');
-            alertMessage.innerHTML = '';
-        });
+           function openCreateModal() {
+               modalTitle.textContent = 'Create Coupon';
+               submitBtn.textContent = 'Save Coupon';
+               submitBtn.disabled = false;
+               couponForm.reset();
+               voucherId.value = '';
+               alertMessage.innerHTML = '';
+               modal.classList.add('show');
+           }
 
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('show');
-                alertMessage.innerHTML = '';
-            }
-        });
+           /* ------------------ Modal Buttons ------------------ */
 
-        // Edit coupon
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('edit-coupon')) {
-                const row = e.target.closest('tr');
-                const vId = row.dataset.voucherId;
+           btnCreateCoupon.onclick = openCreateModal;
+           document.getElementById('closeModal').onclick = closeModal;
+           document.getElementById('cancelBtn').onclick = closeModal;
 
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+           modal.onclick = e => {
+               if (e.target === modal) closeModal();
+           };
 
-                fetch(`AdminCupon.aspx?action=get&id=${vId}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Failed to fetch coupon');
-                        return response.json();
-                    })
-                    .then(data => {
-                        voucherId.value = data.VoucherID;
-                        document.getElementById('couponCode').value = data.Code;
-                        document.getElementById('voucherType').value = data.VoucherType;
-                        document.getElementById('discountType').value = data.DiscountType;
-                        document.getElementById('discountValue').value = data.DiscountValue;
-                        document.getElementById('coinCost').value = data.CoinCost;
-                        document.getElementById('expiryDate').value = data.ExpiryDate;
-                        document.getElementById('status').value = data.Status;
+           /* ------------------ Edit / Delete Buttons ------------------ */
 
-                        modalTitle.textContent = 'Edit Coupon';
-                        alertMessage.innerHTML = '';
-                        modal.classList.add('show');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Update Coupon';
-                    })
-                    .catch(error => {
-                        showAlert('Error loading coupon: ' + error.message);
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Save Coupon';
-                    });
-            }
-        });
+           document.addEventListener('click', e => {
 
-        // Delete coupon
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-coupon')) {
-                const row = e.target.closest('tr');
-                const vId = row.dataset.voucherId;
+               /* ---- EDIT ---- */
+               if (e.target.classList.contains('edit-coupon')) {
+                   const id = e.target.dataset.voucherId;
 
-                if (confirm('Are you sure you want to delete this coupon? This action cannot be undone.')) {
-                    e.target.disabled = true;
-                    e.target.innerHTML = '<span class="loading-spinner"></span>';
+                   fetch(`AdminCupon.aspx?action=get&id=${id}`)
+                       .then(r => r.json())
+                       .then(d => {
+                           voucherId.value = d.VoucherID;
+                           couponCode.value = d.Code;
+                           voucherType.value = d.VoucherType;
+                           discountType.value = d.DiscountType;
+                           discountValue.value = d.DiscountValue;
+                           coinCost.value = d.CoinCost ?? '';
+                           expiryDate.value = d.ExpiryDate;
+                           status.value = d.Status;
 
-                    fetch(`AdminCupon.aspx?action=delete&id=${vId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Failed to delete coupon');
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                row.style.animation = 'fadeOut 0.3s ease';
-                                setTimeout(() => {
-                                    row.remove();
-                                    location.reload();
-                                }, 300);
-                            } else {
-                                throw new Error(data.message || 'Failed to delete coupon');
-                            }
-                        })
-                        .catch(error => {
-                            alert('Error: ' + error.message);
-                            e.target.disabled = false;
-                            e.target.textContent = 'Delete';
-                        });
-                }
-            }
-        });
+                           modalTitle.textContent = 'Edit Coupon';
+                           submitBtn.textContent = 'Update Coupon';
+                           modal.classList.add('show');
+                       })
+                       .catch(() => showAlert('Failed to load coupon'));
+               }
 
-        // Save coupon
-        couponForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+               /* ---- DELETE ---- */
+               if (e.target.classList.contains('delete-coupon')) {
+                   const row = e.target.closest('tr');
+                   const id = e.target.dataset.voucherId;
 
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+                   if (!confirm('Delete this coupon?')) return;
 
-            const formData = new FormData();
-            formData.append('action', voucherId.value ? 'update' : 'create');
-            formData.append('voucherId', voucherId.value);
-            formData.append('code', document.getElementById('couponCode').value.trim());
-            formData.append('voucherType', document.getElementById('voucherType').value);
-            formData.append('discountType', document.getElementById('discountType').value);
-            formData.append('discountValue', document.getElementById('discountValue').value);
-            formData.append('coinCost', document.getElementById('coinCost').value);
-            formData.append('expiryDate', document.getElementById('expiryDate').value);
-            formData.append('status', document.getElementById('status').value);
+                   fetch(`AdminCupon.aspx?action=delete&id=${id}`)
+                       .then(r => r.json())
+                       .then(d => {
+                           if (d.success) {
+                               row.remove();
+                           } else {
+                               showAlert(d.message);
+                           }
+                       })
+                       .catch(() => showAlert('Delete failed'));
+               }
+           });
 
-            fetch('AdminCupon.aspx', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Request failed');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        showAlert(data.message, 'success');
-                        setTimeout(() => {
-                            modal.classList.remove('show');
-                            location.reload();
-                        }, 1500);
-                    } else {
-                        showAlert(data.message || 'An error occurred');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = voucherId.value ? 'Update Coupon' : 'Save Coupon';
-                    }
-                })
-                .catch(error => {
-                    showAlert('Error: ' + error.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = voucherId.value ? 'Update Coupon' : 'Save Coupon';
-                });
-        });
+           /* ------------------ Save (Create / Update) ------------------ */
 
-        // Search functionality
-        searchCoupons.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            let visibleCount = 0;
+           couponForm.onsubmit = e => {
+               e.preventDefault();
 
-            document.querySelectorAll('.coupon-row').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                const isVisible = text.includes(query);
-                row.style.display = isVisible ? '' : 'none';
-                if (isVisible) visibleCount++;
-            });
+               submitBtn.disabled = true;
+               submitBtn.textContent = 'Saving...';
 
-            updateEmptyState(visibleCount === 0);
-        });
+               const fd = new URLSearchParams();
+               fd.append('action', voucherId.value ? 'update' : 'create');
+               fd.append('voucherId', voucherId.value);
+               fd.append('code', couponCode.value);
+               fd.append('voucherType', voucherType.value);
+               fd.append('discountType', discountType.value);
+               fd.append('discountValue', discountValue.value);
+               fd.append('expiryDate', expiryDate.value);
+               fd.append('status', status.value);
 
-        // Filter dropdown
-        moreBtn.addEventListener('click', () => {
-            dropdownMenu.classList.toggle('show');
-        });
+               if (coinCost.value !== '') {
+                   fd.append('coinCost', coinCost.value);
+               }
 
-        document.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const action = e.target.dataset.action;
-                let visibleCount = 0;
+               fetch('AdminCupon.aspx', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                   body: fd.toString()
+               })
+                   .then(r => r.json())
+                   .then(d => {
+                       if (d.success) {
+                           location.reload();
+                       } else {
+                           showAlert(d.message);
+                           submitBtn.disabled = false;
+                           submitBtn.textContent = voucherId.value ? 'Update Coupon' : 'Save Coupon';
+                       }
+                   })
+                   .catch(() => {
+                       showAlert('Save failed');
+                       submitBtn.disabled = false;
+                       submitBtn.textContent = 'Save Coupon';
+                   });
+           };
 
-                document.querySelectorAll('.coupon-row').forEach(row => {
-                    const status = row.dataset.status;
-                    const isVisible = action === 'all' || status === action;
-                    row.style.display = isVisible ? '' : 'none';
-                    if (isVisible) visibleCount++;
-                });
+           /* ------------------ Search ------------------ */
 
-                updateEmptyState(visibleCount === 0);
-                dropdownMenu.classList.remove('show');
-            });
-        });
+           searchCoupons.oninput = () => {
+               const q = searchCoupons.value.toLowerCase();
+               document.querySelectorAll('.coupon-row').forEach(r => {
+                   r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+               });
+           };
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.more-btn') && !e.target.closest('.dropdown-menu')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-
-        // Update empty state
-        function updateEmptyState(isEmpty = false) {
-            const emptyState = document.getElementById('emptyState');
-            const tableWrapper = document.querySelector('.table-wrapper');
-
-            if (isEmpty || couponsTableBody.children.length === 0) {
-                emptyState.style.display = 'block';
-                document.getElementById('couponsTable').style.display = 'none';
-            } else {
-                emptyState.style.display = 'none';
-                document.getElementById('couponsTable').style.display = 'table';
-            }
-        }
-
-        updateEmptyState();
-    </script>
+       });
+   </script>
 </asp:Content>

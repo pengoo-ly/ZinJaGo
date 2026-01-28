@@ -320,7 +320,7 @@
             <!-- Left Side - Signup Form -->
             <div class="login-form-section">
                 <div class="logo">
-                    <img src="Images/zinjago.png" alt="ZinJaGO Logo" />
+                    <img src="../Images/zinjago.png" alt="ZinJaGO Logo" />
                 </div>
 
                 <h1>Create Account</h1>
@@ -376,7 +376,7 @@
                 <asp:Button ID="btnSignup" runat="server" Text="Create Account" CssClass="signup-button" OnClick="btnSignup_Click" />
                 
                 <div class="login-link">
-                    Already have an account? <a href="CustomerLogin.aspx">Sign in here</a>
+                    Already have an account? <a href="../Login.aspx">Sign in here</a>
                 </div>
 
                 <br />

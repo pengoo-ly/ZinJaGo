@@ -5,115 +5,74 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Week1_Practical1.Helpers;
 
 namespace Week1_Practical1
 {
     public partial class OrderManagement : System.Web.UI.Page
     {
-        string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            try
             {
-                LoadOrderStatistics();
-                LoadOrders();
+                if (!IsPostBack)
+                {
+                    if (Session["AdminID"] == null)
+                    {
+                        Response.Redirect("Login.aspx");
+                        return;
+                    }
+
+                    int adminId = Convert.ToInt32(Session["AdminID"]);
+
+                    LoadStatistics(adminId);
+                    LoadOrders(adminId);
+                }
+            }
+            catch(Exception ex)
+            {
+                ShowError(ex.Message);
             }
         }
 
-        private void LoadOrderStatistics()
+        private void LoadStatistics(int adminId)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(cs))
+                DataTable dt = Order.GetOrderStatistics(adminId);
+
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
-
-                    // Total Orders
-                    SqlCommand cmdTotalOrders = new SqlCommand("SELECT COUNT(*) FROM Orders", conn);
-                    int totalOrders = (int)cmdTotalOrders.ExecuteScalar();
-                    lblTotalOrders.Text = totalOrders.ToString("N0");
-
-                    // New Orders (last 7 days)
-                    SqlCommand cmdNewOrders = new SqlCommand(
-                        "SELECT COUNT(*) FROM Orders WHERE OrderDate >= DATEADD(day, -7, CAST(GETDATE() AS DATE))", conn);
-                    int newOrders = (int)cmdNewOrders.ExecuteScalar();
-                    lblNewOrders.Text = newOrders.ToString("N0");
-                    lblAllOrderCount.Text = totalOrders.ToString();
-
-                    // Completed Orders (Paid orders)
-                    SqlCommand cmdCompleted = new SqlCommand(
-                        "SELECT COUNT(*) FROM Orders WHERE PaymentStatus = 'Paid'", conn);
-                    int completedOrders = (int)cmdCompleted.ExecuteScalar();
-                    lblCompletedOrders.Text = completedOrders.ToString("N0");
-
-                    // Unpaid Orders
-                    SqlCommand cmdCanceled = new SqlCommand(
-                        "SELECT COUNT(*) FROM Orders WHERE PaymentStatus = 'Unpaid'", conn);
-                    int unpaidOrders = (int)cmdCanceled.ExecuteScalar();
-                    lblCanceledOrders.Text = unpaidOrders.ToString("N0");
+                    DataRow r = dt.Rows[0];
+                    lblTotalOrders.Text = r["TotalOrders"].ToString();
+                    lblNewOrders.Text = r["NewOrders"].ToString();
+                    lblCompletedOrders.Text = r["CompletedOrders"].ToString();
+                    lblCanceledOrders.Text = r["UnpaidOrders"].ToString();
+                    lblAllOrderCount.Text = r["TotalOrders"].ToString();
                 }
             }
             catch (Exception ex)
             {
-                ShowError("Error loading order statistics: " + ex.Message);
+                ShowError(ex.Message);
             }
         }
 
-        private void LoadOrders()
+        private void LoadOrders(int adminId)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    SqlDataAdapter da = new SqlDataAdapter(
-                        @"SELECT 
-                            o.OrderID,
-                            p.ProductName,
-                            o.OrderDate,
-                            oi.UnitPrice AS Price,
-                            o.PaymentStatus,
-                            CASE 
-                                WHEN o.PaymentStatus = 'Paid' THEN 'Delivered'
-                                WHEN o.PaymentStatus = 'Unpaid' THEN 'Pending'
-                                ELSE 'Pending'
-                            END AS OrderStatus,
-                            '📦' AS ProductIcon
-                        FROM Orders o
-                        JOIN OrderItems oi ON o.OrderID = oi.OrderID
-                        JOIN Products p ON oi.ProductID = p.ProductID
-                        ORDER BY o.OrderDate DESC", conn);
-
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-
-                    rptOrders.DataSource = dt;
-                    rptOrders.DataBind();
-                }
+                rptOrders.DataSource = Order.GetOrdersByAdmin(adminId);
+                rptOrders.DataBind();
             }
             catch (Exception ex)
             {
-                ShowError("Error loading orders: " + ex.Message);
+                ShowError(ex.Message);
             }
         }
 
         /// <summary>
         /// Resolves product image based on product name
         /// </summary>
-        public string ResolveProductImage(string productName)
-        {
-            if (string.IsNullOrEmpty(productName))
-                return "Images/default.png";
-
-            string product = productName.ToLower().Trim();
-
-            if (product.Contains("vitamin"))
-                return "Images/Vitamin.png";
-            else if (product.Contains("mouse") || product.Contains("wireless"))
-                return "Images/Wireless_Mouse.png";
-            else
-                return "Images/default.png";
-        }
 
         public string GetStatusIcon(string status)
         {

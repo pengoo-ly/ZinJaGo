@@ -260,12 +260,12 @@ namespace Week1_Practical1
                 using (SqlConnection con = new SqlConnection(cs))
                 {
                     SqlDataAdapter da = new SqlDataAdapter(@"
-                SELECT OS.ShipmentID, OS.Status, OS.ShippedDate
-                FROM OrderShipments OS
-                JOIN OrderItems OI ON OS.OrderID = OI.OrderID
-                JOIN Products P ON OI.ProductID = P.ProductID
-                WHERE P.AdminID=@AdminID
-                ORDER BY OS.ShippedDate DESC", con);
+                        SELECT OS.ShipmentID, OS.Status, OS.ShippedDate
+                        FROM OrderShipments OS
+                        JOIN OrderItems OI ON OS.OrderID = OI.OrderID
+                        JOIN Products P ON OI.ProductID = P.ProductID
+                        WHERE P.AdminID=@AdminID
+                        ORDER BY OS.ShippedDate DESC", con);
                     da.SelectCommand.Parameters.AddWithValue("@AdminID", adminId);
 
                     DataTable dt = new DataTable();

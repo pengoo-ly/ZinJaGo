@@ -109,7 +109,7 @@ namespace Week1_Practical1
 
         protected void lnkCustomerForgotPassword_Click(object sender, EventArgs e)
         {
-            Response.Redirect("CustomerPasswordReset.aspx");
+            Response.Redirect("~/Customer/CustomerPasswordReset.aspx");
         }
 
         private bool ValidateCustomerCredentials(string email, string password, out int userId, out string userName)

@@ -39,7 +39,7 @@
                 </EditItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="Status" HeaderText="Status" />
-            <asp:CommandField AccessibleHeaderText="Action" ItemStyle-CssClass="gv-btn" HeaderText="Action" ShowSelectButton="True" ShowDeleteButton="True" ShowEditButton="True" >
+            <asp:CommandField AccessibleHeaderText="Action" ItemStyle-CssClass="gv-btn" HeaderText="Action" ShowSelectButton="True" ShowDeleteButton="True" ShowEditButton="True" CancelText="🚫" DeleteText="❌" EditText="✏️" SelectText="👆" UpdateText="✔️" >
 <ItemStyle CssClass="gv-btn"></ItemStyle>
             </asp:CommandField>
         </Columns>

@@ -540,7 +540,7 @@
                             <td>
                                 <div class="product-cell">
                                     <div class="product-icon">
-                                        <img src="<%# ResolveProductImage(Eval("ProductName").ToString()) %>" alt="<%# Eval("ProductName") %>" />
+                                        <img src="<%# Eval("ImageUrl") %>" alt="<%# Eval("ProductName") %>" alt="<%# Eval("ProductName") %>" />
                                     </div>
                                     <div class="product-name"><%# Eval("ProductName") %></div>
                                 </div>
@@ -726,6 +726,12 @@
                 this.classList.add('active');
                 filterOrders(this.dataset.filter);
             });
+        });
+
+        document.getElementById('searchOrders').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
         });
 
         document.getElementById('searchOrders').addEventListener('input', applySearch);

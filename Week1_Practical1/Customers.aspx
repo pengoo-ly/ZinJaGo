@@ -440,6 +440,38 @@
                 padding: 10px 6px;
             }
         }
+        /* Make period selector flexible */
+        .period-selector {
+            display: flex;
+            gap: 8px; /* space between buttons and dropdowns */
+            flex-wrap: wrap; /* wrap on small screens */
+            align-items: center;
+        }
+
+        /* Style the ASP.NET DropDownList to match theme */
+        .period-selector .form-select {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-family: 'Segoe UI', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-selector .form-select:hover {
+            border-color: var(--accent);
+            background: rgba(79,163,146,0.05);
+        }
+
+        .period-selector .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79,163,146,0.2);
+        }
+
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -491,6 +523,12 @@
                 <div class="period-selector">
                     <button type="button" class="period-btn active" data-period="week">This week</button>
                     <button type="button" class="period-btn" data-period="month">Last week</button>
+
+                    <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    </asp:DropDownList>
+
+                    <asp:DropDownList ID="ddlMonth" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    </asp:DropDownList>
                 </div>
             </div>
 
@@ -535,7 +573,6 @@
                         <th>Order Count</th>
                         <th>Total Spent</th>
                         <th>Status</th>
-                        <th style="width: 80px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="customersTableBody">
@@ -552,13 +589,6 @@
                                         <span class="status-dot <%# Eval("Status").ToString() == "Active" ? "status-active" : (Eval("Status").ToString() == "VIP" ? "status-vip" : "status-inactive") %>"></span>
                                         <%# Eval("Status") %>
                                     </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button type="button" class="action-btn" title="View">👁️</button>
-                                        <button type="button" class="action-btn" title="Edit">✎</button>
-                                        <button type="button" class="action-btn" title="Delete">🗑️</button>
-                                    </div>
                                 </td>
                             </tr>
                         </ItemTemplate>
@@ -583,12 +613,25 @@
     <script>
         let chartInstance = null;
 
+        function getCssVariable(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        function hexToRgba(hex, alpha = 0.1) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+
         function renderChart(labels, data) {
             const ctx = document.getElementById('customerChart').getContext('2d');
 
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            const accent = getCssVariable('--accent');
+            const textColor = getCssVariable('--text');
+            const mutedColor = getCssVariable('--muted');
+
+            if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -597,12 +640,12 @@
                     datasets: [{
                         label: 'Customers',
                         data: data,
-                        borderColor: '#1cb074',
-                        backgroundColor: 'rgba(28, 176, 116, 0.1)',
+                        borderColor: accent,
+                        backgroundColor: hexToRgba(accent, 0.1),
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#1cb074',
-                        pointBorderColor: '#fff',
+                        pointBackgroundColor: accent,
+                        pointBorderColor: textColor,
                         pointBorderWidth: 2,
                         pointRadius: 5,
                         pointHoverRadius: 7
@@ -612,34 +655,11 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: 'var(--text)',
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
+                        legend: { labels: { color: textColor } }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: 'var(--muted)'
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: 'var(--muted)'
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { ticks: { color: mutedColor }, grid: { color: hexToRgba(mutedColor, 0.1) } },
+                        x: { ticks: { color: mutedColor }, grid: { display: false } }
                     }
                 }
             });

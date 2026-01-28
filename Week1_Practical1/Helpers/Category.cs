@@ -244,5 +244,59 @@ namespace Week1_Practical1.Helpers
 
             return catList;
         }
+
+        public bool CategoryExists(int categoryId)
+        {
+            try
+            {
+                bool exists = false;
+                string query = "SELECT COUNT(*) FROM Categories WHERE CategoryID = @CategoryID";
+
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@CategoryID", categoryId);
+                    conn.Open();
+                    int count = (int)cmd.ExecuteScalar();
+                    exists = count > 0;
+                    conn.Close();
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                // Optionally log the exception somewhere
+                // Console.WriteLine(ex.Message);
+
+                // Return false if there is an error
+                return false;
+            }
+        }
+
+        public int GetNextCategoryID()
+        {
+            int nextID = 1;
+            string query = "SELECT MAX(CategoryID) FROM Categories";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result != DBNull.Value)
+                        nextID = Convert.ToInt32(result) + 1;
+                    conn.Close();
+                }
+            }
+            catch
+            {
+                nextID = 1; // fallback
+            }
+
+            return nextID;
+        }
     }
 }
