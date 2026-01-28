@@ -196,8 +196,39 @@ namespace Week1_Practical1
             Response.Write(serializer.Serialize(data));
         }
 
+        protected void btnSaveCoupon_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Cupon c = new Cupon
+                {
+                    Code = txtCode.Text,
+                    VoucherType = ddlVoucherType.SelectedValue,
+                    DiscountType = ddlDiscountType.SelectedValue,
+                    DiscountValue = decimal.Parse(txtDiscountValue.Text),
+                    CoinCost = string.IsNullOrEmpty(txtCoinCost.Text) ? (int?)null : int.Parse(txtCoinCost.Text),
+                    Status = ddlStatus.SelectedValue
+                };
 
+                if (string.IsNullOrEmpty(hfVoucherID.Value))
+                {
+                    c.Create();
+                }
+                else
+                {
+                    c.VoucherID = int.Parse(hfVoucherID.Value);
+                    c.Update();
+                }
 
-
+                LoadCoupons();
+                UpdateStatistics();
+                closeCouponModal();
+            }
+            catch (Exception ex)
+            {
+                pnlAlert.Visible = true;
+                lblAlert.Text = "Error: " + ex.Message;
+            }
+        }
     }
 }

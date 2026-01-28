@@ -501,9 +501,7 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-        <button type="button" class="btn-primary-custom" id="btnCreateCoupon">
-            ➕ Create Coupon
-        </button>
+         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClientClick="openCouponModal(); return false;" />
     </div>
     <br />
 
@@ -594,78 +592,75 @@
     <!-- Create/Edit Modal -->
     <div class="modal-backdrop" id="couponModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Create Coupon</h3>
-                <button type="button" class="modal-close" id="closeModal">×</button>
-            </div>
+    <div class="modal-header">
+        <h3 id="modalTitle">Create Coupon</h3>
+        <asp:Button ID="btnCloseModal" runat="server" Text="×" CssClass="modal-close" OnClientClick="closeCouponModal(); return false;" />
+    </div>
 
-            <div id="alertMessage"></div>
+    <asp:Panel ID="pnlAlert" runat="server" Visible="false">
+        <asp:Label ID="lblAlert" runat="server" Text="" />
+    </asp:Panel>
 
-            <form id="couponForm" class="modal-panel">
-                <input type="hidden" id="voucherId" />
+    <asp:Panel ID="pnlCouponForm" runat="server">
+        <asp:HiddenField ID="hfVoucherID" runat="server" />
 
-                <div class="form-group">
-                    <label for="couponCode">Coupon Code *</label>
-                    <input type="text" id="couponCode" placeholder="e.g., SUMMER20" maxlength="50" required />
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="voucherType">Voucher Type *</label>
-                        <select id="voucherType" required>
-                            <option value="">Select Type</option>
-                            <option value="Discount">Discount</option>
-                            <option value="FreeShipping">Free Shipping</option>
-                            <option value="Gift">Gift</option>
-                            <option value="Free">Free</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="discountType">Discount Type *</label>
-                        <select id="discountType" required>
-                            <option value="">Select Type</option>
-                            <option value="Percentage">Percentage (%)</option>
-                            <option value="Fixed">Fixed Amount ($)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="discountValue">Discount Value *</label>
-                        <input type="number" id="discountValue" placeholder="0.00" step="0.01" min="0" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="coinCost">Coin Cost *</label>
-                        <input type="number" id="coinCost" placeholder="0.00" step="1" min="0"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="expiryDate">Expiry Date *</label>
-                    <input type="date" id="expiryDate" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Status *</label>
-                    <select id="status" required>
-                        <option value="">Select Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn-primary" id="submitBtn">Save Coupon</button>
-                </div>
-            </form>
+        <div class="form-group">
+            <label>Code</label>
+            <asp:TextBox ID="txtCode" runat="server" CssClass="form-control" />
         </div>
+
+        <div class="form-group">
+            <label>Voucher Type</label>
+            <asp:DropDownList ID="ddlVoucherType" runat="server" CssClass="form-control">
+                <asp:ListItem Text="Voucher" Value="Voucher" />
+                <asp:ListItem Text="Coupon" Value="Coupon" />
+            </asp:DropDownList>
+        </div>
+
+        <div class="form-group">
+            <label>Discount Type</label>
+            <asp:DropDownList ID="ddlDiscountType" runat="server" CssClass="form-control">
+                <asp:ListItem Text="Percentage" Value="Percentage" />
+                <asp:ListItem Text="Fixed" Value="Fixed" />
+            </asp:DropDownList>
+        </div>
+
+        <div class="form-group">
+            <label>Discount Value</label>
+            <asp:TextBox ID="txtDiscountValue" runat="server" CssClass="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Coin Cost</label>
+            <asp:TextBox ID="txtCoinCost" runat="server" CssClass="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-control">
+                <asp:ListItem Text="Active" Value="Active" />
+                <asp:ListItem Text="Inactive" Value="Inactive" />
+            </asp:DropDownList>
+        </div>
+
+        <div class="modal-footer">
+            <asp:Button ID="btnSaveCoupon" runat="server" Text="Save Coupon" CssClass="btn-primary" OnClick="btnSaveCoupon_Click" />
+            <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn-secondary" OnClientClick="closeCouponModal(); return false;" />
+        </div>
+    </asp:Panel>
+</div>
+
     </div>
 
    <script>
+
+       function openCouponModal() {
+           document.getElementById('couponModal').classList.add('show');
+       }
+       function closeCouponModal() {
+           document.getElementById('couponModal').classList.remove('show');
+       }
+
        document.addEventListener('DOMContentLoaded', () => {
 
            const modal = document.getElementById('couponModal');
