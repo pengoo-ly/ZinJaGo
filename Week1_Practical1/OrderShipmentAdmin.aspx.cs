@@ -38,39 +38,34 @@ namespace Week1_Practical1
         {
             try
             {
-                int adminId = Convert.ToInt32(Session["AdminID"]);
-
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    // Updated query without OrderDetails reference
+                    // FIXED: Removed AdminID references and non-existent columns
+                    // Using PaymentStatus and ShippingStatus instead of Status
                     string query = @"
                         SELECT 
                             o.OrderID,
                             o.OrderDate,
                             o.TotalAmount,
-                            o.Status,
-                            u.Username,
+                            o.PaymentStatus,
+                            o.ShippingStatus,
+                            u.UserID,
                             u.Email,
-                            u.Phone,
                             os.ShipmentID,
                             os.ShippingMethodID,
                             os.TrackingNumber,
                             os.ShippedDate,
                             os.EstimatedDelivery,
-                            sm.MethodName,
-                            sm.Carrier,
+                            os.DeliveredDate,
+                            os.Carrier,
                             ISNULL((SELECT COUNT(*) FROM OrderItems WHERE OrderID = o.OrderID), 0) as ItemCount
                         FROM Orders o
                         JOIN Users u ON o.UserID = u.UserID
                         LEFT JOIN OrderShipments os ON o.OrderID = os.OrderID
-                        LEFT JOIN ShippingMethods sm ON os.ShippingMethodID = sm.ShippingMethodID
-                        WHERE o.AdminID = @AdminID
                         ORDER BY o.OrderDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@AdminID", adminId);
-
                         SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
@@ -81,7 +76,7 @@ namespace Week1_Practical1
                             gvOrders.DataBind();
 
                             // Calculate statistics
-                            CalculateStatistics(adminId);
+                            CalculateStatistics();
 
                             errorMessage.Attributes["class"] = "error-message";
                         }
@@ -89,7 +84,7 @@ namespace Week1_Practical1
                         {
                             gvOrders.DataSource = null;
                             gvOrders.DataBind();
-                            ShowError("No orders found for your account.");
+                            ShowError("No orders found.");
                         }
                     }
                 }
@@ -101,26 +96,25 @@ namespace Week1_Practical1
             }
         }
 
-        private void CalculateStatistics(int adminId)
+        private void CalculateStatistics()
         {
             try
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
+                    // FIXED: Using ShippingStatus instead of Status
                     string query = @"
                         SELECT 
                             COUNT(*) as TotalOrders,
-                            SUM(CASE WHEN Status = 'Pending' THEN 1 ELSE 0 END) as PendingOrders,
-                            SUM(CASE WHEN Status = 'Processing' THEN 1 ELSE 0 END) as ProcessingOrders,
-                            SUM(CASE WHEN Status = 'Shipped' THEN 1 ELSE 0 END) as ShippedOrders,
-                            SUM(CASE WHEN Status = 'Delivered' THEN 1 ELSE 0 END) as DeliveredOrders,
+                            SUM(CASE WHEN ShippingStatus = 'Pending' THEN 1 ELSE 0 END) as PendingOrders,
+                            SUM(CASE WHEN ShippingStatus = 'Processing' THEN 1 ELSE 0 END) as ProcessingOrders,
+                            SUM(CASE WHEN ShippingStatus = 'Shipped' THEN 1 ELSE 0 END) as ShippedOrders,
+                            SUM(CASE WHEN ShippingStatus = 'Delivered' THEN 1 ELSE 0 END) as DeliveredOrders,
                             SUM(TotalAmount) as TotalRevenue
-                        FROM Orders
-                        WHERE AdminID = @AdminID";
+                        FROM Orders";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@AdminID", adminId);
                         conn.Open();
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -190,7 +184,8 @@ namespace Week1_Practical1
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    string query = "UPDATE Orders SET Status = 'Cancelled' WHERE OrderID = @OrderID AND Status IN ('Pending', 'Processing')";
+                    // FIXED: Using ShippingStatus instead of Status
+                    string query = "UPDATE Orders SET ShippingStatus = 'Cancelled' WHERE OrderID = @OrderID AND ShippingStatus IN ('Pending', 'Processing')";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {

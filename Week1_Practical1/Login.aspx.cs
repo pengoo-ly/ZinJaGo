@@ -89,7 +89,7 @@ namespace Week1_Practical1
                     Session["UserName"] = userName;
                     Session["UserEmail"] = email;
 
-                    UpdateLastLogin(userId);
+                    UpdateCustomerLastLogin(userId);
                     DbLogger.Log("Customer login successful", userId);
                     Response.Redirect("~/Home.aspx");
                 }
@@ -118,31 +118,44 @@ namespace Week1_Practical1
             userName = "";
             try
             {
-                string connStr = ConfigurationManager
-                    .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+                string connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    string query = @"SELECT UserID, Username
+                    string query = @"SELECT UserID, Username, PasswordHash, Status
                              FROM Users
                              WHERE Email = @Email
-                             AND PasswordHash = @Password
                              AND Status = 'Active'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", HashPassword(password));
-
                         conn.Open();
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                userId = Convert.ToInt32(reader["UserID"]);
-                                userName = reader["Username"].ToString();
-                                return true;
+                                string storedHash = reader["PasswordHash"].ToString();
+                                string status = reader["Status"].ToString();
+
+                                // Verify the password against the stored hash
+                                if (VerifyPassword(password, storedHash))
+                                {
+                                    userId = Convert.ToInt32(reader["UserID"]);
+                                    userName = reader["Username"].ToString();
+                                    return true;
+                                }
+                                else
+                                {
+                                    DbLogger.Log($"Invalid password for customer: {email}");
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                DbLogger.Log($"Customer not found: {email}");
+                                return false;
                             }
                         }
                     }
@@ -175,6 +188,8 @@ namespace Week1_Practical1
                 string email = txtSellerEmail.Text.Trim();
                 string password = txtSellerPassword.Text;
 
+                DbLogger.Log($"[LOGIN ATTEMPT] Email: {email}, Password length: {password.Length}");
+
                 // Remember email (optional)
                 if (chkSellerRemember.Checked)
                 {
@@ -196,7 +211,7 @@ namespace Week1_Practical1
                     Session["AdminEmail"] = email;
 
                     UpdateAdminLastLogin(adminId);
-                    DbLogger.Log("Admin login successful", adminId);
+                    DbLogger.Log("Admin login successful");
 
                     if (role == "SuperAdmin")
                     {
@@ -233,31 +248,74 @@ namespace Week1_Practical1
             role = "";
             try
             {
-                string connStr = ConfigurationManager
-                    .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+                string connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+
+                DbLogger.Log($"[DEBUG] Starting ValidateSellerCredentials for email: {email}");
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    string query = @"SELECT AdminID, AdminName, Role
+                    string query = @"SELECT AdminID, AdminName, Role, PasswordHash
                          FROM Admins
-                         WHERE Email = @Email
-                         AND PasswordHash = @Password";
+                         WHERE Email = @Email";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Password", HashPassword(password));
 
-                        conn.Open();
+                        try
+                        {
+                            conn.Open();
+                            DbLogger.Log($"[DEBUG] Database connection opened successfully");
+                        }
+                        catch (Exception connEx)
+                        {
+                            DbLogger.Log($"[ERROR] Failed to open connection: {connEx.Message}");
+                            return false;
+                        }
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            if (reader.HasRows)
                             {
-                                adminId = Convert.ToInt32(reader["AdminID"]);
-                                adminName = reader["AdminName"].ToString();
-                                role = reader["Role"].ToString();
-                                return true;
+                                DbLogger.Log($"[DEBUG] Query returned rows for email: {email}");
+
+                                if (reader.Read())
+                                {
+                                    DbLogger.Log($"[DEBUG] reader.Read() returned TRUE - Admin found!");
+
+                                    string storedHash = reader["PasswordHash"].ToString();
+                                    adminId = Convert.ToInt32(reader["AdminID"]);
+                                    adminName = reader["AdminName"].ToString();
+                                    role = reader["Role"].ToString();
+
+                                    DbLogger.Log($"[DEBUG] Admin Details - ID: {adminId}, Name: {adminName}, Role: {role}");
+                                    DbLogger.Log($"[DEBUG] Stored Hash: {storedHash}");
+                                    DbLogger.Log($"[DEBUG] Password to verify: {password}");
+                                    DbLogger.Log($"[DEBUG] About to call VerifyPassword()");
+
+                                    // Verify the password against the stored hash
+                                    if (VerifyPassword(password, storedHash))
+                                    {
+                                        DbLogger.Log($"[SUCCESS] VerifyPassword returned TRUE - Login successful!");
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        DbLogger.Log($"[FAIL] VerifyPassword returned FALSE - Password does not match!");
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    DbLogger.Log($"[ERROR] reader.Read() returned FALSE - This should not happen!");
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                DbLogger.Log($"[ERROR] Query returned NO rows for email: {email}");
+                                DbLogger.Log($"[ERROR] Admin account not found in database!");
+                                return false;
                             }
                         }
                     }
@@ -265,9 +323,10 @@ namespace Week1_Practical1
             }
             catch (Exception ex)
             {
-                DbLogger.Log("Error validating seller credentials: " + ex.Message);
+                DbLogger.Log($"[EXCEPTION] Error validating seller credentials: {ex.Message}");
+                DbLogger.Log($"[EXCEPTION] Stack trace: {ex.StackTrace}");
+                return false;
             }
-            return false;
         }
 
         private void ShowSellerError(string message)
@@ -280,17 +339,16 @@ namespace Week1_Practical1
 
         #region Helper Methods
 
-        private void UpdateLastLogin(int userId)
+        private void UpdateCustomerLastLogin(int userId)
         {
             try
             {
-                string connStr = ConfigurationManager
-                    .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+                string connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     string query = @"UPDATE Users
-                             SET DateCreated = GETDATE()
+                             SET LastLogin = GETDATE()
                              WHERE UserID = @UserID";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -301,9 +359,9 @@ namespace Week1_Practical1
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Log but don't fail the login
+                DbLogger.Log("Error updating customer last login: " + ex.Message);
             }
         }
 
@@ -311,8 +369,7 @@ namespace Week1_Practical1
         {
             try
             {
-                string connStr = ConfigurationManager
-                    .ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+                string connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
@@ -328,51 +385,59 @@ namespace Week1_Practical1
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Log but don't fail the login
+                DbLogger.Log("Error updating admin last login: " + ex.Message);
             }
         }
 
         #endregion
-        private string HashPassword(string password)
+
+        #region Password Hashing & Verification
+
+        /// <summary>
+        /// Hashes password using SHA256 in HEX format
+        /// </summary>
+        public static string HashPassword(string password)
         {
             using (SHA256 sha = SHA256.Create())
             {
                 byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder sb = new StringBuilder();
-                foreach (byte b in bytes) sb.Append(b.ToString("x2"));
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
                 return sb.ToString();
             }
         }
-        private void UpdateAdminHashes()
+
+        /// <summary>
+        /// Verifies a password against stored hash
+        /// </summary>
+        private bool VerifyPassword(string enteredPassword, string storedHash)
         {
-            string newPassword = "admin123"; // your global password
-            string newHash = HashPassword(newPassword);
-
-            string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(cs))
+            try
             {
-                SqlCommand cmd = new SqlCommand(
-                    "UPDATE Admins SET PasswordHash = @hash", conn);
+                DbLogger.Log($"[VERIFY] VerifyPassword called!");
+                DbLogger.Log($"[VERIFY] Entered password: {enteredPassword}");
 
-                cmd.Parameters.AddWithValue("@hash", newHash);
+                string enteredHash = HashPassword(enteredPassword);
 
-                conn.Open();
-                int rows = cmd.ExecuteNonQuery();
-                conn.Close();
+                DbLogger.Log($"[VERIFY] Calculated hash: {enteredHash}");
+                DbLogger.Log($"[VERIFY] Stored hash:     {storedHash}");
 
-                // Optional: show a message
-                Response.Write("Updated hashes for " + rows + " admins.<br>");
+                bool matches = enteredHash.Equals(storedHash, StringComparison.OrdinalIgnoreCase);
+
+                DbLogger.Log($"[VERIFY] Hashes match: {matches}");
+
+                return matches;
             }
-
-            // Stop page execution so you don't log in accidentally
-            Response.End();
+            catch (Exception ex)
+            {
+                DbLogger.Log($"[VERIFY ERROR] Error verifying password: {ex.Message}");
+                return false;
+            }
         }
 
-
+        #endregion
     }
-
-
 }

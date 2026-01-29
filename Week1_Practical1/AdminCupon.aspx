@@ -493,6 +493,9 @@
                 grid-template-columns: 1fr;
             }
         }
+        .auto-style1 {
+            height: 68px;
+        }
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -501,7 +504,7 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClientClick="openCouponModal(); return false;" />
+         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClientClick="openCouponModal(); return false;" OnClick="btnOpenAdd_Click"/>
     </div>
     <br />
 
@@ -529,8 +532,10 @@
     <div class="table-wrapper">
         <div class="table-toolbar">
             <div class="table-search">
-                <input type="text" placeholder="Search coupons..." id="searchCoupons" />
+                <asp:TextBox ID="txtSearch" runat="server" CssClass="table-search-input" placeholder="Search coupons..." />
             </div>
+            <asp:Button ID="btnSearch" runat="server" Text="Search"  CssClass="btn-primary-custom" OnClick="btnSearch_Click" />
+            <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn-secondary" OnClick="btnClear_Click" />
 
             <div style="position: relative;">
                 <button type="button" class="icon-btn more-btn" title="More options">⋯</button>
@@ -544,43 +549,24 @@
             </div>
         </div>
 
-        <table id="couponsTable">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Type</th>
-                    <th>Discount Value</th>
-                    <th>Cost</th>
-                    <th>Expiry Date</th>
-                    <th>Status</th>
-                    <th style="width: 120px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="couponsTableBody">
-                <asp:Repeater ID="rptCoupons" runat="server">
-                    <ItemTemplate>
-                        <tr class="coupon-row" data-voucher-id="<%# Eval("VoucherID") %>" data-status="<%# Eval("Status").ToString().ToLower() %>">
-                            <td><strong><%# Eval("Code") %></strong></td>
-                            <td><%# Eval("VoucherType") %></td>
-                            <td><%# Eval("DiscountType").ToString() == "Percentage" ? Eval("DiscountValue", "{0}") + "%" : "$" + Eval("DiscountValue", "{0:0.00}") %></td>
-                            <td>$<%# Eval("CoinCost", "{0:0.00}") %></td>
-                            <td><%# Eval("ExpiryDate", "{0:dd-MM-yyyy}") %></td>
-                            <td>
-                                <span class="badge <%# "badge-" + Eval("Status").ToString().ToLower() %>">
-                                    ● <%# Eval("Status") %>
-                                </span>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button type="button" class="btn-sm edit-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Edit</button>
-                                    <button type="button" class="btn-sm danger delete-coupon" data-voucher-id="<%# Eval("VoucherID") %>">Delete</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </ItemTemplate>
-                </asp:Repeater>
-            </tbody>
-        </table>
+        <asp:GridView ID="gvCoupons" runat="server"
+            AutoGenerateColumns="False"
+            CssClass="table"
+            DataKeyNames="VoucherID">
+
+            <Columns>
+                <asp:BoundField DataField="Code" HeaderText="Code" />
+                <asp:BoundField DataField="VoucherType" HeaderText="Type" />
+                <asp:BoundField DataField="DiscountValue" HeaderText="Discount" />
+                <asp:BoundField DataField="CoinCost" HeaderText="Coin Cost" />
+                <asp:BoundField DataField="ExpiryDate" HeaderText="Expiry Date" DataFormatString="{0:dd-MM-yyyy}" />
+                <asp:BoundField DataField="Status" HeaderText="Status" />
+
+                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" />
+
+            </Columns>
+        </asp:GridView>
+
 
         <div id="emptyState" class="empty-state" style="display: none;">
             <div class="empty-state-icon">🏷️</div>
@@ -644,8 +630,8 @@
         </div>
 
         <div class="modal-footer">
-            <asp:Button ID="btnSaveCoupon" runat="server" Text="Save Coupon" CssClass="btn-primary" OnClick="btnSaveCoupon_Click" />
-            <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn-secondary" OnClientClick="closeCouponModal(); return false;" />
+            <asp:Button ID="btnSaveCoupon" runat="server" Text="Save Coupon" CssClass="btn-add" OnClick="btnSaveCoupon_Click" />
+            <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn-cancel" OnClientClick="closeCouponModal(); return false;" />
         </div>
     </asp:Panel>
 </div>
