@@ -111,14 +111,18 @@ namespace Week1_Practical1
             {
                 string q = txtSearch.Text.Trim().ToLower();
                 int adminId = Convert.ToInt32(Session["AdminID"]);
+
                 var coupons = new Cupon().GetCouponsByAdmin(adminId)
                     .Where(c => c.Code.ToLower().Contains(q))
                     .ToList();
+
+                gvCoupons.DataSource = coupons;
+                gvCoupons.DataBind();
             }
             catch (Exception ex)
             {
                 pnlAlert.Visible = true;
-                lblAlert.Text = "Error: " + ex.Message;
+                lblAlert.Text = "Search error: " + ex.Message;
             }
         }
 
@@ -134,6 +138,66 @@ namespace Week1_Practical1
             ddlStatus.SelectedIndex = 0;
 
             ScriptManager.RegisterStartupScript(this, GetType(), "ShowModal", "openCouponModal();", true);
+        }
+
+        protected void gvCoupons_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            try
+            {
+                int voucherId = Convert.ToInt32(gvCoupons.DataKeys[e.NewEditIndex].Value);
+                Cupon c = new Cupon().GetCoupon(voucherId);
+
+                if (c == null) return;
+
+                hfVoucherID.Value = c.VoucherID.ToString();
+                txtCode.Text = c.Code;
+                ddlVoucherType.SelectedValue = c.VoucherType;
+                ddlDiscountType.SelectedValue = c.DiscountType;
+                txtDiscountValue.Text = c.DiscountValue.ToString();
+                txtCoinCost.Text = c.CoinCost.HasValue ? c.CoinCost.Value.ToString() : "";
+                ddlStatus.SelectedValue = c.Status;
+
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "ShowModal", "openCouponModal();", true
+                );
+            }
+            catch (Exception ex)
+            {
+                pnlAlert.Visible = true;
+                lblAlert.Text = "Edit failed: " + ex.Message;
+            }
+        }
+
+        protected void gvCoupons_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            try
+            {
+                int voucherId = Convert.ToInt32(gvCoupons.DataKeys[e.RowIndex].Value);
+
+                Cupon c = new Cupon { VoucherID = voucherId };
+                c.Delete();
+
+                LoadCoupons();
+                LoadStatistics();
+            }
+            catch (Exception ex)
+            {
+                pnlAlert.Visible = true;
+                lblAlert.Text = "Delete failed: " + ex.Message;
+            }
+        }
+
+        protected void gvCoupons_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            try
+            {
+                gvCoupons.EditIndex = -1;
+                LoadCoupons();
+            }
+            catch (Exception ex) 
+            { 
+                pnlAlert.Visible = true;
+            }
         }
     }
 }
