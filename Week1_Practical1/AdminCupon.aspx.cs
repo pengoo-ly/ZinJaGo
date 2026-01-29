@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.Script.Serialization;
 using Week1_Practical1.Helpers;
 
 namespace Week1_Practical1
@@ -26,143 +27,11 @@ namespace Week1_Practical1
             }
         }
 
-
-        private void HandleGet()
-        {
-            try
-            {
-                if (!int.TryParse(Request["id"], out int id))
-                {
-                    RespondJson(new { success = false, message = "Invalid ID" }, 400);
-                    return;
-                }
-
-                Cupon coupon = new Cupon().GetCoupon(id);
-
-                if (coupon == null)
-                {
-                    RespondJson(new { success = false, message = "Coupon not found" }, 404);
-                    return;
-                }
-
-                RespondJson(new
-                {
-                    VoucherID = coupon.VoucherID,
-                    Code = coupon.Code,
-                    VoucherType = coupon.VoucherType,
-                    DiscountType = coupon.DiscountType,
-                    DiscountValue = coupon.DiscountValue,
-                    CoinCost = coupon.CoinCost,
-                    ExpiryDate = coupon.ExpiryDate.ToString("yyyy-MM-dd"),
-                    Status = coupon.Status
-                });
-            }
-            catch (Exception ex)
-            {
-                RespondJson(new { success = false, message = ex.Message }, 500);
-            }
-        }
-
-
-        private void HandleCreate()
-        {
-            try
-            {
-                int adminId = Convert.ToInt32(Session["AdminID"]);
-
-                Cupon coupon = new Cupon
-                {
-                    Code = Request.Form["code"],
-                    VoucherType = Request.Form["voucherType"],
-                    DiscountType = Request.Form["discountType"],
-                    DiscountValue = decimal.Parse(Request.Form["discountValue"]),
-                    CoinCost = string.IsNullOrEmpty(Request.Form["coinCost"]) ? (int?)null: int.Parse(Request.Form["coinCost"]),
-                    ExpiryDate = DateTime.Parse(Request.Form["expiryDate"]),
-                    Status = Request.Form["status"],
-                    CreatedBy = adminId
-                };
-
-                bool ok = coupon.Create();
-
-                RespondJson(new
-                {
-                    success = ok,
-                    message = ok ? "Coupon created successfully" : "Create failed"
-                });
-            }
-            catch (Exception ex)
-            {
-                RespondJson(new { success = false, message = ex.Message }, 500);
-            }
-        }
-
-
-        private void HandleUpdate()
-        {
-            try
-            {
-                int adminId = Convert.ToInt32(Session["AdminID"]);
-
-                Cupon coupon = new Cupon
-                {
-                    VoucherID = int.Parse(Request.Form["voucherId"]),
-                    Code = Request.Form["code"],
-                    VoucherType = Request.Form["voucherType"],
-                    DiscountType = Request.Form["discountType"],
-                    DiscountValue = decimal.Parse(Request.Form["discountValue"]),
-                    CoinCost = string.IsNullOrEmpty(Request.Form["coinCost"]) ? (int?)null : int.Parse(Request.Form["coinCost"]),
-                    ExpiryDate = DateTime.Parse(Request.Form["expiryDate"]),
-                    Status = Request.Form["status"]
-                };
-
-                bool ok = coupon.Update();
-
-                RespondJson(new
-                {
-                    success = ok,
-                    message = ok ? "Coupon updated successfully" : "Update failed"
-                });
-            }
-            catch (Exception ex)
-            {
-                RespondJson(new { success = false, message = ex.Message }, 500);
-            }
-        }
-
-
-        private void HandleDelete()
-        {
-            try
-            {
-                if (!int.TryParse(Request["id"], out int id))
-                {
-                    RespondJson(new { success = false, message = "Invalid ID" }, 400);
-                    return;
-                }
-
-                Cupon coupon = new Cupon { VoucherID = id };
-                bool ok = coupon.Delete();
-
-                RespondJson(new
-                {
-                    success = ok,
-                    message = ok ? "Coupon deleted successfully" : "Delete failed"
-                });
-            }
-            catch (Exception ex)
-            {
-                RespondJson(new { success = false, message = ex.Message }, 500);
-            }
-        }
-
-
         private void LoadCoupons()
         {
             int adminId = Convert.ToInt32(Session["AdminID"]);
-            List<Cupon> coupons = new Cupon().GetCouponsByAdmin(adminId);
-
-            rptCoupons.DataSource = coupons;
-            rptCoupons.DataBind();
+            gvCoupons.DataSource = new Cupon().GetCouponsByAdmin(adminId);
+            gvCoupons.DataBind();
         }
 
 
@@ -184,18 +53,6 @@ namespace Week1_Practical1
             catch { }
         }
 
-
-        private void RespondJson(object data, int statusCode = 200)
-        {
-            Response.Clear();
-            Response.StatusCode = statusCode;
-            Response.ContentType = "application/json";
-            Response.TrySkipIisCustomErrors = true;
-
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            Response.Write(serializer.Serialize(data));
-        }
-
         protected void btnSaveCoupon_Click(object sender, EventArgs e)
         {
             try
@@ -212,23 +69,71 @@ namespace Week1_Practical1
 
                 if (string.IsNullOrEmpty(hfVoucherID.Value))
                 {
+                    // Create
+                    c.CreatedBy = Convert.ToInt32(Session["AdminID"]);
                     c.Create();
                 }
                 else
                 {
+                    // Update
                     c.VoucherID = int.Parse(hfVoucherID.Value);
                     c.Update();
                 }
 
                 LoadCoupons();
-                UpdateStatistics();
-                closeCouponModal();
+                LoadStatistics();
+            }
+            catch (Exception ex)
+            {
+                pnlAlert.Visible = true;
+                lblAlert.Text = "Error: " + ex.Message;
+                ScriptManager.RegisterStartupScript(this, GetType(), "ShowModal", "openCouponModal();", true);
+            }
+        }
+
+        protected void btnClear_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                 txtSearch.Text = "";
+                LoadCoupons();
             }
             catch (Exception ex)
             {
                 pnlAlert.Visible = true;
                 lblAlert.Text = "Error: " + ex.Message;
             }
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string q = txtSearch.Text.Trim().ToLower();
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                var coupons = new Cupon().GetCouponsByAdmin(adminId)
+                    .Where(c => c.Code.ToLower().Contains(q))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                pnlAlert.Visible = true;
+                lblAlert.Text = "Error: " + ex.Message;
+            }
+        }
+
+
+        protected void btnOpenAdd_Click(object sender, EventArgs e)
+        {
+            hfVoucherID.Value = "";
+            txtCode.Text = "";
+            ddlVoucherType.SelectedIndex = 0;
+            ddlDiscountType.SelectedIndex = 0;
+            txtDiscountValue.Text = "";
+            txtCoinCost.Text = "";
+            ddlStatus.SelectedIndex = 0;
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "ShowModal", "openCouponModal();", true);
         }
     }
 }
