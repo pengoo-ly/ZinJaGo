@@ -258,7 +258,7 @@
             display: none;               /* hide by default */
             position: fixed;
             inset: 0;                    /* top/right/bottom/left 0 */
-            background: rgba(0,0,0,0.6); /* slightly darker, fully opaque backdrop */
+            background: rgba(0,0,0,0.85);/* slightly darker, fully opaque backdrop */
             z-index: 9999;               /* ensure it’s above everything */
             align-items: center;
             justify-content: center;
@@ -268,16 +268,18 @@
             display: flex !important;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.85);
             z-index: 10000; /* higher than everything else */
             align-items: center;
             justify-content: center;
         }
 
         .modal-content {
-            background: var(--card);     
+            background: var(--card);
+            background-color:rgba(255,255,255,1);
+            opacity:10000;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.85);
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
@@ -285,11 +287,11 @@
             padding: 28px;
             position: relative;
             margin: auto;
-            z-index: 10000;              /* make sure it’s above backdrop */
-            opacity: 1;                   /* fully opaque */
+            z-index: 10000;              /* make sure it’s above backdrop */                   /* fully opaque */
         }
         .modal-panel {
-            display: block; /* always render the panel in DOM */
+            display: block;
+            background:var(--card);/* always render the panel in DOM */
         }
 
         .modal-panel.hidden {
