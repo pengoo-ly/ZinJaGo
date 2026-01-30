@@ -282,6 +282,13 @@
             z-index: 10000;              /* make sure it’s above backdrop */
             opacity: 1;                   /* fully opaque */
         }
+        .modal-panel {
+            display: block; /* always render the panel in DOM */
+        }
+
+        .modal-panel.hidden {
+            display: none; /* hide by default */
+        }
 
         .modal-header {
             display: flex;
@@ -580,7 +587,7 @@
     <div class="modal-backdrop" id="couponModal">
     <div class="modal-content">
         <!-- CREATE PANEL -->
-        <asp:Panel ID="pnlCreateCoupon" runat="server" Visible="false">
+        <asp:Panel ID="pnlCreateCoupon" runat="server" CssClass="modal-panel hidden">
             <div class="modal-header">
                 <h3>Create Coupon</h3>
                 <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
@@ -627,7 +634,7 @@
         </asp:Panel>
 
         <!-- EDIT PANEL -->
-        <asp:Panel ID="pnlEditCoupon" runat="server" Visible="false">
+        <asp:Panel ID="pnlEditCoupon" runat="server" CssClass="modal-panel hidden">
             <div class="modal-header">
                 <h3>Edit Coupon</h3>
                 <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
