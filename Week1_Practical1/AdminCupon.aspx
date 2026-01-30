@@ -504,7 +504,7 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClientClick="openCouponModal(); return false;" OnClick="btnOpenAdd_Click"/>
+         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClick="btnOpenAdd_Click"/>
     </div>
     <br />
 
@@ -562,7 +562,7 @@
                 <asp:BoundField DataField="ExpiryDate" HeaderText="Expiry Date" DataFormatString="{0:dd-MM-yyyy}" />
                 <asp:BoundField DataField="Status" HeaderText="Status" />
 
-                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" />
+                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" CausesValidation="False" />
 
             </Columns>
         </asp:GridView>
@@ -575,76 +575,120 @@
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <div class="modal-backdrop" id="couponModal">
-        <div class="modal-content">
-    <div class="modal-header">
-        <h3 id="modalTitle">Create Coupon</h3>
-        <asp:Button ID="btnCloseModal" runat="server" Text="×" CssClass="modal-close" OnClientClick="closeCouponModal(); return false;" />
+    <!-- Modal -->
+<div class="modal-backdrop" id="couponModal">
+    <div class="modal-content">
+
+        <!-- CREATE PANEL -->
+        <asp:Panel ID="pnlCreateCoupon" runat="server" Visible="false">
+            <div class="modal-header">
+                <h3>Create Coupon</h3>
+                <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
+            </div>
+
+            <asp:Panel ID="pnlCreateAlert" runat="server" Visible="false" CssClass="alert alert-error">
+                <asp:Label ID="lblCreateAlert" runat="server" />
+            </asp:Panel>
+
+            <div class="form-group">
+                <label>Code</label>
+                <asp:TextBox ID="txtCreateCode" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Voucher Type</label>
+                <asp:DropDownList ID="ddlCreateVoucherType" runat="server">
+                    <asp:ListItem Text="Free Shipping" />
+                    <asp:ListItem Text="Discount" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="form-group">
+                <label>Discount Value</label>
+                <asp:TextBox ID="txtCreateDiscount" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Coin Cost</label>
+                <asp:TextBox ID="txtCreateCoin" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Expiry Date</label>
+                <asp:TextBox ID="txtCreateExpiry" runat="server" TextMode="Date" />
+            </div>
+
+            <div class="modal-footer">
+                <asp:Button ID="btnCreateCoupon" runat="server" Text="Create"
+                    CssClass="btn-primary" OnClick="btnCreateCoupon_Click" />
+                <button type="button" class="btn-secondary" onclick="closeCouponModal()">Cancel</button>
+            </div>
+        </asp:Panel>
+
+        <!-- EDIT PANEL -->
+        <asp:Panel ID="pnlEditCoupon" runat="server" Visible="false">
+            <div class="modal-header">
+                <h3>Edit Coupon</h3>
+                <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
+            </div>
+
+            <asp:HiddenField ID="hfEditVoucherID" runat="server" />
+
+            <asp:Panel ID="pnlEditAlert" runat="server" Visible="false" CssClass="alert alert-error">
+                <asp:Label ID="lblEditAlert" runat="server" />
+            </asp:Panel>
+
+            <div class="form-group">
+                <label>Code</label>
+                <asp:TextBox ID="txtEditCode" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Voucher Type</label>
+                <asp:DropDownList ID="ddlEditVoucherType" runat="server">
+                    <asp:ListItem Text="Free Shipping" Value="Free Shipping" />
+                    <asp:ListItem Text="Discount" Value="Discount" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="form-group">
+                <label>Discount Value</label>
+                <asp:TextBox ID="txtEditDiscount" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Coin Cost</label>
+                <asp:TextBox ID="txtEditCoin" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Expiry Date</label>
+                <asp:TextBox ID="txtEditExpiry" runat="server" TextMode="Date" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <asp:DropDownList ID="ddlEditStatus" runat="server">
+                    <asp:ListItem Text="Active" />
+                    <asp:ListItem Text="Inactive" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="modal-footer">
+                <asp:Button ID="btnUpdateCoupon" runat="server" Text="Update"
+                    CssClass="btn-primary" OnClick="btnUpdateCoupon_Click" />
+                <button type="button" class="btn-secondary" onclick="closeCouponModal()">Cancel</button>
+            </div>
+        </asp:Panel>
+
     </div>
-
-    <asp:Panel ID="pnlAlert" runat="server" Visible="false">
-        <asp:Label ID="lblAlert" runat="server" Text="" />
-    </asp:Panel>
-
-    <asp:Panel ID="pnlCouponForm" runat="server">
-        <asp:HiddenField ID="hfVoucherID" runat="server" />
-
-        <div class="form-group">
-            <label>Code</label>
-            <asp:TextBox ID="txtCode" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Voucher Type</label>
-            <asp:DropDownList ID="ddlVoucherType" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Voucher" Value="Voucher" />
-                <asp:ListItem Text="Coupon" Value="Coupon" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="form-group">
-            <label>Discount Type</label>
-            <asp:DropDownList ID="ddlDiscountType" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Percentage" Value="Percentage" />
-                <asp:ListItem Text="Fixed" Value="Fixed" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="form-group">
-            <label>Discount Value</label>
-            <asp:TextBox ID="txtDiscountValue" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Coin Cost</label>
-            <asp:TextBox ID="txtCoinCost" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Status</label>
-            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Active" Value="Active" />
-                <asp:ListItem Text="Inactive" Value="Inactive" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="modal-footer">
-            <asp:Button ID="btnSaveCoupon" runat="server" Text="Save Coupon" CssClass="btn-add" OnClick="btnSaveCoupon_Click" />
-            <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn-cancel" OnClientClick="closeCouponModal(); return false;" />
-        </div>
-    </asp:Panel>
 </div>
 
-    </div>
 
-   <script>
+<script>
+    function closeCouponModal() {
+        document.getElementById('couponModal').classList.remove('show');
+    }
+</script>
 
-       function openCouponModal() {
-           document.getElementById('couponModal').classList.add('show');
-       }
-       function closeCouponModal() {
-           document.getElementById('couponModal').classList.remove('show');
-       }
-   </script>
 </asp:Content>

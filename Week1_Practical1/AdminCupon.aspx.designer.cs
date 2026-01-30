@@ -96,120 +96,183 @@ namespace Week1_Practical1
         protected global::System.Web.UI.WebControls.GridView gvCoupons;
 
         /// <summary>
-        /// btnCloseModal control.
+        /// pnlCreateCoupon control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCloseModal;
+        protected global::System.Web.UI.WebControls.Panel pnlCreateCoupon;
 
         /// <summary>
-        /// pnlAlert control.
+        /// pnlCreateAlert control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlAlert;
+        protected global::System.Web.UI.WebControls.Panel pnlCreateAlert;
 
         /// <summary>
-        /// lblAlert control.
+        /// lblCreateAlert control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAlert;
+        protected global::System.Web.UI.WebControls.Label lblCreateAlert;
 
         /// <summary>
-        /// pnlCouponForm control.
+        /// txtCreateCode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlCouponForm;
+        protected global::System.Web.UI.WebControls.TextBox txtCreateCode;
 
         /// <summary>
-        /// hfVoucherID control.
+        /// ddlCreateVoucherType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfVoucherID;
+        protected global::System.Web.UI.WebControls.DropDownList ddlCreateVoucherType;
 
         /// <summary>
-        /// txtCode control.
+        /// txtCreateDiscount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCode;
+        protected global::System.Web.UI.WebControls.TextBox txtCreateDiscount;
 
         /// <summary>
-        /// ddlVoucherType control.
+        /// txtCreateCoin control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlVoucherType;
+        protected global::System.Web.UI.WebControls.TextBox txtCreateCoin;
 
         /// <summary>
-        /// ddlDiscountType control.
+        /// txtCreateExpiry control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlDiscountType;
+        protected global::System.Web.UI.WebControls.TextBox txtCreateExpiry;
 
         /// <summary>
-        /// txtDiscountValue control.
+        /// btnCreateCoupon control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtDiscountValue;
+        protected global::System.Web.UI.WebControls.Button btnCreateCoupon;
 
         /// <summary>
-        /// txtCoinCost control.
+        /// pnlEditCoupon control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCoinCost;
+        protected global::System.Web.UI.WebControls.Panel pnlEditCoupon;
 
         /// <summary>
-        /// ddlStatus control.
+        /// hfEditVoucherID control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
+        protected global::System.Web.UI.WebControls.HiddenField hfEditVoucherID;
 
         /// <summary>
-        /// btnSaveCoupon control.
+        /// pnlEditAlert control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveCoupon;
+        protected global::System.Web.UI.WebControls.Panel pnlEditAlert;
 
         /// <summary>
-        /// btnCancel control.
+        /// lblEditAlert control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancel;
+        protected global::System.Web.UI.WebControls.Label lblEditAlert;
+
+        /// <summary>
+        /// txtEditCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEditCode;
+
+        /// <summary>
+        /// ddlEditVoucherType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlEditVoucherType;
+
+        /// <summary>
+        /// txtEditDiscount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEditDiscount;
+
+        /// <summary>
+        /// txtEditCoin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEditCoin;
+
+        /// <summary>
+        /// txtEditExpiry control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEditExpiry;
+
+        /// <summary>
+        /// ddlEditStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlEditStatus;
+
+        /// <summary>
+        /// btnUpdateCoupon control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdateCoupon;
     }
 }
