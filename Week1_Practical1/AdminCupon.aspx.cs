@@ -94,14 +94,21 @@ namespace Week1_Practical1
 
         protected void btnOpenAdd_Click(object sender, EventArgs e)
         {
-            pnlCreateCoupon.Visible = true;
-            pnlEditCoupon.Visible = false;
+            try
+            {
+                pnlCreateCoupon.CssClass = "modal-panel";   // show create panel
+                pnlEditCoupon.CssClass = "modal-panel hidden"; // hide edit panel
 
-            ScriptManager.RegisterStartupScript(
+                ScriptManager.RegisterStartupScript(
                     this, GetType(), "showModal",
                     "document.getElementById('couponModal').classList.add('show');",
                     true
                 );
+            }
+            catch
+            {
+                return;
+            }
         }
 
         protected void gvCoupons_RowEditing(object sender, GridViewEditEventArgs e)
@@ -123,8 +130,8 @@ namespace Week1_Practical1
                 txtEditExpiry.Text = c.ExpiryDate.ToString("yyyy-MM-dd");
                 ddlEditStatus.SelectedValue = c.Status;
 
-                pnlCreateCoupon.Visible = false;
-                pnlEditCoupon.Visible = true;
+                pnlCreateCoupon.CssClass = "modal-panel hidden"; // hide create
+                pnlEditCoupon.CssClass = "modal-panel"; // show edit
 
                 ScriptManager.RegisterStartupScript(
                     this, GetType(), "editModal",

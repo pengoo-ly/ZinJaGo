@@ -253,28 +253,25 @@
             }
 
         /* Modal Styles */
+        /* ---------------- Modal Fix ---------------- */
         .modal-backdrop {
-            display:none;
+            display: none;               /* hide by default */
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
+            inset: 0;                    /* top/right/bottom/left 0 */
+            background: rgba(0,0,0,0.6); /* slightly darker, fully opaque backdrop */
+            z-index: 9999;               /* ensure it’s above everything */
             align-items: center;
             justify-content: center;
         }
 
         .modal-backdrop.show {
             display: flex;
-            z-index: 10;
         }
 
         .modal-content {
-            background: var(--card);
+            background: var(--card);     
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
@@ -282,8 +279,8 @@
             padding: 28px;
             position: relative;
             margin: auto;
-            opacity:100;
-            backdrop-filter:none;
+            z-index: 10000;              /* make sure it’s above backdrop */
+            opacity: 1;                   /* fully opaque */
         }
 
         .modal-header {
