@@ -268,6 +268,7 @@
 
         .modal-backdrop.show {
             display: flex;
+            z-index: 10;
         }
 
         .modal-content {
@@ -281,7 +282,7 @@
             padding: 28px;
             position: relative;
             margin: auto;
-            opacity:1;
+            opacity:100;
             backdrop-filter:none;
         }
 
@@ -534,8 +535,8 @@
             <div class="table-search">
                 <asp:TextBox ID="txtSearch" runat="server" CssClass="table-search-input" placeholder="Search coupons..." />
             </div>
-            <asp:Button ID="btnSearch" runat="server" Text="Search"  CssClass="btn-primary-custom" OnClick="btnSearch_Click" />
-            <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn-secondary" OnClick="btnClear_Click" />
+            <asp:Button ID="btnSearch" runat="server" Text="Search"  CssClass="btn-add" OnClick="btnSearch_Click" />
+            <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn-cancel" OnClick="btnClear_Click" />
 
             <div style="position: relative;">
                 <button type="button" class="icon-btn more-btn" title="More options">⋯</button>
@@ -551,7 +552,7 @@
 
         <asp:GridView ID="gvCoupons" runat="server"
             AutoGenerateColumns="False"
-            CssClass="table"
+            CssClass="gridview-style"
             DataKeyNames="VoucherID" OnRowCancelingEdit="gvCoupons_RowCancelingEdit" OnRowDeleting="gvCoupons_RowDeleting" OnRowEditing="gvCoupons_RowEditing">
 
             <Columns>
@@ -562,7 +563,10 @@
                 <asp:BoundField DataField="ExpiryDate" HeaderText="Expiry Date" DataFormatString="{0:dd-MM-yyyy}" />
                 <asp:BoundField DataField="Status" HeaderText="Status" />
 
-                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" CausesValidation="False" />
+                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" CausesValidation="False" >
+
+                <ControlStyle CssClass="btn-add" />
+                </asp:CommandField>
 
             </Columns>
         </asp:GridView>
@@ -600,6 +604,7 @@
                 <asp:DropDownList ID="ddlCreateVoucherType" runat="server">
                     <asp:ListItem Text="Free Shipping" />
                     <asp:ListItem Text="Discount" />
+                    <asp:ListItem Text="Free" />
                 </asp:DropDownList>
             </div>
 
@@ -620,8 +625,8 @@
 
             <div class="modal-footer">
                 <asp:Button ID="btnCreateCoupon" runat="server" Text="Create"
-                    CssClass="btn-primary" OnClick="btnCreateCoupon_Click" />
-                <button type="button" class="btn-secondary" onclick="closeCouponModal()">Cancel</button>
+                    CssClass="btn-add" OnClick="btnCreateCoupon_Click" />
+                <button type="button" class="btn-cancel" onclick="closeCouponModal()">Cancel</button>
             </div>
         </asp:Panel>
 
@@ -648,6 +653,7 @@
                 <asp:DropDownList ID="ddlEditVoucherType" runat="server">
                     <asp:ListItem Text="Free Shipping" Value="Free Shipping" />
                     <asp:ListItem Text="Discount" Value="Discount" />
+                    <asp:ListItem Text ="Free" Value="Free" />
                 </asp:DropDownList>
             </div>
 
@@ -676,8 +682,8 @@
 
             <div class="modal-footer">
                 <asp:Button ID="btnUpdateCoupon" runat="server" Text="Update"
-                    CssClass="btn-primary" OnClick="btnUpdateCoupon_Click" />
-                <button type="button" class="btn-secondary" onclick="closeCouponModal()">Cancel</button>
+                    CssClass="btn-add" OnClick="btnUpdateCoupon_Click" />
+                <button type="button" class="btn-cancel" onclick="closeCouponModal()">Cancel</button>
             </div>
         </asp:Panel>
 
