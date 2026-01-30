@@ -254,7 +254,7 @@
 
         /* Modal Styles */
         .modal-backdrop {
-            display: none;
+            display:none;
             position: fixed;
             top: 0;
             left: 0;
@@ -569,6 +569,7 @@
                 </asp:CommandField>
 
             </Columns>
+            <HeaderStyle CssClass="gv-header" />
         </asp:GridView>
 
 
@@ -579,10 +580,8 @@
         </div>
     </div>
 
-    <!-- Modal -->
-<div class="modal-backdrop" id="couponModal">
+    <div class="modal-backdrop" id="couponModal">
     <div class="modal-content">
-
         <!-- CREATE PANEL -->
         <asp:Panel ID="pnlCreateCoupon" runat="server" Visible="false">
             <div class="modal-header">
@@ -687,10 +686,8 @@
             </div>
         </asp:Panel>
 
+      </div>
     </div>
-</div>
-
-
 <script>
     function closeCouponModal() {
         document.getElementById('couponModal').classList.remove('show');
