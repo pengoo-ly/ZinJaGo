@@ -142,7 +142,7 @@
                     <div class="group-title">Main menu</div>
                     <ul class="menu" role="menu">
                         <li role="menuitem"><a href="ZinJaGODashboard.aspx"><span class="icon">🏠</span><span class="label">ZinJaGO Dashboard</span></a></li>
-                        <li role="menuitem"><a href="#"><span class="icon"></span><span class="label">Coupon</span></a></li>
+                        <li role="menuitem"><a href="#"><span class="icon">🏷️</span><span class="label">Coupon</span></a></li>
                         <li role="menuitem"><a href="#"><span class="icon">📦</span><span class="label">Reports Analytics</span></a></li>
                         <li role="menuitem"><a href="#"><span class="icon">👥</span><span class="label">System Settings</span></a></li>
                     </ul>
@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="sidebar-footer">
-                    <a class="profile-link" id="profileFooterLink" href="Profile.aspx" role="button" aria-label="Open profile">
+                    <a class="profile-link" id="profileFooterLink" href="../Profile.aspx" role="button" aria-label="Open profile">
                         <div class="profile" aria-hidden="false">
                             <div class="avatar">
                                 <asp:Label ID="lblAvatar" runat="server" />
