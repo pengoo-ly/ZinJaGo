@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WarehouseManagement.aspx.cs" Inherits="EcommerceWebsite.WarehouseManagement" MasterPageFile="~/Admin.master" %>
+﻿<%@ Page Title="Warehouse Management" Language="C#" AutoEventWireup="true" CodeBehind="WarehouseManagement.aspx.cs" Inherits="EcommerceWebsite.WarehouseManagement" MasterPageFile="~/Admin.master" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style>
