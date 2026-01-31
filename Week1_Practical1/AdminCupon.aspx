@@ -268,15 +268,15 @@
             display: flex !important;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.25);
             z-index: 10000; /* higher than everything else */
             align-items: center;
             justify-content: center;
+            opacity:1;
         }
 
         .modal-content {
             background: var(--card);
-            background-color:rgba(255,255,255,1);
             opacity:10000;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.85);
@@ -291,7 +291,8 @@
         }
         .modal-panel {
             display: block;
-            background:var(--card);/* always render the panel in DOM */
+            background:var(--card);
+            background-color:var(--card);/* always render the panel in DOM */
         }
 
         .modal-panel.hidden {
@@ -341,20 +342,22 @@
             font-weight: 500;
             margin-bottom: 6px;
             color: var(--text);
+            opacity:1;
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 6px;
-            background: var(--card);
-            color: var(--text);
-            font-size: 13px;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 6px;
+                background: var(--card);
+                color: var(--text);
+                font-size: 13px;
+                font-family: inherit;
+                box-sizing: border-box;
+                opacity: 1;
+            }
 
         .dark .form-group input,
         .dark .form-group select {
