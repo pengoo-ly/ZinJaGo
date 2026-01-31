@@ -53,55 +53,17 @@ namespace Week1_Practical1
             catch { }
         }
 
-        protected void btnSaveCoupon_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Cupon c = new Cupon
-                {
-                    Code = txtCode.Text,
-                    VoucherType = ddlVoucherType.SelectedValue,
-                    DiscountType = ddlDiscountType.SelectedValue,
-                    DiscountValue = decimal.Parse(txtDiscountValue.Text),
-                    CoinCost = string.IsNullOrEmpty(txtCoinCost.Text) ? (int?)null : int.Parse(txtCoinCost.Text),
-                    Status = ddlStatus.SelectedValue
-                };
-
-                if (string.IsNullOrEmpty(hfVoucherID.Value))
-                {
-                    // Create
-                    c.CreatedBy = Convert.ToInt32(Session["AdminID"]);
-                    c.Create();
-                }
-                else
-                {
-                    // Update
-                    c.VoucherID = int.Parse(hfVoucherID.Value);
-                    c.Update();
-                }
-
-                LoadCoupons();
-                LoadStatistics();
-            }
-            catch (Exception ex)
-            {
-                pnlAlert.Visible = true;
-                lblAlert.Text = "Error: " + ex.Message;
-                ScriptManager.RegisterStartupScript(this, GetType(), "ShowModal", "openCouponModal();", true);
-            }
-        }
-
         protected void btnClear_Click(object sender, EventArgs e)
         {
             try
             {
-                 txtSearch.Text = "";
+                txtSearch.Text = "";
+                gvCoupons.EditIndex = -1;
                 LoadCoupons();
             }
             catch (Exception ex)
             {
-                pnlAlert.Visible = true;
-                lblAlert.Text = "Error: " + ex.Message;
+                return;
             }
         }
 
@@ -109,31 +71,178 @@ namespace Week1_Practical1
         {
             try
             {
+                gvCoupons.EditIndex = -1; // 🔑 VERY IMPORTANT
+
                 string q = txtSearch.Text.Trim().ToLower();
                 int adminId = Convert.ToInt32(Session["AdminID"]);
-                var coupons = new Cupon().GetCouponsByAdmin(adminId)
+
+                var coupons = new Cupon()
+                    .GetCouponsByAdmin(adminId)
                     .Where(c => c.Code.ToLower().Contains(q))
                     .ToList();
+
+                gvCoupons.DataSource = coupons;
+                gvCoupons.DataBind();
             }
             catch (Exception ex)
             {
-                pnlAlert.Visible = true;
-                lblAlert.Text = "Error: " + ex.Message;
+                pnlCreateAlert.Visible = true;
+                lblCreateAlert.Text = ex.Message;
             }
         }
 
 
         protected void btnOpenAdd_Click(object sender, EventArgs e)
         {
-            hfVoucherID.Value = "";
-            txtCode.Text = "";
-            ddlVoucherType.SelectedIndex = 0;
-            ddlDiscountType.SelectedIndex = 0;
-            txtDiscountValue.Text = "";
-            txtCoinCost.Text = "";
-            ddlStatus.SelectedIndex = 0;
+            try
+            {
+                pnlCreateCoupon.CssClass = "modal-panel";   // show create panel
+                pnlEditCoupon.CssClass = "modal-panel hidden"; // hide edit panel
 
-            ScriptManager.RegisterStartupScript(this, GetType(), "ShowModal", "openCouponModal();", true);
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "showModal",
+                    "document.getElementById('couponModal').classList.add('show');",
+                    true
+                );
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        protected void gvCoupons_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            try
+            {
+                e.Cancel = true;               // 🔑 STOP GridView edit mode
+                gvCoupons.EditIndex = -1;      // 🔑 ENSURE no inline edit
+
+                int id = Convert.ToInt32(gvCoupons.DataKeys[e.NewEditIndex].Value);
+                Cupon c = new Cupon().GetCoupon(id);
+                if (c == null) return;
+
+                hfEditVoucherID.Value = c.VoucherID.ToString();
+                txtEditCode.Text = c.Code.ToUpper();
+                ddlEditVoucherType.SelectedValue = c.VoucherType;
+                txtEditDiscount.Text = c.DiscountValue.ToString();
+                txtEditCoin.Text = c.CoinCost?.ToString() ?? "";
+                txtEditExpiry.Text = c.ExpiryDate.ToString("yyyy-MM-dd");
+                ddlEditStatus.SelectedValue = c.Status;
+
+                pnlCreateCoupon.CssClass = "modal-panel hidden"; // hide create
+                pnlEditCoupon.CssClass = "modal-panel"; // show edit
+
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "editModal",
+                    "document.getElementById('couponModal').classList.add('show');",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                pnlEditAlert.Visible = true;
+                lblEditAlert.Text = ex.Message;
+
+                // 🔑 SHOW MODAL EVEN ON ERROR
+                ScriptManager.RegisterStartupScript(
+                    this, GetType(), "editModalErr",
+                    "document.getElementById('couponModal').classList.add('show');",
+                    true
+                );
+            }
+        }
+
+        protected void gvCoupons_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            try
+            {
+                gvCoupons.EditIndex = -1;
+
+                int id = Convert.ToInt32(gvCoupons.DataKeys[e.RowIndex].Value);
+                new Cupon { VoucherID = id }.Delete();
+
+                LoadCoupons();
+                LoadStatistics();
+            }
+            catch (Exception ex)
+            {
+                pnlCreateAlert.Visible = true;
+                lblCreateAlert.Text = ex.Message;
+            }
+        }
+
+        protected void gvCoupons_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            try
+            {
+                gvCoupons.EditIndex = -1;
+                LoadCoupons();
+            }
+            catch (Exception ex) 
+            {
+                return;
+            }
+        }
+
+        protected void btnCreateCoupon_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Cupon c = new Cupon
+                {
+                    Code = txtCreateCode.Text.Trim().ToUpper(),
+                    VoucherType = ddlCreateVoucherType.SelectedValue,
+                    DiscountType = "Fixed", // or Percentage if you add later
+                    DiscountValue = decimal.Parse(txtCreateDiscount.Text),
+                    CoinCost = string.IsNullOrEmpty(txtCreateCoin.Text) ? (int?)null : int.Parse(txtCreateCoin.Text),
+                    ExpiryDate = DateTime.Parse(txtCreateExpiry.Text),
+                    Status = "Active",
+                    CreatedBy = Convert.ToInt32(Session["AdminID"])
+                };
+
+                c.Create();
+
+                LoadCoupons();
+                LoadStatistics();
+            }
+            catch (Exception ex)
+            {
+                pnlCreateAlert.Visible = true;
+                lblCreateAlert.Text = ex.Message;
+            }
+        }
+
+        protected void btnUpdateCoupon_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int id = int.Parse(hfEditVoucherID.Value);
+
+                Cupon c = new Cupon
+                {
+                    VoucherID = id,
+                    Code = txtEditCode.Text.Trim().ToUpper(),
+                    VoucherType = ddlEditVoucherType.SelectedValue,
+                    DiscountType = "Fixed",
+                    DiscountValue = decimal.Parse(txtEditDiscount.Text),
+                    CoinCost = string.IsNullOrEmpty(txtEditCoin.Text)
+                                ? (int?)null
+                                : int.Parse(txtEditCoin.Text),
+                    ExpiryDate = DateTime.Parse(txtEditExpiry.Text),
+                    Status = ddlEditStatus.SelectedValue
+                };
+
+                c.Update();
+
+                LoadCoupons();
+                LoadStatistics();
+            }
+            catch (Exception ex)
+            {
+                pnlEditAlert.Visible = true;
+                lblEditAlert.Text = ex.Message;
+            }
         }
     }
 }

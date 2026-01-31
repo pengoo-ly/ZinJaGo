@@ -7,272 +7,227 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Week1_Practical1
+namespace Week1_Practical1.SuperAdmin
 {
 
 
-    public partial class AdminCupon
+    public partial class SProfile
     {
 
         /// <summary>
-        /// btnOpenAdd control.
+        /// lblInitial control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnOpenAdd;
+        protected global::System.Web.UI.WebControls.Label lblInitial;
 
         /// <summary>
-        /// lblTotalCoupons control.
+        /// lblAdminName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTotalCoupons;
+        protected global::System.Web.UI.WebControls.Label lblAdminName;
 
         /// <summary>
-        /// lblActiveCoupons control.
+        /// lblAdminEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblActiveCoupons;
+        protected global::System.Web.UI.WebControls.Label lblAdminEmail;
 
         /// <summary>
-        /// lblTotalDiscount control.
+        /// btnDeleteAccount control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTotalDiscount;
+        protected global::System.Web.UI.WebControls.Button btnDeleteAccount;
 
         /// <summary>
-        /// lblTimesUsed control.
+        /// btnConfirmDelete control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTimesUsed;
+        protected global::System.Web.UI.WebControls.Button btnConfirmDelete;
 
         /// <summary>
-        /// txtSearch control.
+        /// lblAvatarPreview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSearch;
+        protected global::System.Web.UI.WebControls.Label lblAvatarPreview;
 
         /// <summary>
-        /// btnSearch control.
+        /// btnDeletePhoto control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSearch;
+        protected global::System.Web.UI.WebControls.Button btnDeletePhoto;
 
         /// <summary>
-        /// btnClear control.
+        /// fileUpload control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnClear;
+        protected global::System.Web.UI.WebControls.FileUpload fileUpload;
 
         /// <summary>
-        /// gvCoupons control.
+        /// txtFirstName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvCoupons;
+        protected global::System.Web.UI.WebControls.TextBox txtFirstName;
 
         /// <summary>
-        /// pnlCreateCoupon control.
+        /// txtLastName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlCreateCoupon;
+        protected global::System.Web.UI.WebControls.TextBox txtLastName;
 
         /// <summary>
-        /// pnlCreateAlert control.
+        /// txtEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlCreateAlert;
+        protected global::System.Web.UI.WebControls.TextBox txtEmail;
 
         /// <summary>
-        /// lblCreateAlert control.
+        /// txtPasswordDisplay control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblCreateAlert;
+        protected global::System.Web.UI.WebControls.TextBox txtPasswordDisplay;
 
         /// <summary>
-        /// txtCreateCode control.
+        /// txtPhoneNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCreateCode;
+        protected global::System.Web.UI.WebControls.TextBox txtPhoneNumber;
 
         /// <summary>
-        /// ddlCreateVoucherType control.
+        /// txtDateOfBirth control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCreateVoucherType;
+        protected global::System.Web.UI.WebControls.TextBox txtDateOfBirth;
 
         /// <summary>
-        /// txtCreateDiscount control.
+        /// txtLocation control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCreateDiscount;
+        protected global::System.Web.UI.WebControls.TextBox txtLocation;
 
         /// <summary>
-        /// txtCreateCoin control.
+        /// txtBiography control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCreateCoin;
+        protected global::System.Web.UI.WebControls.TextBox txtBiography;
 
         /// <summary>
-        /// txtCreateExpiry control.
+        /// btnSaveProfile control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCreateExpiry;
+        protected global::System.Web.UI.WebControls.Button btnSaveProfile;
 
         /// <summary>
-        /// btnCreateCoupon control.
+        /// btnCancel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCreateCoupon;
+        protected global::System.Web.UI.WebControls.Button btnCancel;
 
         /// <summary>
-        /// pnlEditCoupon control.
+        /// txtCardName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlEditCoupon;
+        protected global::System.Web.UI.WebControls.TextBox txtCardName;
 
         /// <summary>
-        /// hfEditVoucherID control.
+        /// txtCardNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfEditVoucherID;
+        protected global::System.Web.UI.WebControls.TextBox txtCardNumber;
 
         /// <summary>
-        /// pnlEditAlert control.
+        /// txtCardExpiry control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlEditAlert;
+        protected global::System.Web.UI.WebControls.TextBox txtCardExpiry;
 
         /// <summary>
-        /// lblEditAlert control.
+        /// txtCardCVV control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblEditAlert;
+        protected global::System.Web.UI.WebControls.TextBox txtCardCVV;
 
         /// <summary>
-        /// txtEditCode control.
+        /// btnAddCard control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEditCode;
+        protected global::System.Web.UI.WebControls.Button btnAddCard;
 
         /// <summary>
-        /// ddlEditVoucherType control.
+        /// btnConfirmDeleteCard control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlEditVoucherType;
-
-        /// <summary>
-        /// txtEditDiscount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEditDiscount;
-
-        /// <summary>
-        /// txtEditCoin control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEditCoin;
-
-        /// <summary>
-        /// txtEditExpiry control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEditExpiry;
-
-        /// <summary>
-        /// ddlEditStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlEditStatus;
-
-        /// <summary>
-        /// btnUpdateCoupon control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnUpdateCoupon;
+        protected global::System.Web.UI.WebControls.Button btnConfirmDeleteCard;
     }
 }

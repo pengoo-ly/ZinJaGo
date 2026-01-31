@@ -253,27 +253,33 @@
             }
 
         /* Modal Styles */
+        /* ---------------- Modal Fix ---------------- */
         .modal-backdrop {
-            display: none;
+            display: none;               /* hide by default */
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
+            inset: 0;                    /* top/right/bottom/left 0 */
+            background: rgba(0,0,0,0.85);/* slightly darker, fully opaque backdrop */
+            z-index: 9999;               /* ensure it’s above everything */
             align-items: center;
             justify-content: center;
         }
 
         .modal-backdrop.show {
-            display: flex;
+            display: flex !important;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 10000; /* higher than everything else */
+            align-items: center;
+            justify-content: center;
+            opacity:1;
         }
 
         .modal-content {
             background: var(--card);
+            opacity:10000;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.85);
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
@@ -281,8 +287,16 @@
             padding: 28px;
             position: relative;
             margin: auto;
-            opacity:1;
-            backdrop-filter:none;
+            z-index: 10000;              /* make sure it’s above backdrop */                   /* fully opaque */
+        }
+        .modal-panel {
+            display: block;
+            background:var(--card);
+            background-color:var(--card);/* always render the panel in DOM */
+        }
+
+        .modal-panel.hidden {
+            display: none; /* hide by default */
         }
 
         .modal-header {
@@ -328,20 +342,22 @@
             font-weight: 500;
             margin-bottom: 6px;
             color: var(--text);
+            opacity:1;
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 6px;
-            background: var(--card);
-            color: var(--text);
-            font-size: 13px;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 6px;
+                background: var(--card);
+                color: var(--text);
+                font-size: 13px;
+                font-family: inherit;
+                box-sizing: border-box;
+                opacity: 1;
+            }
 
         .dark .form-group input,
         .dark .form-group select {
@@ -504,7 +520,7 @@
             <h2>Coupon Management</h2>
             <p style="color: var(--muted); margin: 6px 0 0 0; font-size: 13px;">Create and manage discount coupons for your customers</p>
         </div>
-         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClientClick="openCouponModal(); return false;" OnClick="btnOpenAdd_Click"/>
+         <asp:Button ID="btnOpenAdd" runat="server" Text="➕ Create Coupon" CssClass="btn-add" OnClick="btnOpenAdd_Click"/>
     </div>
     <br />
 
@@ -534,8 +550,8 @@
             <div class="table-search">
                 <asp:TextBox ID="txtSearch" runat="server" CssClass="table-search-input" placeholder="Search coupons..." />
             </div>
-            <asp:Button ID="btnSearch" runat="server" Text="Search"  CssClass="btn-primary-custom" OnClick="btnSearch_Click" />
-            <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn-secondary" OnClick="btnClear_Click" />
+            <asp:Button ID="btnSearch" runat="server" Text="Search"  CssClass="btn-add" OnClick="btnSearch_Click" />
+            <asp:Button ID="btnClear" runat="server" Text="Clear" CssClass="btn-cancel" OnClick="btnClear_Click" />
 
             <div style="position: relative;">
                 <button type="button" class="icon-btn more-btn" title="More options">⋯</button>
@@ -551,8 +567,8 @@
 
         <asp:GridView ID="gvCoupons" runat="server"
             AutoGenerateColumns="False"
-            CssClass="table"
-            DataKeyNames="VoucherID">
+            CssClass="gridview-style"
+            DataKeyNames="VoucherID" OnRowCancelingEdit="gvCoupons_RowCancelingEdit" OnRowDeleting="gvCoupons_RowDeleting" OnRowEditing="gvCoupons_RowEditing">
 
             <Columns>
                 <asp:BoundField DataField="Code" HeaderText="Code" />
@@ -562,9 +578,13 @@
                 <asp:BoundField DataField="ExpiryDate" HeaderText="Expiry Date" DataFormatString="{0:dd-MM-yyyy}" />
                 <asp:BoundField DataField="Status" HeaderText="Status" />
 
-                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" />
+                <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" CausesValidation="False" >
+
+                <ControlStyle CssClass="btn-add" />
+                </asp:CommandField>
 
             </Columns>
+            <HeaderStyle CssClass="gv-header" />
         </asp:GridView>
 
 
@@ -575,225 +595,118 @@
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
     <div class="modal-backdrop" id="couponModal">
-        <div class="modal-content">
-    <div class="modal-header">
-        <h3 id="modalTitle">Create Coupon</h3>
-        <asp:Button ID="btnCloseModal" runat="server" Text="×" CssClass="modal-close" OnClientClick="closeCouponModal(); return false;" />
+    <div class="modal-content">
+        <!-- CREATE PANEL -->
+        <asp:Panel ID="pnlCreateCoupon" runat="server" CssClass="modal-panel hidden">
+            <div class="modal-header">
+                <h3>Create Coupon</h3>
+                <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
+            </div>
+
+            <asp:Panel ID="pnlCreateAlert" runat="server" Visible="false" CssClass="alert alert-error">
+                <asp:Label ID="lblCreateAlert" runat="server" />
+            </asp:Panel>
+
+            <div class="form-group">
+                <label>Code</label>
+                <asp:TextBox ID="txtCreateCode" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Voucher Type</label>
+                <asp:DropDownList ID="ddlCreateVoucherType" runat="server">
+                    <asp:ListItem Text="Free Shipping" />
+                    <asp:ListItem Text="Discount" />
+                    <asp:ListItem Text="Free" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="form-group">
+                <label>Discount Value</label>
+                <asp:TextBox ID="txtCreateDiscount" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Coin Cost</label>
+                <asp:TextBox ID="txtCreateCoin" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Expiry Date</label>
+                <asp:TextBox ID="txtCreateExpiry" runat="server" TextMode="Date" />
+            </div>
+
+            <div class="modal-footer">
+                <asp:Button ID="btnCreateCoupon" runat="server" Text="Create"
+                    CssClass="btn-add" OnClick="btnCreateCoupon_Click" />
+                <button type="button" class="btn-cancel" onclick="closeCouponModal()">Cancel</button>
+            </div>
+        </asp:Panel>
+
+        <!-- EDIT PANEL -->
+        <asp:Panel ID="pnlEditCoupon" runat="server" CssClass="modal-panel hidden">
+            <div class="modal-header">
+                <h3>Edit Coupon</h3>
+                <button type="button" class="modal-close" onclick="closeCouponModal()">×</button>
+            </div>
+
+            <asp:HiddenField ID="hfEditVoucherID" runat="server" />
+
+            <asp:Panel ID="pnlEditAlert" runat="server" Visible="false" CssClass="alert alert-error">
+                <asp:Label ID="lblEditAlert" runat="server" />
+            </asp:Panel>
+
+            <div class="form-group">
+                <label>Code</label>
+                <asp:TextBox ID="txtEditCode" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Voucher Type</label>
+                <asp:DropDownList ID="ddlEditVoucherType" runat="server">
+                    <asp:ListItem Text="Free Shipping" Value="Free Shipping" />
+                    <asp:ListItem Text="Discount" Value="Discount" />
+                    <asp:ListItem Text ="Free" Value="Free" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="form-group">
+                <label>Discount Value</label>
+                <asp:TextBox ID="txtEditDiscount" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Coin Cost</label>
+                <asp:TextBox ID="txtEditCoin" runat="server" />
+            </div>
+
+            <div class="form-group">
+                <label>Expiry Date</label>
+                <asp:TextBox ID="txtEditExpiry" runat="server" TextMode="Date" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <asp:DropDownList ID="ddlEditStatus" runat="server">
+                    <asp:ListItem Text="Active" />
+                    <asp:ListItem Text="Inactive" />
+                </asp:DropDownList>
+            </div>
+
+            <div class="modal-footer">
+                <asp:Button ID="btnUpdateCoupon" runat="server" Text="Update"
+                    CssClass="btn-add" OnClick="btnUpdateCoupon_Click" />
+                <button type="button" class="btn-cancel" onclick="closeCouponModal()">Cancel</button>
+            </div>
+        </asp:Panel>
+
+      </div>
     </div>
+<script>
+    function closeCouponModal() {
+        document.getElementById('couponModal').classList.remove('show');
+    }
+</script>
 
-    <asp:Panel ID="pnlAlert" runat="server" Visible="false">
-        <asp:Label ID="lblAlert" runat="server" Text="" />
-    </asp:Panel>
-
-    <asp:Panel ID="pnlCouponForm" runat="server">
-        <asp:HiddenField ID="hfVoucherID" runat="server" />
-
-        <div class="form-group">
-            <label>Code</label>
-            <asp:TextBox ID="txtCode" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Voucher Type</label>
-            <asp:DropDownList ID="ddlVoucherType" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Voucher" Value="Voucher" />
-                <asp:ListItem Text="Coupon" Value="Coupon" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="form-group">
-            <label>Discount Type</label>
-            <asp:DropDownList ID="ddlDiscountType" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Percentage" Value="Percentage" />
-                <asp:ListItem Text="Fixed" Value="Fixed" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="form-group">
-            <label>Discount Value</label>
-            <asp:TextBox ID="txtDiscountValue" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Coin Cost</label>
-            <asp:TextBox ID="txtCoinCost" runat="server" CssClass="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Status</label>
-            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-control">
-                <asp:ListItem Text="Active" Value="Active" />
-                <asp:ListItem Text="Inactive" Value="Inactive" />
-            </asp:DropDownList>
-        </div>
-
-        <div class="modal-footer">
-            <asp:Button ID="btnSaveCoupon" runat="server" Text="Save Coupon" CssClass="btn-add" OnClick="btnSaveCoupon_Click" />
-            <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="btn-cancel" OnClientClick="closeCouponModal(); return false;" />
-        </div>
-    </asp:Panel>
-</div>
-
-    </div>
-
-   <script>
-
-       function openCouponModal() {
-           document.getElementById('couponModal').classList.add('show');
-       }
-       function closeCouponModal() {
-           document.getElementById('couponModal').classList.remove('show');
-       }
-
-       document.addEventListener('DOMContentLoaded', () => {
-
-           const modal = document.getElementById('couponModal');
-           const modalTitle = document.getElementById('modalTitle');
-           const couponForm = document.getElementById('couponForm');
-           const voucherId = document.getElementById('voucherId');
-           const btnCreateCoupon = document.getElementById('btnCreateCoupon');
-           const submitBtn = document.getElementById('submitBtn');
-           const alertMessage = document.getElementById('alertMessage');
-           const couponsTableBody = document.getElementById('couponsTableBody');
-
-           /* ------------------ Helpers ------------------ */
-
-           function showAlert(msg, type = 'error') {
-               alertMessage.innerHTML =
-                   `<div class="alert alert-${type}">${msg}</div>`;
-           }
-
-           function closeModal() {
-               modal.classList.remove('show');
-               alertMessage.innerHTML = '';
-               submitBtn.disabled = false;
-               submitBtn.textContent = 'Save Coupon';
-               couponForm.reset();
-               voucherId.value = '';
-           }
-
-           function openCreateModal() {
-               modalTitle.textContent = 'Create Coupon';
-               submitBtn.textContent = 'Save Coupon';
-               submitBtn.disabled = false;
-               couponForm.reset();
-               voucherId.value = '';
-               alertMessage.innerHTML = '';
-               modal.classList.add('show');
-           }
-
-           /* ------------------ Modal Buttons ------------------ */
-
-           btnCreateCoupon.onclick = openCreateModal;
-           document.getElementById('closeModal').onclick = closeModal;
-           document.getElementById('cancelBtn').onclick = closeModal;
-
-           modal.onclick = e => {
-               if (e.target === modal) closeModal();
-           };
-
-           /* ------------------ Edit / Delete Buttons ------------------ */
-
-           document.addEventListener('click', e => {
-
-               /* ---- EDIT ---- */
-               if (e.target.classList.contains('edit-coupon')) {
-                   const id = e.target.dataset.voucherId;
-
-                   fetch(`AdminCupon.aspx?action=get&id=${id}`)
-                       .then(r => r.json())
-                       .then(d => {
-                           voucherId.value = d.VoucherID;
-                           couponCode.value = d.Code;
-                           voucherType.value = d.VoucherType;
-                           discountType.value = d.DiscountType;
-                           discountValue.value = d.DiscountValue;
-                           coinCost.value = d.CoinCost ?? '';
-                           expiryDate.value = d.ExpiryDate;
-                           status.value = d.Status;
-
-                           modalTitle.textContent = 'Edit Coupon';
-                           submitBtn.textContent = 'Update Coupon';
-                           modal.classList.add('show');
-                       })
-                       .catch(() => showAlert('Failed to load coupon'));
-               }
-
-               /* ---- DELETE ---- */
-               if (e.target.classList.contains('delete-coupon')) {
-                   const row = e.target.closest('tr');
-                   const id = e.target.dataset.voucherId;
-
-                   if (!confirm('Delete this coupon?')) return;
-
-                   fetch(`AdminCupon.aspx?action=delete&id=${id}`)
-                       .then(r => r.json())
-                       .then(d => {
-                           if (d.success) {
-                               row.remove();
-                           } else {
-                               showAlert(d.message);
-                           }
-                       })
-                       .catch(() => showAlert('Delete failed'));
-               }
-           });
-
-           /* ------------------ Save (Create / Update) ------------------ */
-
-           couponForm.onsubmit = e => {
-               e.preventDefault();
-
-               submitBtn.disabled = true;
-               submitBtn.textContent = 'Saving...';
-
-               const fd = new URLSearchParams();
-               fd.append('action', voucherId.value ? 'update' : 'create');
-               fd.append('voucherId', voucherId.value);
-               fd.append('code', couponCode.value);
-               fd.append('voucherType', voucherType.value);
-               fd.append('discountType', discountType.value);
-               fd.append('discountValue', discountValue.value);
-               fd.append('expiryDate', expiryDate.value);
-               fd.append('status', status.value);
-
-               if (coinCost.value !== '') {
-                   fd.append('coinCost', coinCost.value);
-               }
-
-               fetch('AdminCupon.aspx', {
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                   body: fd.toString()
-               })
-                   .then(r => r.json())
-                   .then(d => {
-                       if (d.success) {
-                           location.reload();
-                       } else {
-                           showAlert(d.message);
-                           submitBtn.disabled = false;
-                           submitBtn.textContent = voucherId.value ? 'Update Coupon' : 'Save Coupon';
-                       }
-                   })
-                   .catch(() => {
-                       showAlert('Save failed');
-                       submitBtn.disabled = false;
-                       submitBtn.textContent = 'Save Coupon';
-                   });
-           };
-
-           /* ------------------ Search ------------------ */
-
-           searchCoupons.oninput = () => {
-               const q = searchCoupons.value.toLowerCase();
-               document.querySelectorAll('.coupon-row').forEach(r => {
-                   r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-               });
-           };
-
-       });
-   </script>
 </asp:Content>
