@@ -501,18 +501,43 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
             gap: 12px;
-            background: rgba(79, 163, 146, 0.05);
-            border: 2px dashed #4FA392;
+            background: linear-gradient(135deg, rgba(79, 163, 146, 0.08) 0%, rgba(118, 178, 159, 0.08) 100%);
+            border: 2px solid #4FA392;
             border-radius: 12px;
             padding: 60px 24px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #4FA392;
+            font-weight: 600;
         }
 
         .add-card-btn:hover {
-            border-color: #4FA392;
-            background: rgba(79, 163, 146, 0.1);
+            border-color: #3D8577;
+            background: linear-gradient(135deg, rgba(79, 163, 146, 0.15) 0%, rgba(118, 178, 159, 0.15) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 163, 146, 0.15);
+        }
+
+        .add-card-icon {
+            font-size: 48px;
+            line-height: 1;
+        }
+
+        .add-card-text h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #4FA392;
+            font-weight: 600;
+        }
+
+        .add-card-text p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            color: #7a9993;
+            font-weight: 400;
         }
 
         /* Modal */
@@ -543,7 +568,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4FA392 0%, #76B29F 100%);
             color: white;
             padding: 20px;
             display: flex;
@@ -554,6 +579,10 @@
         .modal-header h2 {
             margin: 0;
             font-size: 20px;
+        }
+
+        .modal-header.card-header {
+            background: linear-gradient(135deg, #4FA392 0%, #76B29F 100%);
         }
 
         .close {
@@ -602,12 +631,13 @@
         }
 
         .btn-modal-primary {
-            background: var(--accent);
+            background: linear-gradient(135deg, #4FA392 0%, #76B29F 100%);
             color: white;
         }
 
         .btn-modal-primary:hover {
             opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(79, 163, 146, 0.3);
         }
 
         /* Delete Confirmation Modal */
@@ -783,7 +813,7 @@
             <!-- Credit Cards Tab -->
             <div id="cards-tab" class="tab-content">
                 <div class="profile-header">
-                    <h2>My Credit Cards</h2>
+                    <h2>💳 My Credit Cards</h2>
                 </div>
 
                 <div class="credit-cards-grid" id="creditCardsGrid">
@@ -807,8 +837,8 @@
     <!-- Add Credit Card Modal -->
     <div class="modal" id="addCardModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add Credit Card</h2>
+            <div class="modal-header card-header">
+                <h2>💳 Add Credit Card</h2>
                 <span class="close" onclick="closeAddCardModal()">&times;</span>
             </div>
             <div class="modal-body">
@@ -834,7 +864,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-modal btn-modal-cancel" onclick="closeAddCardModal()">Cancel</button>
-                <asp:Button ID="btnAddCard" runat="server" Text="Add Card" CssClass="btn-modal btn-modal-primary" OnClick="btnAddCard_Click" />
+                <asp:Button ID="btnAddCard" runat="server" Text="✓ Add Card" CssClass="btn-modal btn-modal-primary" OnClick="btnAddCard_Click" />
             </div>
         </div>
     </div>

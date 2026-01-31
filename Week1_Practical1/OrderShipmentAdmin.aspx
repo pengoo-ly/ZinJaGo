@@ -7,7 +7,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background-color: #FDFBF7;
+            background-color: #f8f0e3;
             border-radius: 8px;
             padding: 30px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -18,7 +18,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #E8DED2;
+            border-bottom: 2px solid #e8ddd2;
             padding-bottom: 20px;
         }
 
@@ -36,12 +36,12 @@
         }
 
         .stat-card {
-            background: #F5EFE7;
+            background: #f8f0e3;
             color: #2C2C2C;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #E8DED2;
+            border: 1px solid #e8ddd2;
         }
 
         .stat-card.total {
@@ -50,23 +50,23 @@
         }
 
         .stat-card.pending {
-            background: #FBF7F1;
-            border-color: #EAE1D3;
+            background: #f8f0e3;
+            border-color: #e8ddd2;
         }
 
         .stat-card.shipped {
-            background: #F9F3E8;
-            border-color: #E8DED2;
+            background: #f8f0e3;
+            border-color: #e8ddd2;
         }
 
         .stat-card.delivered {
-            background: #F5EFE7;
-            border-color: #E0D5C8;
+            background: #f8f0e3;
+            border-color: #e8ddd2;
         }
 
         .stat-card.revenue {
-            background: #F2EBE0;
-            border-color: #DDD2C5;
+            background: #f8f0e3;
+            border-color: #e8ddd2;
         }
 
         .stat-label {
@@ -116,13 +116,13 @@
             margin-top: 20px;
             background: #f8f0e3;
             border-radius: 8px;
-            border: 1px solid #E8DED2;
+            border: 1px solid #e8ddd2;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #FDFBF7;
+            background-color: #f8f0e3;
         }
 
         th {
@@ -137,12 +137,12 @@
 
         td {
             padding: 15px;
-            border-bottom: 1px solid #E8DED2;
+            border-bottom: 1px solid #e8ddd2;
             color: #2C2C2C;
         }
 
         tr:hover {
-            background-color: #F9F5F0;
+            background-color: #f0e8dc;
         }
 
         .status-badge {
@@ -155,19 +155,19 @@
         }
 
         .status-pending {
-            background-color: #FBF7F1;
+            background-color: #f8f0e3;
             color: #8B7355;
-            border: 1px solid #E8D5C4;
+            border: 1px solid #e8ddd2;
         }
 
         .status-shipped {
-            background-color: #F9F3E8;
+            background-color: #f8f0e3;
             color: #8B7355;
-            border: 1px solid #E0D0BC;
+            border: 1px solid #e8ddd2;
         }
 
         .status-delivered {
-            background-color: #E8D9C8;
+            background-color: #e8d9c8;
             color: #5C4A3D;
             font-weight: 700;
         }
@@ -179,9 +179,9 @@
         }
 
         .status-processing {
-            background-color: #F5EFE7;
+            background-color: #f8f0e3;
             color: #666666;
-            border: 1px solid #E0D5C8;
+            border: 1px solid #e8ddd2;
         }
 
         .action-buttons {
@@ -214,24 +214,24 @@
         }
 
         .btn-update {
-            background-color: #D4C4A8;
+            background-color: #d4c4a8;
             color: #2C2C2C;
-            border: 1px solid #C4B498;
+            border: 1px solid #c4b498;
         }
 
         .btn-update:hover {
-            background-color: #C4B498;
+            background-color: #c4b498;
             transform: translateY(-1px);
         }
 
         .btn-cancel {
-            background-color: #E8A8A8;
+            background-color: #e8a8a8;
             color: #2C2C2C;
-            border: 1px solid #D89898;
+            border: 1px solid #d89898;
         }
 
         .btn-cancel:hover {
-            background-color: #D89898;
+            background-color: #d89898;
             transform: translateY(-1px);
         }
 
@@ -244,12 +244,12 @@
 
         .pagination a, .pagination span {
             padding: 8px 12px;
-            border: 1px solid #D4C4A8;
+            border: 1px solid #d4c4a8;
             border-radius: 4px;
             cursor: pointer;
             color: #4FA392;
             text-decoration: none;
-            background-color: #F9F5F0;
+            background-color: #f8f0e3;
         }
 
         .pagination a:hover {
@@ -307,7 +307,7 @@
             </div>
             <div class="stat-card revenue">
                 <div class="stat-label">Total Revenue</div>
-                <div class="stat-value" style="color: #8B7355;"><asp:Label ID="lblTotalRevenue" runat="server" Text="₱0.00"></asp:Label></div>
+                <div class="stat-value" style="color: #8B7355;"><asp:Label ID="lblTotalRevenue" runat="server" Text="$0.00"></asp:Label></div>
             </div>
         </div>
 

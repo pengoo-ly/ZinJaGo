@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web.UI;
 using Week1_Practical1.Helpers;
 
@@ -159,8 +161,11 @@ namespace Week1_Practical1
                     return;
                 }
 
+                // Hash the new password using same method as Login.aspx
+                string hashedPassword = HashPassword(newPassword);
+
                 // Update password in database
-                if (UpdateUserPassword(userId, newPassword))
+                if (UpdateUserPassword(userId, hashedPassword))
                 {
                     // Clear reset code from database
                     ClearResetCode(userId);
@@ -175,7 +180,7 @@ namespace Week1_Practical1
                     DbLogger.Log("Password reset successful for UserID: " + userId);
 
                     System.Threading.Thread.Sleep(2000);
-                    Response.Redirect("CustomerLogin.aspx");
+                    Response.Redirect("~/Login.aspx");
                 }
                 else
                 {
@@ -281,7 +286,7 @@ namespace Week1_Practical1
             }
         }
 
-        private bool UpdateUserPassword(int userId, string newPassword)
+        private bool UpdateUserPassword(int userId, string hashedPassword)
         {
             try
             {
@@ -297,7 +302,7 @@ namespace Week1_Practical1
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@PasswordHash", newPassword); // Note: In production, hash the password
+                        cmd.Parameters.AddWithValue("@PasswordHash", hashedPassword);
                         cmd.Parameters.AddWithValue("@UserID", userId);
 
                         conn.Open();
@@ -355,31 +360,6 @@ namespace Week1_Practical1
                 // For now, just log it or store in debug output
                 DbLogger.Log("Reset code for " + email + ": " + resetCode);
                 System.Diagnostics.Debug.WriteLine("Reset code for " + email + ": " + resetCode);
-
-                // Example implementation using System.Net.Mail
-                // You would need to configure these settings in Web.config
-                /*
-                using (System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient())
-                {
-                    smtp.Host = ConfigurationManager.AppSettings["SmtpHost"];
-                    smtp.Port = int.Parse(ConfigurationManager.AppSettings["SmtpPort"]);
-                    smtp.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["SmtpEnableSsl"]);
-                    smtp.Credentials = new System.Net.NetworkCredential(
-                        ConfigurationManager.AppSettings["SmtpUsername"],
-                        ConfigurationManager.AppSettings["SmtpPassword"]);
-
-                    using (System.Net.Mail.MailMessage mail = new System.Net.Mail.MailMessage())
-                    {
-                        mail.From = new System.Net.Mail.MailAddress(ConfigurationManager.AppSettings["EmailFrom"]);
-                        mail.To.Add(email);
-                        mail.Subject = "ZinJaGO Password Reset Code";
-                        mail.Body = $"Your password reset code is: {resetCode}\n\nThis code will expire in {RESET_CODE_EXPIRY_MINUTES} minutes.";
-                        mail.IsBodyHtml = false;
-
-                        smtp.Send(mail);
-                    }
-                }
-                */
             }
             catch (Exception ex)
             {
@@ -426,6 +406,18 @@ namespace Week1_Practical1
         {
             lblSuccess.Text = message;
             successMessage.Attributes["class"] = "success-message show";
+        }
+
+        /// <summary>
+        /// Hashes password using SHA256 in Base64 format (same as Login.aspx)
+        /// </summary>
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hashedBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
         }
     }
 }
