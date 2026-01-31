@@ -317,6 +317,31 @@
 
                 var footerLink = document.getElementById('profileFooterLink');
                 if (footerLink) footerLink.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { window.location = footerLink.href; } });
+
+                // Profile Dropdown Menu
+                var profileBtn = document.getElementById('profileTopLink');
+                var dropdownMenu = document.getElementById('profileDropdownMenu');
+
+                if (profileBtn && dropdownMenu) {
+                    profileBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        dropdownMenu.classList.toggle('active');
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function (e) {
+                        if (!e.target.closest('.profile-dropdown')) {
+                            dropdownMenu.classList.remove('active');
+                        }
+                    });
+
+                    // Close dropdown when pressing Escape
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') {
+                            dropdownMenu.classList.remove('active');
+                        }
+                    });
+                }
             })();
 
             const hamburgerBtn = document.getElementById('hamburger');
