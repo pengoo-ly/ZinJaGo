@@ -108,7 +108,6 @@
     <Content Include="Guess_the_number.aspx" />
     <Content Include="SuperAdmin\AdminRole.aspx" />
     <Content Include="SuperAdmin\ControlAuthority.aspx" />
-    <Content Include="SuperAdmin\SProfile.aspx" />
     <Content Include="SuperAdmin\ReportsAnalytics.aspx" />
     <Content Include="SuperAdmin\SuperCupon.aspx" />
     <Content Include="SuperAdmin\SystemSettings.aspx" />
@@ -279,13 +278,6 @@
     </Compile>
     <Compile Include="SuperAdmin\ControlAuthority.aspx.designer.cs">
       <DependentUpon>ControlAuthority.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="SuperAdmin\SProfile.aspx.cs">
-      <DependentUpon>SProfile.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="SuperAdmin\SProfile.aspx.designer.cs">
-      <DependentUpon>SProfile.aspx</DependentUpon>
     </Compile>
     <Compile Include="SuperAdmin\ReportsAnalytics.aspx.cs">
       <DependentUpon>ReportsAnalytics.aspx</DependentUpon>
