@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web.UI;
 using Week1_Practical1.Helpers;
 
@@ -41,6 +43,8 @@ namespace Week1_Practical1
                 string password = txtPassword.Text.Trim();
                 string confirmPassword = txtConfirmPassword.Text.Trim();
 
+                DbLogger.Log($"[SIGNUP] Attempting to create account - Email: {email}, Name: {firstName} {lastName}");
+
                 // Validate passwords match
                 if (password != confirmPassword)
                 {
@@ -55,23 +59,33 @@ namespace Week1_Practical1
                     return;
                 }
 
+                // Hash password
+                string hashedPassword = HashPassword(password);
+
                 // Create user account
-                if (CreateUserAccount(firstName, lastName, email, password))
+                if (CreateUserAccount(firstName, lastName, email, hashedPassword))
                 {
                     ShowSuccess("Account created successfully! Redirecting to login page...");
                     DbLogger.Log("New customer account created for email: " + email);
                     System.Threading.Thread.Sleep(2000);
-                    Response.Redirect("CustomerLogin.aspx");
+                    Response.Redirect("~/Login.aspx");
                 }
                 else
                 {
-                    ShowError("Failed to create account. Please try again.");
+                    ShowError("Failed to create account. Please check the logs for details.");
                 }
+            }
+            catch (SqlException sqlEx)
+            {
+                DbLogger.Log("SIGNUP SQL Exception: " + sqlEx.Message);
+                DbLogger.Log("SIGNUP SQL Error Number: " + sqlEx.Number);
+                ShowError("Database error: " + sqlEx.Message);
             }
             catch (Exception ex)
             {
-                DbLogger.Log("Customer signup error: " + ex.Message);
-                ShowError("An unexpected error occurred. Please try again.");
+                DbLogger.Log("SIGNUP General Exception: " + ex.Message);
+                DbLogger.Log("SIGNUP Stack Trace: " + ex.StackTrace);
+                ShowError("An unexpected error occurred: " + ex.Message);
             }
         }
 
@@ -103,7 +117,7 @@ namespace Week1_Practical1
             }
         }
 
-        private bool CreateUserAccount(string firstName, string lastName, string email, string password)
+        private bool CreateUserAccount(string firstName, string lastName, string email, string hashedPassword)
         {
             try
             {
@@ -112,31 +126,53 @@ namespace Week1_Practical1
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
+                    // Use only core columns that should exist in Users table
                     string query = @"INSERT INTO Users 
-                                    (Username, Email, PasswordHash, Role, DateCreated, Status)
-                                    VALUES (@Username, @Email, @PasswordHash, @Role, GETDATE(), @Status)";
+                                    (Username, Email, PasswordHash, Status)
+                                    VALUES (@Username, @Email, @PasswordHash, @Status)";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         string username = firstName + " " + lastName;
                         cmd.Parameters.AddWithValue("@Username", username);
                         cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@PasswordHash", password); // Note: In production, hash the password
-                        cmd.Parameters.AddWithValue("@Role", "Customer");
+                        cmd.Parameters.AddWithValue("@PasswordHash", hashedPassword);
                         cmd.Parameters.AddWithValue("@Status", "Active");
 
                         conn.Open();
                         int result = cmd.ExecuteNonQuery();
                         conn.Close();
 
-                        return result > 0;
+                        if (result > 0)
+                        {
+                            DbLogger.Log($"[SIGNUP] Account created: {email}");
+                            return true;
+                        }
+                        return false;
                     }
                 }
             }
+            catch (SqlException sqlEx)
+            {
+                DbLogger.Log($"[SIGNUP] SQL Error #{sqlEx.Number}: {sqlEx.Message.Substring(0, Math.Min(200, sqlEx.Message.Length))}");
+                return false;
+            }
             catch (Exception ex)
             {
-                DbLogger.Log("Error creating user account: " + ex.Message);
+                DbLogger.Log($"[SIGNUP] Error: {ex.GetType().Name} - {ex.Message.Substring(0, Math.Min(200, ex.Message.Length))}");
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Hashes password using SHA256 in Base64 format (same as Login.aspx)
+        /// </summary>
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hashedBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
             }
         }
 

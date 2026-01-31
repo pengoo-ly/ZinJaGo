@@ -18,6 +18,14 @@ namespace Week1_Practical1
             {
                 if (!IsPostBack)
                 {
+                    // Prevent caching
+                    Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                    Response.Cache.SetNoStore();
+                    Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
+                    Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                    Response.AddHeader("Pragma", "no-cache");
+                    Response.AddHeader("Expires", "0");
+
                     // Check if customer is already logged in
                     if (Session["IsCustomerLoggedIn"] != null && (bool)Session["IsCustomerLoggedIn"])
                     {
@@ -396,17 +404,14 @@ namespace Week1_Practical1
         #region Password Hashing & Verification
 
         /// <summary>
-        /// Hashes password using SHA256 in HEX format
+        /// Hashes password using SHA256 in Base64 format
         /// </summary>
         public static string HashPassword(string password)
         {
             using (SHA256 sha = SHA256.Create())
             {
-                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder sb = new StringBuilder();
-                foreach (byte b in bytes)
-                    sb.Append(b.ToString("x2"));
-                return sb.ToString();
+                byte[] hashedBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
             }
         }
 
@@ -425,7 +430,7 @@ namespace Week1_Practical1
                 DbLogger.Log($"[VERIFY] Calculated hash: {enteredHash}");
                 DbLogger.Log($"[VERIFY] Stored hash:     {storedHash}");
 
-                bool matches = enteredHash.Equals(storedHash, StringComparison.OrdinalIgnoreCase);
+                bool matches = enteredHash.Equals(storedHash, StringComparison.Ordinal);
 
                 DbLogger.Log($"[VERIFY] Hashes match: {matches}");
 

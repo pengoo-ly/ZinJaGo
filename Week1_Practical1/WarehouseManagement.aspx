@@ -10,7 +10,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f0e8;
+            background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
         }
@@ -49,17 +49,17 @@
         }
 
         .metric-card {
-            background: white;
+            background: #f8f0e3;
             border-radius: 8px;
             padding: 18px 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             border-left: 4px solid #4a9b8e;
         }
 
         .metric-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
         }
 
         .metric-card.warning {
@@ -121,8 +121,8 @@
         }
 
         .filter-tabs button {
-            background: white;
-            border: 1px solid #e0ddd5;
+            background: #f8f0e3;
+            border: 1px solid #e8ddd2;
             padding: 10px 18px;
             border-radius: 6px;
             cursor: pointer;
@@ -139,8 +139,8 @@
         }
 
         .filter-tabs button:hover:not(.active) {
-            background-color: #f9f7f4;
-            border-color: #d0ccc4;
+            background-color: #f0e8dc;
+            border-color: #d8cdc2;
         }
 
         .search-box {
@@ -152,7 +152,7 @@
         .search-box input {
             width: 100%;
             padding: 10px 15px;
-            border: 1px solid #e0ddd5;
+            border: 1px solid #e8ddd2;
             border-radius: 6px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
@@ -183,34 +183,34 @@
         }
 
         .btn-sort {
-            background: white;
-            border: 1px solid #e0ddd5;
+            background: #f8f0e3;
+            border: 1px solid #e8ddd2;
             color: #666;
         }
 
         .btn-sort:hover {
-            background-color: #f9f7f4;
-            border-color: #d0ccc4;
+            background-color: #f0e8dc;
+            border-color: #d8cdc2;
         }
 
         .btn-menu {
-            background: white;
-            border: 1px solid #e0ddd5;
+            background: #f8f0e3;
+            border: 1px solid #e8ddd2;
             color: #666;
             padding: 10px 12px;
         }
 
         .btn-menu:hover {
-            background-color: #f9f7f4;
-            border-color: #d0ccc4;
+            background-color: #f0e8dc;
+            border-color: #d8cdc2;
         }
 
         /* Table Section */
         .table-wrapper {
-            background: white;
+            background: #f8f0e3;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             animation: fadeInUp 1.2s ease-out;
         }
 
@@ -220,8 +220,8 @@
         }
 
         thead {
-            background-color: #faf8f5;
-            border-bottom: 2px solid #e0ddd5;
+            background-color: #ede5d6;
+            border-bottom: 2px solid #e8ddd2;
         }
 
         th {
@@ -236,7 +236,7 @@
 
         td {
             padding: 16px 18px;
-            border-bottom: 1px solid #f0ede5;
+            border-bottom: 1px solid #ede5d6;
             font-size: 0.95rem;
         }
 
@@ -245,7 +245,7 @@
         }
 
         tbody tr:hover {
-            background-color: #faf8f5;
+            background-color: #f9f5f0;
         }
 
         .checkbox {
@@ -297,8 +297,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 18px;
-            background-color: #faf8f5;
-            border-top: 1px solid #e0ddd5;
+            background-color: #ede5d6;
+            border-top: 1px solid #e8ddd2;
         }
 
         .pagination-info {
@@ -315,8 +315,8 @@
         .pagination-controls a,
         .pagination-controls button {
             padding: 8px 12px;
-            border: 1px solid #e0ddd5;
-            background: white;
+            border: 1px solid #e8ddd2;
+            background: #f8f0e3;
             color: #666;
             border-radius: 4px;
             cursor: pointer;

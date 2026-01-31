@@ -17,17 +17,24 @@ namespace Week1_Practical1
         {
             try
             {
-                // Protect admin pages
-                if (Session["IsAdminLoggedIn"] == null)
+                // Protect admin pages - check both null and false
+                if (Session["IsAdminLoggedIn"] == null || (bool)Session["IsAdminLoggedIn"] == false)
                 {
-                    Response.Redirect("Login.aspx");
+                    Response.Redirect("~/Login.aspx", true);
                     return;
                 }
 
                 if (!IsPostBack)
                 {
-                    string adminName = Session["AdminName"].ToString();
-                    string adminEmail = Session["AdminEmail"].ToString();
+                    string adminName = Session["AdminName"]?.ToString();
+                    string adminEmail = Session["AdminEmail"]?.ToString();
+
+                    // Validate session data exists
+                    if (string.IsNullOrEmpty(adminName) || string.IsNullOrEmpty(adminEmail))
+                    {
+                        Response.Redirect("~/Login.aspx", true);
+                        return;
+                    }
 
                     lblAdminName.Text = adminName;
                     lblAdminEmail.Text = adminEmail;
@@ -48,11 +55,11 @@ namespace Week1_Practical1
                 string themeCookie = Request.Cookies["adminThemeDark"]?.Value;
                 IsDarkMode = themeCookie == "1";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log the exception (not shown here for brevity)
-                // Optionally, display a user-friendly message or redirect to an error page
-                lblPageTitle.Text = "Error loading page";
+                // Log the exception and redirect to login
+                DbLogger.Log("Admin.Master Page_Load error: " + ex.Message);
+                Response.Redirect("~/Login.aspx", true);
             }
         }
 
@@ -69,16 +76,15 @@ namespace Week1_Practical1
                     DbLogger.Log("Admin logout", adminId);
                 }
 
-                // Clear all session variables
-                Session["IsAdminLoggedIn"] = null;
-                Session["AdminID"] = null;
-                Session["AdminName"] = null;
-                Session["AdminRole"] = null;
-                Session["AdminEmail"] = null;
-                Session["AdminInitial"] = null;
-                Session["AdminProfileImage"] = null;
+                // Prevent page caching FIRST - set cache headers before any redirects
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
+                Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
+                Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
+                Response.AddHeader("Pragma", "no-cache");
+                Response.AddHeader("Expires", "0");
 
-                // Clear admin email cookie
+                // Clear admin email cookie BEFORE session abandon
                 if (Request.Cookies["AdminEmail"] != null)
                 {
                     HttpCookie cookie = new HttpCookie("AdminEmail");
@@ -86,16 +92,41 @@ namespace Week1_Practical1
                     Response.Cookies.Add(cookie);
                 }
 
-                // Abandon session
+                // Clear all session variables explicitly
+                Session.Clear();
+
+                // Then abandon the entire session
                 Session.Abandon();
 
-                // Redirect to login page
-                Response.Redirect("Login.aspx");
+                // Force a new session by setting a dummy value (this ensures old session is completely gone)
+                Session["LoggedOut"] = true;
+
+                // Clear the cookie from browser by setting empty and negative expiry
+                if (Request.Cookies["ASP.NET_SessionId"] != null)
+                {
+                    HttpCookie sessionCookie = new HttpCookie("ASP.NET_SessionId");
+                    sessionCookie.Expires = DateTime.Now.AddDays(-1);
+                    Response.Cookies.Add(sessionCookie);
+                }
+
+                // Redirect to login page with absolute path and end response
+                Response.Redirect("~/Login.aspx", true);
             }
             catch (Exception ex)
             {
                 DbLogger.Log("Admin logout error: " + ex.Message);
-                Response.Redirect("Login.aspx");
+                try
+                {
+                    // Even on error, try to clear and redirect
+                    Session.Clear();
+                    Session.Abandon();
+                    Response.Redirect("~/Login.aspx", true);
+                }
+                catch
+                {
+                    // Last resort - just redirect
+                    Response.Redirect("~/Login.aspx", true);
+                }
             }
         }
 

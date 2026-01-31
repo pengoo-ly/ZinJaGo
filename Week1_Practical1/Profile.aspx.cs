@@ -336,138 +336,191 @@ namespace Week1_Practical1
         {
             try
             {
-                string adminEmail = Session["AdminEmail"].ToString();
+                string adminEmail = Session["AdminEmail"]?.ToString();
+                
+                if (string.IsNullOrEmpty(adminEmail))
+                {
+                    ShowCardError("Session expired. Please login again.");
+                    return;
+                }
+
                 string cardName = txtCardName.Text.Trim();
                 string cardNumber = txtCardNumber.Text.Trim().Replace(" ", "").Replace("-", "");
                 string expireDate = txtCardExpiry.Text.Trim();
                 string cvv = txtCardCVV.Text.Trim();
 
+                // Log input for debugging
+                DbLogger.Log($"[CARD ADD] Attempting to add card for: {adminEmail}");
+                DbLogger.Log($"[CARD ADD] Card Name: {cardName}, Card Number Length: {cardNumber.Length}, Expiry: {expireDate}, CVV: {cvv.Length}");
+
                 // Validation
                 if (string.IsNullOrEmpty(cardName) || string.IsNullOrEmpty(cardNumber) ||
                     string.IsNullOrEmpty(expireDate) || string.IsNullOrEmpty(cvv))
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Please fill in all credit card fields.', false);", true);
+                    ShowCardError("Please fill in all credit card fields.");
+                    DbLogger.Log("[CARD ADD] Validation failed: Missing required fields");
                     return;
                 }
 
                 if (!System.Text.RegularExpressions.Regex.IsMatch(cardNumber, @"^\d{13,19}$"))
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Invalid card number. Must be 13-19 digits.', false);", true);
+                    ShowCardError("Invalid card number. Must be 13-19 digits.");
+                    DbLogger.Log("[CARD ADD] Validation failed: Invalid card number format");
                     return;
                 }
 
                 if (!System.Text.RegularExpressions.Regex.IsMatch(expireDate, @"^\d{2}/\d{2}$"))
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Expiry date must be in MM/YY format.', false);", true);
+                    ShowCardError("Expiry date must be in MM/YY format.");
+                    DbLogger.Log("[CARD ADD] Validation failed: Invalid expiry date format");
                     return;
                 }
 
                 if (!System.Text.RegularExpressions.Regex.IsMatch(cvv, @"^\d{3,4}$"))
                 {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('CVV must be 3-4 digits.', false);", true);
+                    ShowCardError("CVV must be 3-4 digits.");
+                    DbLogger.Log("[CARD ADD] Validation failed: Invalid CVV format");
                     return;
                 }
+
+                // All validation passed
+                DbLogger.Log("[CARD ADD] All validations passed, attempting database insert");
 
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     // Update admin's credit card info
-                    SqlCommand cmd = new SqlCommand(
-                        @"UPDATE Admins SET 
-                          CardNumber = @cardNumber, 
-                          CardName = @cardName, 
-                          ExpireDate = @expireDate, 
-                          CVV = @cvv
-                          WHERE Email = @email", conn);
+                    string updateQuery = @"UPDATE Admins SET 
+                                          CardNumber = @cardNumber, 
+                                          CardName = @cardName, 
+                                          ExpireDate = @expireDate, 
+                                          CVV = @cvv
+                                          WHERE Email = @email";
 
-                    cmd.Parameters.AddWithValue("@cardNumber", cardNumber);
-                    cmd.Parameters.AddWithValue("@cardName", cardName);
-                    cmd.Parameters.AddWithValue("@expireDate", expireDate);
-                    cmd.Parameters.AddWithValue("@cvv", cvv);
-                    cmd.Parameters.AddWithValue("@email", adminEmail);
-
-                    try
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                     {
-                        conn.Open();
-                        int result = cmd.ExecuteNonQuery();
-                        conn.Close();
+                        cmd.Parameters.AddWithValue("@cardNumber", cardNumber);
+                        cmd.Parameters.AddWithValue("@cardName", cardName);
+                        cmd.Parameters.AddWithValue("@expireDate", expireDate);
+                        cmd.Parameters.AddWithValue("@cvv", cvv);
+                        cmd.Parameters.AddWithValue("@email", adminEmail);
 
-                        if (result > 0)
+                        try
                         {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
-                                "showMessage('Credit card added successfully!', true);", true);
+                            conn.Open();
+                            DbLogger.Log("[CARD ADD] Database connection opened");
 
-                            ClearCardForm();
-                            LoadCreditCards();
+                            int result = cmd.ExecuteNonQuery();
+                            DbLogger.Log($"[CARD ADD] ExecuteNonQuery returned: {result}");
 
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
-                                "setTimeout(function() { closeAddCardModal(); }, 1000);", true);
+                            if (result > 0)
+                            {
+                                DbLogger.Log("[CARD ADD] Successfully added credit card");
+                                ShowCardSuccess("Credit card added successfully!");
+                                
+                                // Clear form fields
+                                ClearCardForm();
+                                
+                                // Reload credit cards
+                                LoadCreditCards();
+                                
+                                // Close modal via JavaScript without redirect
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                                    "closeAddCardModal();", false);
+                            }
+                            else
+                            {
+                                DbLogger.Log("[CARD ADD] No records were updated. Email may not exist in database.");
+                                ShowCardError("Failed to add card. Please check your information and try again.");
+                            }
                         }
-                        else
+                        catch (SqlException sqlEx)
                         {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                                "showMessage('Failed to add card. No records updated.', false);", true);
+                            DbLogger.Log($"[CARD ADD ERROR] SQL Exception: {sqlEx.Message}");
+                            DbLogger.Log($"[CARD ADD ERROR] SQL Number: {sqlEx.Number}");
+                            ShowCardError($"Database error: {sqlEx.Message}");
                         }
-                    }
-                    catch (SqlException sqlEx)
-                    {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                            "showMessage('Error adding card: " + sqlEx.Message.Replace("'", "\\'") + "', false);", true);
                     }
                 }
             }
             catch (Exception ex)
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                    "showMessage('Error: " + ex.Message.Replace("'", "\\'") + "', false);", true);
+                DbLogger.Log($"[CARD ADD ERROR] Exception: {ex.Message}");
+                DbLogger.Log($"[CARD ADD ERROR] Stack Trace: {ex.StackTrace}");
+                ShowCardError($"Error: {ex.Message}");
             }
+        }
+
+        private void ShowCardSuccess(string message)
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "cardSuccess",
+                $"showMessage('{message}', true);", true);
+        }
+
+        private void ShowCardError(string message)
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "cardError",
+                $"showMessage('{message.Replace("'", "\\'")}', false);", true);
         }
 
         protected void btnConfirmDeleteCard_Click(object sender, EventArgs e)
         {
             try
             {
-                string adminEmail = Session["AdminEmail"].ToString();
+                string adminEmail = Session["AdminEmail"]?.ToString();
+                
+                if (string.IsNullOrEmpty(adminEmail))
+                {
+                    ShowCardError("Session expired. Please login again.");
+                    return;
+                }
 
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    SqlCommand cmd = new SqlCommand(
-                        @"UPDATE Admins SET CardNumber = NULL, CardName = NULL, ExpireDate = NULL, CVV = NULL
-                          WHERE Email = @email", conn);
+                    string deleteQuery = @"UPDATE Admins SET 
+                                          CardNumber = NULL, 
+                                          CardName = NULL, 
+                                          ExpireDate = NULL, 
+                                          CVV = NULL
+                                          WHERE Email = @email";
 
-                    cmd.Parameters.AddWithValue("@email", adminEmail);
-
-                    try
+                    using (SqlCommand cmd = new SqlCommand(deleteQuery, conn))
                     {
-                        conn.Open();
-                        int result = cmd.ExecuteNonQuery();
-                        conn.Close();
+                        cmd.Parameters.AddWithValue("@email", adminEmail);
 
-                        if (result > 0)
+                        try
                         {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
-                                "showMessage('Credit card deleted successfully!', true);", true);
+                            conn.Open();
+                            int result = cmd.ExecuteNonQuery();
 
-                            LoadCreditCards();
-
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
-                                "setTimeout(function() { closeDeleteCardModal(); }, 500);", true);
+                            if (result > 0)
+                            {
+                                DbLogger.Log("[CARD DELETE] Successfully deleted credit card");
+                                ShowCardSuccess("Credit card deleted successfully!");
+                                
+                                // Reload credit cards
+                                LoadCreditCards();
+                                
+                                // Close modal without redirect
+                                ScriptManager.RegisterStartupScript(this, this.GetType(), "closeDeleteModal",
+                                    "closeDeleteCardModal();", false);
+                            }
+                            else
+                            {
+                                ShowCardError("Failed to delete card.");
+                            }
                         }
-                    }
-                    catch (SqlException sqlEx)
-                    {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                            "showMessage('Error deleting card: " + sqlEx.Message.Replace("'", "\\'") + "', false);", true);
+                        catch (SqlException sqlEx)
+                        {
+                            DbLogger.Log($"[CARD DELETE ERROR] SQL Exception: {sqlEx.Message}");
+                            ShowCardError($"Database error: {sqlEx.Message}");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                    "showMessage('Error: " + ex.Message.Replace("'", "\\'") + "', false);", true);
+                DbLogger.Log($"[CARD DELETE ERROR] Exception: {ex.Message}");
+                ShowCardError($"Error: {ex.Message}");
             }
         }
 
@@ -520,12 +573,22 @@ namespace Week1_Practical1
         {
             try
             {
-                Session["IsAdminLoggedIn"] = null;
-                Session["AdminEmail"] = null;
+                int adminId = 0;
+                if (Session["AdminID"] != null && int.TryParse(Session["AdminID"].ToString(), out adminId))
+                {
+                    DbLogger.Log("Admin logout from profile", adminId);
+                }
+
+                // Clear all session variables
+                Session["IsAdminLoggedIn"] = false;
+                Session["AdminID"] = null;
                 Session["AdminName"] = null;
+                Session["AdminRole"] = null;
+                Session["AdminEmail"] = null;
                 Session["AdminInitial"] = null;
                 Session["AdminProfileImage"] = null;
 
+                // Clear admin email cookie
                 if (Request.Cookies["AdminEmail"] != null)
                 {
                     HttpCookie cookie = new HttpCookie("AdminEmail");
@@ -533,14 +596,24 @@ namespace Week1_Practical1
                     Response.Cookies.Add(cookie);
                 }
 
+                // Prevent page caching
+                Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                Response.Cache.SetNoStore();
+                Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
+                Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                Response.AddHeader("Pragma", "no-cache");
+                Response.AddHeader("Expires", "0");
+
+                // Abandon session after clearing values
                 Session.Abandon();
 
-                Response.Redirect("Login.aspx");
+                // Redirect to login page with absolute path
+                Response.Redirect("~/Login.aspx", true);
             }
             catch (Exception ex)
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                    "showMessage('Error during logout: " + ex.Message.Replace("'", "\\'") + "', false);", true);
+                DbLogger.Log("Admin logout error: " + ex.Message);
+                Response.Redirect("~/Login.aspx", true);
             }
         }
 

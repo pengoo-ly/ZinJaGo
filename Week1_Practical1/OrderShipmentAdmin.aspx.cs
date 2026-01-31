@@ -24,7 +24,14 @@ namespace Week1_Practical1
 
                 if (!IsPostBack)
                 {
-                    LoadOrderData();
+                    if (Session["AdminID"] == null)
+                    {
+                        Response.Redirect("~/Login.aspx");
+                        return;
+                    }
+
+                    int adminId = Convert.ToInt32(Session["AdminID"]);
+                    LoadOrderData(adminId);
                 }
             }
             catch (Exception ex)
@@ -34,23 +41,24 @@ namespace Week1_Practical1
             }
         }
 
-        private void LoadOrderData()
+        private void LoadOrderData(int adminId)
         {
             try
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    // FIXED: Removed AdminID references and non-existent columns
-                    // Using PaymentStatus and ShippingStatus instead of Status
+                    // FIXED: Query now includes Username, Phone, Status and filters by AdminID via Products
+                    // Using UserProfiles for Phone data and ShippingStatus for Status
                     string query = @"
-                        SELECT 
+                        SELECT DISTINCT
                             o.OrderID,
+                            u.Username,
+                            u.Email,
+                            ISNULL(up.Phone, 'N/A') AS Phone,
                             o.OrderDate,
                             o.TotalAmount,
                             o.PaymentStatus,
-                            o.ShippingStatus,
-                            u.UserID,
-                            u.Email,
+                            o.ShippingStatus AS Status,
                             os.ShipmentID,
                             os.ShippingMethodID,
                             os.TrackingNumber,
@@ -61,11 +69,16 @@ namespace Week1_Practical1
                             ISNULL((SELECT COUNT(*) FROM OrderItems WHERE OrderID = o.OrderID), 0) as ItemCount
                         FROM Orders o
                         JOIN Users u ON o.UserID = u.UserID
+                        LEFT JOIN UserProfiles up ON u.UserID = up.UserID
                         LEFT JOIN OrderShipments os ON o.OrderID = os.OrderID
+                        JOIN OrderItems oi ON o.OrderID = oi.OrderID
+                        JOIN Products p ON oi.ProductID = p.ProductID
+                        WHERE p.AdminID = @AdminID
                         ORDER BY o.OrderDate DESC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.Parameters.AddWithValue("@AdminID", adminId);
                         SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
@@ -76,7 +89,7 @@ namespace Week1_Practical1
                             gvOrders.DataBind();
 
                             // Calculate statistics
-                            CalculateStatistics();
+                            CalculateStatistics(adminId);
 
                             errorMessage.Attributes["class"] = "error-message";
                         }
@@ -84,7 +97,7 @@ namespace Week1_Practical1
                         {
                             gvOrders.DataSource = null;
                             gvOrders.DataBind();
-                            ShowError("No orders found.");
+                            ShowError("No orders found for your products.");
                         }
                     }
                 }
@@ -96,25 +109,29 @@ namespace Week1_Practical1
             }
         }
 
-        private void CalculateStatistics()
+        private void CalculateStatistics(int adminId)
         {
             try
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    // FIXED: Using ShippingStatus instead of Status
+                    // FIXED: Using ShippingStatus and filtering by AdminID via Products
                     string query = @"
                         SELECT 
-                            COUNT(*) as TotalOrders,
-                            SUM(CASE WHEN ShippingStatus = 'Pending' THEN 1 ELSE 0 END) as PendingOrders,
-                            SUM(CASE WHEN ShippingStatus = 'Processing' THEN 1 ELSE 0 END) as ProcessingOrders,
-                            SUM(CASE WHEN ShippingStatus = 'Shipped' THEN 1 ELSE 0 END) as ShippedOrders,
-                            SUM(CASE WHEN ShippingStatus = 'Delivered' THEN 1 ELSE 0 END) as DeliveredOrders,
-                            SUM(TotalAmount) as TotalRevenue
-                        FROM Orders";
+                            COUNT(DISTINCT o.OrderID) as TotalOrders,
+                            SUM(CASE WHEN o.ShippingStatus = 'Pending' THEN 1 ELSE 0 END) as PendingOrders,
+                            SUM(CASE WHEN o.ShippingStatus = 'Processing' THEN 1 ELSE 0 END) as ProcessingOrders,
+                            SUM(CASE WHEN o.ShippingStatus = 'Shipped' THEN 1 ELSE 0 END) as ShippedOrders,
+                            SUM(CASE WHEN o.ShippingStatus = 'Delivered' THEN 1 ELSE 0 END) as DeliveredOrders,
+                            SUM(o.TotalAmount) as TotalRevenue
+                        FROM Orders o
+                        JOIN OrderItems oi ON o.OrderID = oi.OrderID
+                        JOIN Products p ON oi.ProductID = p.ProductID
+                        WHERE p.AdminID = @AdminID";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.Parameters.AddWithValue("@AdminID", adminId);
                         conn.Open();
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -163,7 +180,8 @@ namespace Week1_Practical1
                     if (CancelOrder(orderId))
                     {
                         ShowSuccess("Order cancelled successfully!");
-                        LoadOrderData();
+                        int adminId = Convert.ToInt32(Session["AdminID"]);
+                        LoadOrderData(adminId);
                     }
                     else
                     {
@@ -211,7 +229,8 @@ namespace Week1_Practical1
         protected void gvOrders_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             gvOrders.PageIndex = e.NewPageIndex;
-            LoadOrderData();
+            int adminId = Convert.ToInt32(Session["AdminID"]);
+            LoadOrderData(adminId);
         }
 
         private void ShowError(string message)
