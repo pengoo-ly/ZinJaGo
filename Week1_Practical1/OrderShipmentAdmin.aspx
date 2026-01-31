@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="OrderShipmentAdmin.aspx.cs" 
+﻿<%@ Page Title="Order Shipment" Language="C#" AutoEventWireup="true" CodeBehind="OrderShipmentAdmin.aspx.cs" 
     Inherits="Week1_Practical1.OrderShipmentAdmin" MasterPageFile="~/Admin.Master" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
