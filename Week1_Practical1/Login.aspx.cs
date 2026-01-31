@@ -148,7 +148,7 @@ namespace Week1_Practical1
                                 string status = reader["Status"].ToString();
 
                                 // Verify the password against the stored hash
-                                if (VerifyPassword(password, storedHash))
+                                if (VerifyPassword(password, storedHash, userId))
                                 {
                                     userId = Convert.ToInt32(reader["UserID"]);
                                     userName = reader["Username"].ToString();
@@ -302,7 +302,7 @@ namespace Week1_Practical1
                                     DbLogger.Log($"[DEBUG] About to call VerifyPassword()");
 
                                     // Verify the password against the stored hash
-                                    if (VerifyPassword(password, storedHash))
+                                    if (VerifyPassword(password, storedHash, adminId))
                                     {
                                         DbLogger.Log($"[SUCCESS] VerifyPassword returned TRUE - Login successful!");
                                         return true;
@@ -414,34 +414,72 @@ namespace Week1_Practical1
                 return Convert.ToBase64String(hashedBytes);
             }
         }
+        private string HashPasswordHex(string password)
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
+        }
 
         /// <summary>
         /// Verifies a password against stored hash
         /// </summary>
-        private bool VerifyPassword(string enteredPassword, string storedHash)
+        private bool VerifyPassword(string enteredPassword, string storedHash, int adminId)
         {
             try
             {
-                DbLogger.Log($"[VERIFY] VerifyPassword called!");
-                DbLogger.Log($"[VERIFY] Entered password: {enteredPassword}");
+                // 1️⃣ Base64 SHA256 (NEW accounts)
+                string base64Hash = HashPassword(enteredPassword);
+                if (base64Hash.Equals(storedHash, StringComparison.Ordinal))
+                {
+                    return true;
+                }
 
-                string enteredHash = HashPassword(enteredPassword);
+                // 2️⃣ HEX SHA256 (OLD accounts)
+                string hexHash = HashPasswordHex(enteredPassword);
+                if (hexHash.Equals(storedHash, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 🔄 Upgrade old HEX hash → Base64
+                    UpdateAdminPasswordHash(adminId, base64Hash);
+                    DbLogger.Log($"[MIGRATION] AdminID {adminId} password upgraded from HEX to Base64");
 
-                DbLogger.Log($"[VERIFY] Calculated hash: {enteredHash}");
-                DbLogger.Log($"[VERIFY] Stored hash:     {storedHash}");
+                    return true;
+                }
 
-                bool matches = enteredHash.Equals(storedHash, StringComparison.Ordinal);
-
-                DbLogger.Log($"[VERIFY] Hashes match: {matches}");
-
-                return matches;
+                return false;
             }
             catch (Exception ex)
             {
-                DbLogger.Log($"[VERIFY ERROR] Error verifying password: {ex.Message}");
+                DbLogger.Log($"[VERIFY ERROR] {ex.Message}");
                 return false;
             }
         }
+
+        private void UpdateAdminPasswordHash(int adminId, string newHash)
+        {
+            string connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string query = @"UPDATE Admins
+                         SET PasswordHash = @PasswordHash
+                         WHERE AdminID = @AdminID";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PasswordHash", newHash);
+                    cmd.Parameters.AddWithValue("@AdminID", adminId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
 
         #endregion
     }
