@@ -39,7 +39,15 @@
                             CssClass="btn-add"
                             CommandName="Approve"
                             CommandArgument='<%# Eval("ReturnID") %>'
-                            Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' />
+                            Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' 
+                            OnClientClick="return confirm('Are you sure you want to approve this return?');" />
+                        <asp:Button 
+                            ID="btnReject" 
+                            runat="server" 
+                            Text="Reject" 
+                            CommandName="Reject" 
+                            CommandArgument='<%# Eval("ReturnID") %>' 
+                            CssClass="btn-cancel" />
 
                         <asp:Button runat="server" Text="Reject"
                             CssClass="btn-add"
@@ -55,6 +63,8 @@
                     </ItemTemplate>
                 </asp:TemplateField>
             </Columns>
+
+            <HeaderStyle CssClass="gv-header" />
 
         </asp:GridView>
 
