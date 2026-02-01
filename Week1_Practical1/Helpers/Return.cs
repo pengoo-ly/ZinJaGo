@@ -10,5 +10,101 @@ namespace Week1_Practical1.Helpers
 {
     public class Return
     {
+        string _connStr = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
+
+        public int ReturnID { get; set; }
+        public int OrderID { get; set; }
+        public int ProductID { get; set; }
+        public string Reason { get; set; }
+        public string ReturnStatus { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public decimal? RefundAmount { get; set; }
+        public int? ProcessedBy { get; set; }
+
+        public Return() { }
+
+        public List<Return> GetAllReturns()
+        {
+            List<Return> list = new List<Return>();
+
+            try
+            {
+                string sql = "SELECT * FROM Returns ORDER BY ReturnID DESC";
+
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            Return r = new Return
+                            {
+                                ReturnID = Convert.ToInt32(dr["ReturnID"]),
+                                OrderID = Convert.ToInt32(dr["OrderID"]),
+                                ProductID = Convert.ToInt32(dr["ProductID"]),
+                                Reason = dr["Reason"].ToString(),
+                                ReturnStatus = dr["ReturnStatus"].ToString(),
+                                RefundAmount = dr["RefundAmount"] == DBNull.Value ? null : (decimal?)dr["RefundAmount"],
+                                ReturnDate = dr["ReturnDate"] == DBNull.Value ? null : (DateTime?)dr["ReturnDate"],
+                                ProcessedBy = dr["ProcessedBy"] == DBNull.Value ? null : (int?)dr["ProcessedBy"]
+                            };
+
+                            list.Add(r);
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Handle database-related errors (log if needed)
+                throw new Exception("An error occurred while retrieving return records from the database.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                throw new Exception("An unexpected error occurred while retrieving return records.", ex);
+            }
+
+            return list;
+        }
+
+        public int UpdateStatus(int returnId, string status, int adminId)
+        {
+            try
+            {
+                string sql = @"
+            UPDATE Returns
+            SET ReturnStatus = @status,
+                ProcessedBy = @adminId,
+                ReturnDate = GETDATE()
+            WHERE ReturnID = @returnId";
+
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@status", status);
+                    cmd.Parameters.AddWithValue("@adminId", adminId);
+                    cmd.Parameters.AddWithValue("@returnId", returnId);
+
+                    conn.Open();
+                    return cmd.ExecuteNonQuery(); // number of rows affected
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Database-related error
+                throw new Exception("An error occurred while updating the return status.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Any other unexpected error
+                throw new Exception("An unexpected error occurred while updating the return status.", ex);
+            }
+        }
+
+
     }
 }
