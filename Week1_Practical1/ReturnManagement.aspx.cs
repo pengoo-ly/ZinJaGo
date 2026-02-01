@@ -25,9 +25,7 @@ namespace Week1_Practical1
             }
             catch (Exception ex)
             {
-                // Log error if needed
-                // Example: lblError.Text = "Failed to load the page."
-                throw;
+                return;
             }
         }
 
