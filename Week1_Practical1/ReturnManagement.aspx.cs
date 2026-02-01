@@ -81,5 +81,18 @@ namespace Week1_Practical1
             }
         }
 
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Return r = new Return();
+                gvReturns.DataSource = r.SearchReturns(txtSearch.Text.Trim());
+                gvReturns.DataBind();
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
     }
 }
