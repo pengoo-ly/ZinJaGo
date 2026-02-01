@@ -149,22 +149,22 @@ namespace Week1_Practical1.Helpers
             try
             {
                 string sql = @"
-            UPDATE Returns
-            SET ReturnStatus = @status,
-                ProcessedBy = @adminId,
-                ReturnDate = GETDATE(),
-                RefundAmount = 
-                    CASE 
-                        WHEN @status IN ('Approved','Processed') 
-                        THEN (
-                            SELECT TOP 1 Quantity * UnitPrice
-                            FROM OrderItems oi
-                            JOIN Returns r ON r.OrderID = oi.OrderID
-                            WHERE r.ReturnID = @returnId AND oi.ProductID = r.ProductID
-                        )
-                        ELSE RefundAmount
-                    END
-            WHERE ReturnID = @returnId";
+                    UPDATE Returns
+                    SET ReturnStatus = @status,
+                        ProcessedBy = @adminId,
+                        ReturnDate = GETDATE(),
+                        RefundAmount = 
+                            CASE 
+                                WHEN @status IN ('Approved','Processed') 
+                                THEN (
+                                    SELECT TOP 1 Quantity * UnitPrice
+                                    FROM OrderItems oi
+                                    JOIN Returns r ON r.OrderID = oi.OrderID
+                                    WHERE r.ReturnID = @returnId AND oi.ProductID = r.ProductID
+                                )
+                                ELSE RefundAmount
+                            END
+                    WHERE ReturnID = @returnId";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -201,13 +201,13 @@ namespace Week1_Practical1.Helpers
             try
             {
                 string sql = @"
-            INSERT INTO AuditTrail (AuditID, AdminID, Action, DateTime)
-            VALUES (
-                (SELECT ISNULL(MAX(AuditID),0)+1 FROM AuditTrail),
-                @adminId,
-                @action,
-                GETDATE()
-            )";
+                    INSERT INTO AuditTrail (AuditID, AdminID, Action, DateTime)
+                    VALUES (
+                        (SELECT ISNULL(MAX(AuditID),0)+1 FROM AuditTrail),
+                        @adminId,
+                        @action,
+                        GETDATE()
+                    )";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -236,12 +236,12 @@ namespace Week1_Practical1.Helpers
             try
             {
                 string sql = @"
-            SELECT * FROM Returns
-            WHERE 
-                CAST(ReturnID AS NVARCHAR) LIKE @kw OR
-                CAST(OrderID AS NVARCHAR) LIKE @kw OR
-                ReturnStatus LIKE @kw
-            ORDER BY ReturnID DESC";
+                    SELECT * FROM Returns
+                    WHERE 
+                        CAST(ReturnID AS NVARCHAR) LIKE @kw OR
+                        CAST(OrderID AS NVARCHAR) LIKE @kw OR
+                        ReturnStatus LIKE @kw
+                    ORDER BY ReturnID DESC";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
