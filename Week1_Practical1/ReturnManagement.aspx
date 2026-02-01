@@ -5,6 +5,10 @@
     <h2>Return Management</h2>
     <p>Approve, reject or process customer return requests</p>
 
+    <br />
+
+    <asp:TextBox ID="txtSearch" runat="server" CssClass="table-search input" Placeholder="Search Return / Order / Status" />
+    <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn-add" OnClick="btnSearch_Click" />
     <asp:Panel runat="server" CssClass="panel-style">
 
         <asp:GridView ID="gvReturns" runat="server"
@@ -20,7 +24,14 @@
                 <asp:BoundField DataField="ProductID" HeaderText="Product ID" />
                 <asp:BoundField DataField="Reason" HeaderText="Reason" />
                 <asp:BoundField DataField="RefundAmount" HeaderText="Refund ($)" DataFormatString="{0:0.00}" />
-                <asp:BoundField DataField="ReturnStatus" HeaderText="Status" />
+
+                <asp:TemplateField HeaderText="Status">
+                    <ItemTemplate>
+                        <span class='status-badge <%# Eval("ReturnStatus").ToString().ToLower() %>'>
+                            <%# Eval("ReturnStatus") %>
+                        </span>
+                    </ItemTemplate>
+                </asp:TemplateField>
 
                 <asp:TemplateField HeaderText="Actions">
                     <ItemTemplate>
