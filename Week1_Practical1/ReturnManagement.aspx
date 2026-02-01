@@ -25,19 +25,19 @@
                 <asp:TemplateField HeaderText="Actions">
                     <ItemTemplate>
                         <asp:Button runat="server" Text="Approve"
-                            CssClass="gv-btn"
+                            CssClass="btn-add"
                             CommandName="Approve"
                             CommandArgument='<%# Eval("ReturnID") %>'
                             Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' />
 
                         <asp:Button runat="server" Text="Reject"
-                            CssClass="gv-btn"
+                            CssClass="btn-add"
                             CommandName="Reject"
                             CommandArgument='<%# Eval("ReturnID") %>'
                             Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' />
 
                         <asp:Button runat="server" Text="Processed"
-                            CssClass="gv-btn"
+                            CssClass="btn-add"
                             CommandName="Processed"
                             CommandArgument='<%# Eval("ReturnID") %>'
                             Visible='<%# Eval("ReturnStatus").ToString() == "Approved" %>' />
