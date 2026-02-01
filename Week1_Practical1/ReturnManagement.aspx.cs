@@ -50,26 +50,20 @@ namespace Week1_Practical1
             {
                 int returnId = Convert.ToInt32(e.CommandArgument);
 
-                // Safely get AdminID from Session
                 if (Session["AdminID"] == null)
                 {
                     throw new Exception("Admin session has expired. Please log in again.");
                 }
 
                 int adminId = Convert.ToInt32(Session["AdminID"]);
+                Return r = new Return();
 
                 if (e.CommandName == "Approve")
-                {
-                    returnHelper.UpdateStatus(returnId, "Approved", adminId);
-                }
+                    r.UpdateReturnWithAudit(returnId, "Approved", adminId);
                 else if (e.CommandName == "Reject")
-                {
-                    returnHelper.UpdateStatus(returnId, "Rejected", adminId);
-                }
+                    r.UpdateReturnWithAudit(returnId, "Rejected", adminId);
                 else if (e.CommandName == "Processed")
-                {
-                    returnHelper.UpdateStatus(returnId, "Processed", adminId);
-                }
+                    r.UpdateReturnWithAudit(returnId, "Processed", adminId);
 
                 LoadReturns(); // refresh table
             }
