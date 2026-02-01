@@ -7,8 +7,10 @@
 
     <br />
 
-    <asp:TextBox ID="txtSearch" runat="server" CssClass="table-search input" Placeholder="Search Return / Order / Status" />
+    <asp:TextBox ID="txtSearch" runat="server" CssClass="textbox" Placeholder="Search Return / Order / Status" />
     <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn-add" OnClick="btnSearch_Click" />
+    <br />
+
     <asp:Panel runat="server" CssClass="panel-style">
 
         <asp:GridView ID="gvReturns" runat="server"
