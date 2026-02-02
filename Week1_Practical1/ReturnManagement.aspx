@@ -30,7 +30,7 @@
                 <asp:TemplateField HeaderText="Status">
                     <ItemTemplate>
                         <span class='status-badge <%# Eval("ReturnStatus").ToString().ToLower() %>'>
-                            <%# Eval("ReturnStatus") %>
+                            <%# Eval("ReturnStatus").ToString().ToUpper() %>
                         </span>
                     </ItemTemplate>
                 </asp:TemplateField>
