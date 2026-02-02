@@ -33,7 +33,11 @@ namespace Week1_Practical1
         {
             try
             {
-                gvReturns.DataSource = returnHelper.GetAllReturns();
+                if (Session["AdminID"] == null)
+                    Response.Redirect("~/AdminLogin.aspx");
+
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                gvReturns.DataSource = returnHelper.GetAllReturns(adminId);
                 gvReturns.DataBind();
             }
             catch (Exception ex)
