@@ -236,22 +236,27 @@ namespace Week1_Practical1.Helpers
             }
         }
 
-        public List<Return> SearchReturns(string keyword)
+        public List<Return> SearchReturns(string keyword, int adminId)
         {
             try
             {
                 string sql = @"
-                    SELECT * FROM Returns
-                    WHERE 
-                        CAST(ReturnID AS NVARCHAR) LIKE @kw OR
-                        CAST(OrderID AS NVARCHAR) LIKE @kw OR
-                        UPPER(ReturnStatus) LIKE UPPER(@kw)
-                    ORDER BY ReturnID DESC";
+                    SELECT r.*
+                    FROM Returns r
+                    INNER JOIN Products p ON r.ProductID = p.ProductID
+                    WHERE p.AdminID = @adminId
+                      AND (
+                            CAST(r.ReturnID AS NVARCHAR) LIKE @kw OR
+                            CAST(r.OrderID AS NVARCHAR) LIKE @kw OR
+                            UPPER(r.ReturnStatus) LIKE UPPER(@kw)
+                      )
+                    ORDER BY r.ReturnID DESC";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@kw", "%" + keyword + "%");
+                    cmd.Parameters.AddWithValue("@adminId", adminId);
                     conn.Open();
 
                     using (SqlDataReader dr = cmd.ExecuteReader())
