@@ -68,7 +68,7 @@ namespace Week1_Practical1
                     case "PROCESSED":
                         statusToSet = "Processed";
                         break;
-                    case "CANCEL":
+                    case "CANCELRETURN":
                         statusToSet = "Pending";
                         break;
                     default:
