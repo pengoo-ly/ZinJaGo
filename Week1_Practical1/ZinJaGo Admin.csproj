@@ -214,6 +214,7 @@
     <Compile Include="Helpers\Cupon.cs" />
     <Compile Include="Helpers\Customer.cs" />
     <Compile Include="Helpers\DbLogger.cs" />
+    <Compile Include="Helpers\Delivery.cs" />
     <Compile Include="Helpers\Order.cs" />
     <Compile Include="Helpers\Product.cs" />
     <Compile Include="Helpers\Return.cs" />

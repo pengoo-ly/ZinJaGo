@@ -7,7 +7,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background-color: #f8f0e3;
+            background-color: var(--card);
             border-radius: 8px;
             padding: 30px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -36,7 +36,7 @@
         }
 
         .stat-card {
-            background: #f8f0e3;
+            background: var(--card);
             color: #2C2C2C;
             padding: 20px;
             border-radius: 8px;
