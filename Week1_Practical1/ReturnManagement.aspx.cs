@@ -34,7 +34,7 @@ namespace Week1_Practical1
             try
             {
                 if (Session["AdminID"] == null)
-                    Response.Redirect("~/AdminLogin.aspx");
+                    Response.Redirect("Login.aspx");
 
                 int adminId = Convert.ToInt32(Session["AdminID"]);
                 gvReturns.DataSource = returnHelper.GetAllReturns(adminId);
