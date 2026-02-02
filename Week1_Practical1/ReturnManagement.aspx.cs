@@ -94,8 +94,10 @@ namespace Week1_Practical1
         {
             try
             {
-                Return r = new Return();
-                gvReturns.DataSource = r.SearchReturns(txtSearch.Text.Trim());
+                if (Session["AdminID"] == null) return;
+
+                int adminId = Convert.ToInt32(Session["AdminID"]);
+                gvReturns.DataSource = returnHelper.SearchReturns(txtSearch.Text.Trim(), adminId);
                 gvReturns.DataBind();
             }
             catch (Exception ex)
