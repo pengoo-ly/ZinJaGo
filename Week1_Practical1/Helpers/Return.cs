@@ -240,7 +240,7 @@ namespace Week1_Practical1.Helpers
                     WHERE 
                         CAST(ReturnID AS NVARCHAR) LIKE @kw OR
                         CAST(OrderID AS NVARCHAR) LIKE @kw OR
-                        ReturnStatus LIKE @kw
+                        UPPER(ReturnStatus) LIKE UPPER(@kw)
                     ORDER BY ReturnID DESC";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
