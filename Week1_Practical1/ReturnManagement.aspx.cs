@@ -48,23 +48,34 @@ namespace Week1_Practical1
         {
             try
             {
-                int returnId = Convert.ToInt32(e.CommandArgument);
-
                 if (Session["AdminID"] == null)
-                {
                     throw new Exception("Admin session has expired. Please log in again.");
-                }
 
+                int returnId = Convert.ToInt32(e.CommandArgument);
                 int adminId = Convert.ToInt32(Session["AdminID"]);
                 Return r = new Return();
 
-                if (e.CommandName == "Approve")
-                    r.UpdateReturnWithAudit(returnId, "Approved", adminId);
-                else if (e.CommandName == "Reject")
-                    r.UpdateReturnWithAudit(returnId, "Rejected", adminId);
-                else if (e.CommandName == "Processed")
-                    r.UpdateReturnWithAudit(returnId, "Processed", adminId);
+                string statusToSet = "";
 
+                switch (e.CommandName.ToUpper())
+                {
+                    case "APPROVE":
+                        statusToSet = "Approved";
+                        break;
+                    case "REJECT":
+                        statusToSet = "Rejected";
+                        break;
+                    case "PROCESSED":
+                        statusToSet = "Processed";
+                        break;
+                    case "CANCEL":
+                        statusToSet = "Pending";
+                        break;
+                    default:
+                        return; // unknown command
+                }
+
+                r.UpdateReturnWithAudit(returnId, statusToSet, adminId);
                 LoadReturns(); // refresh table
             }
             catch (Exception ex)
