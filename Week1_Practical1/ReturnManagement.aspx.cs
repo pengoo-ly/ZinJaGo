@@ -96,7 +96,7 @@ namespace Week1_Practical1
             }
             catch (Exception ex)
             {
-                return;
+                Response.Write("<script>alert('Error search: " + ex.Message + "');</script>");
             }
         }
     }
