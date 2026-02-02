@@ -60,7 +60,7 @@
 
                         <asp:Button runat="server" Text="Cancel"
                             CssClass="btn-cancel"
-                            CommandName="Cancel"
+                            CommandName="CancelReturn"
                             CommandArgument='<%# Eval("ReturnID") %>'
                             Visible='<%# Eval("ReturnStatus").ToString().ToUpper() == "REJECTED" || Eval("ReturnStatus").ToString().ToUpper() == "APPROVED" %>'
                             OnClientClick="return confirm('Cancel this return and set it back to Pending?');" />
