@@ -41,20 +41,29 @@
                             CssClass="btn-add"
                             CommandName="Approve"
                             CommandArgument='<%# Eval("ReturnID") %>'
-                            Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' 
+                            Visible='<%# Eval("ReturnStatus").ToString().ToUpper() == "PENDING" %>'
                             OnClientClick="return confirm('Are you sure you want to approve this return?');" />
 
                         <asp:Button runat="server" Text="Reject"
                             CssClass="btn-add"
                             CommandName="Reject"
                             CommandArgument='<%# Eval("ReturnID") %>'
-                            Visible='<%# Eval("ReturnStatus").ToString() == "Pending" %>' />
+                            Visible='<%# Eval("ReturnStatus").ToString().ToUpper() == "PENDING" %>'
+                            OnClientClick="return confirm('Are you sure you want to reject this return?');" />
 
                         <asp:Button runat="server" Text="Processed"
                             CssClass="btn-add"
                             CommandName="Processed"
                             CommandArgument='<%# Eval("ReturnID") %>'
-                            Visible='<%# Eval("ReturnStatus").ToString() == "Approved" %>' />
+                            Visible='<%# Eval("ReturnStatus").ToString().ToUpper() == "APPROVED" %>'
+                            OnClientClick="return confirm('Mark this return as processed?');" />
+
+                        <asp:Button runat="server" Text="Cancel"
+                            CssClass="btn-cancel"
+                            CommandName="Cancel"
+                            CommandArgument='<%# Eval("ReturnID") %>'
+                            Visible='<%# Eval("ReturnStatus").ToString().ToUpper() == "REJECTED" || Eval("ReturnStatus").ToString().ToUpper() == "APPROVED" %>'
+                            OnClientClick="return confirm('Cancel this return and set it back to Pending?');" />
                     </ItemTemplate>
                 </asp:TemplateField>
             </Columns>
