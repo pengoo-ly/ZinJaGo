@@ -23,17 +23,22 @@ namespace Week1_Practical1.Helpers
 
         public Return() { }
 
-        public List<Return> GetAllReturns()
+        public List<Return> GetAllReturns(int adminId)
         {
             List<Return> list = new List<Return>();
 
             try
             {
-                string sql = "SELECT * FROM Returns ORDER BY ReturnID DESC";
+                string sql = @"SELECT r.*
+                    FROM Returns r
+                    INNER JOIN Products p ON r.ProductID = p.ProductID
+                    WHERE p.AdminID = @adminId
+                    ORDER BY r.ReturnID DESC";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
+                    cmd.Parameters.AddWithValue("@adminId", adminId);
                     conn.Open();
 
                     using (SqlDataReader dr = cmd.ExecuteReader())
@@ -76,11 +81,11 @@ namespace Week1_Practical1.Helpers
             try
             {
                 string sql = @"
-            UPDATE Returns
-            SET ReturnStatus = @status,
-                ProcessedBy = @adminId,
-                ReturnDate = GETDATE()
-            WHERE ReturnID = @returnId";
+                UPDATE Returns
+                SET ReturnStatus = @status,
+                    ProcessedBy = @adminId,
+                    ReturnDate = GETDATE()
+                WHERE ReturnID = @returnId";
 
                 using (SqlConnection conn = new SqlConnection(_connStr))
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -273,9 +278,6 @@ namespace Week1_Practical1.Helpers
                 return new List<Return>();
             }
         }
-
-
-
 
     }
 }
