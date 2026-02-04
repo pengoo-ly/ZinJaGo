@@ -13,7 +13,7 @@
             <asp:TextBox ID="txtShipmentID" runat="server" CssClass="textbox"/>
 
             Status:
-            <asp:DropDownList ID="ddlStatus" runat="server">
+            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="status-dropdown">
                 <asp:ListItem Text="-- All --" Value="" />
                 <asp:ListItem Text="Packed" Value="Packed" />
                 <asp:ListItem Text="Shipped" Value="Shipped" />
