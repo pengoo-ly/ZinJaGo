@@ -154,5 +154,17 @@ namespace Week1_Practical1
                 BindDeliveryGrid();
             }
         }
+        protected string GetStatusClass(string status)
+        {
+            return status switch
+            {
+                "Packed" => "processed",
+                "Shipped" => "processed",
+                "Out for Delivery" => "pending",
+                "Delivered" => "approved",
+                _ => "pending"
+            };
+        }
+
     }
 }

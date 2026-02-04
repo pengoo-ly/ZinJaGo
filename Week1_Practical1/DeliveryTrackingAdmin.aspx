@@ -48,7 +48,7 @@
                     <asp:BoundField DataField="ShipmentID" HeaderText="Shipment ID" ReadOnly="true" />
                     <asp:TemplateField HeaderText="Status">
                         <ItemTemplate>
-                            <span class="status-badge <%# Eval("StatusUpdate").ToString().Replace(" ", "").ToLower() %>">
+                            <span class="status-badge <%# GetStatusClass(Eval("StatusUpdate").ToString()) %>">
                                 <%# Eval("StatusUpdate") %>
                             </span>
                         </ItemTemplate>
