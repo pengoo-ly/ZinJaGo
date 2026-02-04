@@ -26,9 +26,22 @@ namespace Week1_Practical1
             {
                 BindDeliveryGrid();
                 ddlStatus.SelectedValue = "Packed";
-                ddlStatus.CssClass = "status-dropdown " + GetStatusClass(ddlStatus.SelectedValue);
             }
 
+        }
+        protected void Page_PreRender(object sender, EventArgs e)
+        {
+            ddlStatus.CssClass = "status-dropdown";
+        }
+        protected void ddlStatus_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ddlStatus.CssClass = "status-dropdown " + GetStatusClass(ddlStatus.SelectedValue);
+        }
+
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            this.PreRender += Page_PreRender;
         }
 
         private void BindDeliveryGrid()
@@ -180,7 +193,7 @@ namespace Week1_Practical1
                 else if (status == "Delivered")
                     return "approved";
                 else
-                    return "pending"; // default
+                    return ""; // default
             }
             catch
             {

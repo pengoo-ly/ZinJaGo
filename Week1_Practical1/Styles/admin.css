@@ -928,16 +928,25 @@ body {
     }
 
 .status-dropdown {
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     border: 1px solid var(--muted);
     font-size: 14px;
     font-family: 'Segoe UI', sans-serif;
-    color: var(--status-text);
-    background-color: var(--card); /* default */
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    color: var(--text);
+    background-color: var(--card);
+    outline: none;
+    appearance: none; /* removes default arrow */
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 10px;
 }
 
+.dark .status-dropdown {
+    background-color: var(--card);
+    color: var(--text);
+    border: 1px solid var(--muted);
+}
     /* Status-specific styles */
     .status-dropdown.processed {
         background-color: var(--status-processed);

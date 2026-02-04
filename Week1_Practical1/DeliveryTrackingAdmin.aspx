@@ -24,7 +24,7 @@
             <asp:Button ID="btnSearch" runat="server"
                 Text=" 🔍 Search"
                 OnClick="btnSearch_Click"
-                CssClass="textbox"/>
+                CssClass="btn-add"/>
 
             <asp:Button ID="btnReset" runat="server"
                 Text="Reset"
@@ -78,6 +78,10 @@
                             CommandName="UpdateStatus"
                             CssClass="btn-add"
                             CommandArgument='<%# Eval("TrackingID") + "|Shipped" %>' />
+                        <asp:Button runat="server" Text="Out for Delivery"
+                            CommandName="UpdateStatus"
+                            CssClass="btn-add"
+                            CommandArgument='<%# Eval("TrackingID") + "|Out for Delivery" %>' />
 
                         <asp:Button runat="server" Text="Delivered"
                             CommandName="UpdateStatus"
@@ -85,9 +89,10 @@
                             CommandArgument='<%# Eval("TrackingID") + "|Delivered" %>' />
                     </ItemTemplate>
                 </asp:TemplateField>
-
-
+                <asp:CommandField ShowEditButton="true" CancelText="🚫" EditText="✏️" UpdateText="✔️" />
                 </Columns>
+
+<HeaderStyle CssClass="gv-header"></HeaderStyle>
             </asp:GridView>
         </div>  
 
