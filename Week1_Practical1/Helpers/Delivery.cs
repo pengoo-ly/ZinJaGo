@@ -111,7 +111,10 @@ namespace Week1_Practical1.Helpers
             string queryStr = @"
                 UPDATE DeliveryTracking
                 SET StatusUpdate = @StatusUpdate,
-                    Location = @Location,
+                    Location = CASE 
+                        WHEN @Location = '' THEN Location 
+                        ELSE @Location 
+                    END,
                     UpdateTime = GETDATE()
                 WHERE TrackingID = @TrackingID";
 
@@ -135,5 +138,61 @@ namespace Week1_Practical1.Helpers
                 return 0;
             }
         }
+
+        public List<Delivery> SearchDeliveryByAdmin(
+    int adminID,
+    string shipmentID,
+    string status)
+        {
+            List<Delivery> list = new List<Delivery>();
+
+            string queryStr = @"
+        SELECT DISTINCT DT.TrackingID, DT.ShipmentID, DT.StatusUpdate, DT.Location, DT.UpdateTime
+        FROM DeliveryTracking DT
+        INNER JOIN OrderShipments OS ON DT.ShipmentID = OS.ShipmentID
+        INNER JOIN Orders O ON OS.OrderID = O.OrderID
+        INNER JOIN OrderItems OI ON O.OrderID = OI.OrderID
+        INNER JOIN Products P ON OI.ProductID = P.ProductID
+        WHERE P.AdminID = @AdminID
+          AND (@ShipmentID = '' OR DT.ShipmentID LIKE '%' + @ShipmentID + '%')
+          AND (@Status = '' OR DT.StatusUpdate = @Status)
+        ORDER BY DT.UpdateTime DESC";
+
+            try
+            {
+                SqlConnection conn = new SqlConnection(_connStr);
+                SqlCommand cmd = new SqlCommand(queryStr, conn);
+
+                cmd.Parameters.AddWithValue("@AdminID", adminID);
+                cmd.Parameters.AddWithValue("@ShipmentID", shipmentID);
+                cmd.Parameters.AddWithValue("@Status", status);
+
+                conn.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    Delivery d = new Delivery(
+                        Convert.ToInt32(dr["TrackingID"]),
+                        Convert.ToInt32(dr["ShipmentID"]),
+                        dr["StatusUpdate"].ToString(),
+                        dr["Location"].ToString(),
+                        Convert.ToDateTime(dr["UpdateTime"])
+                    );
+
+                    list.Add(d);
+                }
+
+                dr.Close();
+                conn.Close();
+            }
+            catch
+            {
+                return null;
+            }
+
+            return list;
+        }
+
     }
 }

@@ -101,5 +101,58 @@ namespace Week1_Practical1
                 Response.Write("<script>alert('Unable to cancel edit mode.');</script>");
             }
         }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Session["AdminID"] == null)
+                    throw new Exception("Session expired.");
+
+                int adminID = Convert.ToInt32(Session["AdminID"]);
+
+                gvDelivery.DataSource = delivery.SearchDeliveryByAdmin(
+                    adminID,
+                    txtShipmentID.Text.Trim(),
+                    ddlStatus.SelectedValue
+                );
+
+                gvDelivery.DataBind();
+            }
+            catch 
+            {
+                Response.Write("<script>alert('Failed to search delivery records.');</script>");
+            }
+        }
+
+        protected void btnReset_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                txtShipmentID.Text = "";
+                ddlStatus.SelectedIndex = 0;
+
+                gvDelivery.EditIndex = -1;
+                BindDeliveryGrid();
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to reset search filters.');</script>");
+            }
+        }
+
+        protected void gvDelivery_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "UpdateStatus")
+            {
+                string[] args = e.CommandArgument.ToString().Split('|');
+                int trackingID = Convert.ToInt32(args[0]);
+                string newStatus = args[1];
+
+                delivery.UpdateDelivery(trackingID, newStatus, ""); // keep location unchanged
+
+                BindDeliveryGrid();
+            }
+        }
     }
 }
