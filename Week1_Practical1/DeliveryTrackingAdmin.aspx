@@ -10,7 +10,7 @@
         <asp:Panel ID="pnlSearch" runat="server" CssClass="search-panel">
 
             Shipment ID:
-            <asp:TextBox ID="txtShipmentID" runat="server" Width="120px" />
+            <asp:TextBox ID="txtShipmentID" runat="server" CssClass="textbox"/>
 
             Status:
             <asp:DropDownList ID="ddlStatus" runat="server">
@@ -23,11 +23,13 @@
 
             <asp:Button ID="btnSearch" runat="server"
                 Text=" 🔍 Search"
-                OnClick="btnSearch_Click" />
+                OnClick="btnSearch_Click"
+                CssClass="textbox"/>
 
             <asp:Button ID="btnReset" runat="server"
                 Text="Reset"
-                OnClick="btnReset_Click" />
+                OnClick="btnReset_Click"
+                CssClass="btn-add"/>
 
         </asp:Panel>
 

@@ -25,6 +25,8 @@ namespace Week1_Practical1
             if (!IsPostBack)
             {
                 BindDeliveryGrid();
+                ddlStatus.SelectedValue = "Packed";
+                ddlStatus.CssClass = "status-dropdown " + GetStatusClass(ddlStatus.SelectedValue);
             }
 
         }

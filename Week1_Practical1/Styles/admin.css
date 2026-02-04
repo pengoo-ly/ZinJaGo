@@ -927,3 +927,34 @@ body {
         background: var(--status-processed);
     }
 
+.status-dropdown {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--muted);
+    font-size: 14px;
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--status-text);
+    background-color: var(--card); /* default */
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+    /* Status-specific styles */
+    .status-dropdown.processed {
+        background-color: var(--status-processed);
+        color: var(--status-text);
+    }
+
+    .status-dropdown.pending {
+        background-color: var(--status-pending);
+        color: var(--status-text);
+    }
+
+    .status-dropdown.approved {
+        background-color: var(--status-approved);
+        color: var(--status-text);
+    }
+
+    .status-dropdown.rejected {
+        background-color: var(--status-rejected);
+        color: var(--status-text);
+    }
