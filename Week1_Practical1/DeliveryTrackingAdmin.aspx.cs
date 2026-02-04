@@ -143,28 +143,48 @@ namespace Week1_Practical1
 
         protected void gvDelivery_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if (e.CommandName == "UpdateStatus")
+            try
             {
-                string[] args = e.CommandArgument.ToString().Split('|');
-                int trackingID = Convert.ToInt32(args[0]);
-                string newStatus = args[1];
+                if (e.CommandName == "UpdateStatus")
+                {
+                    if (string.IsNullOrEmpty(e.CommandArgument?.ToString()))
+                        throw new Exception("Invalid command argument.");
 
-                delivery.UpdateDelivery(trackingID, newStatus, ""); // keep location unchanged
+                    string[] args = e.CommandArgument.ToString().Split('|');
+                    if (args.Length < 2)
+                        throw new Exception("Invalid command argument format.");
 
-                BindDeliveryGrid();
+                    int trackingID = Convert.ToInt32(args[0]);
+                    string newStatus = args[1];
+
+                    delivery.UpdateDelivery(trackingID, newStatus, ""); // keep location unchanged
+
+                    BindDeliveryGrid();
+                }
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to update delivery status.');</script>");
             }
         }
         protected string GetStatusClass(string status)
         {
-            return status switch
+            try
             {
-                "Packed" => "processed",
-                "Shipped" => "processed",
-                "Out for Delivery" => "pending",
-                "Delivered" => "approved",
-                _ => "pending"
-            };
+                if (status == "Packed" || status == "Shipped")
+                    return "processed";
+                else if (status == "Out for Delivery")
+                    return "pending";
+                else if (status == "Delivered")
+                    return "approved";
+                else
+                    return "pending"; // default
+            }
+            catch
+            {
+                Response.Write("<script>alert('Error determining status class.');</script>");
+                return "pending"; // safe default
+            }
         }
-
     }
 }
