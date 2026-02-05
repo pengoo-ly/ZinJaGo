@@ -10,8 +10,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.6;
         }
 
@@ -29,14 +29,14 @@
 
         .header h1 {
             font-size: 2.5rem;
-            color: #2c2c2c;
+            color: var(--text);
             margin-bottom: 8px;
             font-weight: 600;
         }
 
         .header p {
             font-size: 1rem;
-            color: #666;
+            color: var(--muted);
         }
 
         /* Key Metrics Cards */
@@ -49,12 +49,12 @@
         }
 
         .metric-card {
-            background: #f8f0e3;
+            background: var(--card);
             border-radius: 8px;
             padding: 18px 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            border-left: 4px solid #4a9b8e;
+            border-left: 4px solid var(--accent);
         }
 
         .metric-card:hover {
@@ -76,7 +76,7 @@
 
         .metric-label {
             font-size: 0.75rem;
-            color: #999;
+            color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 8px;
@@ -85,7 +85,7 @@
 
         .metric-value {
             font-size: 1.8rem;
-            color: #2c2c2c;
+            color: var(--text);
             font-weight: 700;
             margin-bottom: 8px;
         }
@@ -95,12 +95,12 @@
             display: inline-block;
             padding: 3px 6px;
             border-radius: 4px;
-            background-color: #f0f9f7;
-            color: #4a9b8e;
+            background-color: rgba(79, 163, 146, 0.1);
+            color: var(--accent);
         }
 
         .metric-change.negative {
-            background-color: #fef2f2;
+            background-color: rgba(239, 68, 68, 0.1);
             color: #ef4444;
         }
 
@@ -121,26 +121,34 @@
         }
 
         .filter-tabs button {
-            background: #f8f0e3;
-            border: 1px solid #e8ddd2;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             padding: 10px 18px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
-            color: #666;
+            color: var(--text);
             transition: all 0.3s ease;
             font-weight: 500;
         }
 
+        .dark .filter-tabs button {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .filter-tabs button.active {
-            background-color: #4a9b8e;
+            background-color: var(--accent);
             color: white;
-            border-color: #4a9b8e;
+            border-color: var(--accent);
         }
 
         .filter-tabs button:hover:not(.active) {
-            background-color: #f0e8dc;
-            border-color: #d8cdc2;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--accent);
+        }
+
+        .dark .filter-tabs button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .search-box {
@@ -152,16 +160,26 @@
         .search-box input {
             width: 100%;
             padding: 10px 15px;
-            border: 1px solid #e8ddd2;
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 6px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .dark .search-box input {
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .search-box input:focus {
             outline: none;
-            border-color: #4a9b8e;
+            border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(74, 155, 142, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: var(--muted);
         }
 
         .action-buttons {
@@ -183,31 +201,47 @@
         }
 
         .btn-sort {
-            background: #f8f0e3;
-            border: 1px solid #e8ddd2;
-            color: #666;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text);
+        }
+
+        .dark .btn-sort {
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn-sort:hover {
-            background-color: #f0e8dc;
-            border-color: #d8cdc2;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--accent);
+        }
+
+        .dark .btn-sort:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .btn-menu {
-            background: #f8f0e3;
-            border: 1px solid #e8ddd2;
-            color: #666;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text);
             padding: 10px 12px;
         }
 
+        .dark .btn-menu {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .btn-menu:hover {
-            background-color: #f0e8dc;
-            border-color: #d8cdc2;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--accent);
+        }
+
+        .dark .btn-menu:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         /* Table Section */
         .table-wrapper {
-            background: #f8f0e3;
+            background: var(--card);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -220,15 +254,20 @@
         }
 
         thead {
-            background-color: #ede5d6;
-            border-bottom: 2px solid #e8ddd2;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark thead {
+            background-color: rgba(255, 255, 255, 0.02);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         th {
             padding: 16px 18px;
             text-align: left;
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -236,8 +275,13 @@
 
         td {
             padding: 16px 18px;
-            border-bottom: 1px solid #ede5d6;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .dark td {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
         }
 
         tbody tr {
@@ -245,14 +289,14 @@
         }
 
         tbody tr:hover {
-            background-color: #f9f5f0;
+            background-color: rgba(79, 163, 146, 0.05);
         }
 
         .checkbox {
             width: 18px;
             height: 18px;
             cursor: pointer;
-            accent-color: #4a9b8e;
+            accent-color: var(--accent);
         }
 
         .status-badge {
@@ -265,29 +309,24 @@
         }
 
         .status-in-stock {
-            background-color: #d1fae5;
+            background-color: rgba(209, 250, 229, 0.8);
             color: #065f46;
         }
 
         .status-low-stock {
-            background-color: #fed7aa;
+            background-color: rgba(254, 215, 170, 0.8);
             color: #92400e;
         }
 
         .status-out-of-stock {
-            background-color: #fee2e2;
+            background-color: rgba(254, 226, 226, 0.8);
             color: #991b1b;
-        }
-
-        .status-pending {
-            background-color: #dbeafe;
-            color: #1e40af;
         }
 
         .sku {
             font-family: 'Courier New', monospace;
             font-size: 0.85rem;
-            color: #999;
+            color: var(--muted);
             font-weight: 500;
         }
 
@@ -297,13 +336,18 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 18px;
-            background-color: #ede5d6;
-            border-top: 1px solid #e8ddd2;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .pagination {
+            background-color: rgba(255, 255, 255, 0.02);
+            border-top-color: rgba(255, 255, 255, 0.1);
         }
 
         .pagination-info {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--text);
         }
 
         .pagination-controls {
@@ -315,9 +359,9 @@
         .pagination-controls a,
         .pagination-controls button {
             padding: 8px 12px;
-            border: 1px solid #e8ddd2;
-            background: #f8f0e3;
-            color: #666;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--card);
+            color: var(--text);
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
@@ -325,16 +369,21 @@
             text-decoration: none;
         }
 
+        .dark .pagination-controls a,
+        .dark .pagination-controls button {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .pagination-controls a:hover,
         .pagination-controls button:hover {
-            border-color: #4a9b8e;
-            color: #4a9b8e;
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         .pagination-number {
-            background-color: #4a9b8e;
+            background-color: var(--accent);
             color: white;
-            border-color: #4a9b8e;
+            border-color: var(--accent);
             pointer-events: none;
             min-width: 36px;
             text-align: center;
@@ -344,7 +393,7 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #999;
+            color: var(--muted);
         }
 
         .empty-state-icon {
@@ -354,7 +403,7 @@
         }
 
         .empty-state h3 {
-            color: #666;
+            color: var(--text);
             margin-bottom: 10px;
             font-size: 1.2rem;
         }

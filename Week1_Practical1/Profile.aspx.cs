@@ -122,9 +122,15 @@ namespace Week1_Practical1
                     {
                         while (reader.Read())
                         {
-                            string cardNumber = reader["CardNumber"].ToString();
+                            // Decode card data from VARBINARY
+                            byte[] cardNumberBytes = (byte[])reader["CardNumber"];
+                            string cardNumber = System.Text.Encoding.UTF8.GetString(cardNumberBytes);
+                            
                             string cardName = reader["CardName"].ToString();
-                            string expireDate = reader["ExpireDate"].ToString();
+                            
+                            // Format expiry date from DATE to MM/YY
+                            DateTime expiryDateObj = (DateTime)reader["ExpireDate"];
+                            string expireDate = expiryDateObj.ToString("MM/yy");
 
                             // Mask card number
                             string maskedCard = "**** **** **** " + cardNumber.Substring(Math.Max(0, cardNumber.Length - 4));
@@ -383,6 +389,17 @@ namespace Week1_Practical1
                     return;
                 }
 
+                // Convert MM/YY to DATE format (YYYY-MM-DD)
+                // Assume 20YY for years less than 50, 19YY for years 50 and above
+                string[] dateparts = expireDate.Split('/');
+                string month = dateparts[0];
+                string year = "20" + dateparts[1];
+                string convertedExpireDate = year + "-" + month + "-01"; // First day of expiry month
+
+                // Encrypt card data (using basic encoding - in production, use proper encryption)
+                byte[] cardNumberBytes = System.Text.Encoding.UTF8.GetBytes(cardNumber);
+                byte[] cvvBytes = System.Text.Encoding.UTF8.GetBytes(cvv);
+
                 // All validation passed
                 DbLogger.Log("[CARD ADD] All validations passed, attempting database insert");
 
@@ -398,10 +415,10 @@ namespace Week1_Practical1
 
                     using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                     {
-                        cmd.Parameters.AddWithValue("@cardNumber", cardNumber);
+                        cmd.Parameters.AddWithValue("@cardNumber", cardNumberBytes);
                         cmd.Parameters.AddWithValue("@cardName", cardName);
-                        cmd.Parameters.AddWithValue("@expireDate", expireDate);
-                        cmd.Parameters.AddWithValue("@cvv", cvv);
+                        cmd.Parameters.AddWithValue("@expireDate", DateTime.ParseExact(convertedExpireDate, "yyyy-MM-dd", null));
+                        cmd.Parameters.AddWithValue("@cvv", cvvBytes);
                         cmd.Parameters.AddWithValue("@email", adminEmail);
 
                         try

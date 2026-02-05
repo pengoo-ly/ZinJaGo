@@ -18,13 +18,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #e8ddd2;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
             padding-bottom: 20px;
+        }
+
+        .dark .header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         .header h1 {
             font-size: 28px;
-            color: #2C2C2C;
+            color: var(--text);
             font-weight: 600;
         }
 
@@ -37,36 +41,40 @@
 
         .stat-card {
             background: var(--card);
-            color: #2C2C2C;
+            color: var(--text);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e8ddd2;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .stat-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stat-card.total {
-            background: linear-gradient(135deg, #4FA392 0%, #5DB5A4 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, #5DB5A4 100%);
             color: white;
         }
 
         .stat-card.pending {
-            background: #f8f0e3;
-            border-color: #e8ddd2;
+            background: var(--card);
+            border-color: rgba(0, 0, 0, 0.1);
         }
 
         .stat-card.shipped {
-            background: #f8f0e3;
-            border-color: #e8ddd2;
+            background: var(--card);
+            border-color: rgba(0, 0, 0, 0.1);
         }
 
         .stat-card.delivered {
-            background: #f8f0e3;
-            border-color: #e8ddd2;
+            background: var(--card);
+            border-color: rgba(0, 0, 0, 0.1);
         }
 
         .stat-card.revenue {
-            background: #f8f0e3;
-            border-color: #e8ddd2;
+            background: var(--card);
+            border-color: rgba(0, 0, 0, 0.1);
         }
 
         .stat-label {
@@ -114,35 +122,43 @@
         .table-container {
             overflow-x: auto;
             margin-top: 20px;
-            background: #f8f0e3;
+            background: var(--card);
             border-radius: 8px;
-            border: 1px solid #e8ddd2;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .table-container {
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #f8f0e3;
+            background-color: var(--card);
         }
 
         th {
-            background-color: #4FA392;
+            background-color: var(--accent);
             padding: 15px;
             text-align: left;
             font-weight: 600;
             color: white;
-            border-bottom: 2px solid #3D8577;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
             font-size: 14px;
         }
 
         td {
             padding: 15px;
-            border-bottom: 1px solid #e8ddd2;
-            color: #2C2C2C;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text);
+        }
+
+        .dark td {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         tr:hover {
-            background-color: #f0e8dc;
+            background-color: rgba(79, 163, 146, 0.05);
         }
 
         .status-badge {
@@ -203,7 +219,7 @@
         }
 
         .btn-view {
-            background-color: #4FA392;
+            background-color: var(--accent);
             color: white;
         }
 
@@ -247,21 +263,21 @@
             border: 1px solid #d4c4a8;
             border-radius: 4px;
             cursor: pointer;
-            color: #4FA392;
+            color: var(--accent);
             text-decoration: none;
-            background-color: #f8f0e3;
+            background-color: var(--card);
         }
 
         .pagination a:hover {
-            background-color: #4FA392;
+            background-color: var(--accent);
             color: white;
-            border-color: #4FA392;
+            border-color: var(--accent);
         }
 
         .pagination .active {
-            background-color: #4FA392;
+            background-color: var(--accent);
             color: white;
-            border-color: #4FA392;
+            border-color: var(--accent);
         }
 
         .no-data {
