@@ -28,9 +28,9 @@ namespace Week1_Practical1.SuperAdmin
             if (!IsPostBack)
             {
                 LoadAdminProfile();
-                LoadCreditCards();
             }
         }
+
         private void LoadAdminProfile()
         {
             try
@@ -97,76 +97,6 @@ namespace Week1_Practical1.SuperAdmin
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
                     "showMessage('Error loading profile: " + ex.Message.Replace("'", "\\'") + "', false);", true);
-            }
-        }
-
-        private void LoadCreditCards()
-        {
-            try
-            {
-                string email = Session["AdminEmail"].ToString();
-                string cardsHtml = "";
-
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    SqlCommand cmd = new SqlCommand(
-                        @"SELECT CardNumber, CardName, ExpireDate 
-                          FROM Admins 
-                          WHERE Email = @email AND CardNumber IS NOT NULL", conn);
-
-                    cmd.Parameters.AddWithValue("@email", email);
-
-                    conn.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            string cardNumber = reader["CardNumber"].ToString();
-                            string cardName = reader["CardName"].ToString();
-                            string expireDate = reader["ExpireDate"].ToString();
-
-                            // Mask card number
-                            string maskedCard = "**** **** **** " + cardNumber.Substring(Math.Max(0, cardNumber.Length - 4));
-
-                            cardsHtml += @"
-                                <div class='credit-card'>
-                                    <div class='card-logo'>💳</div>
-                                    <div class='card-number'>" + maskedCard + @"</div>
-                                    <div class='card-info'>
-                                        <div>
-                                            <div class='card-holder'>Card Holder</div>
-                                            <div class='card-holder-name'>" + cardName + @"</div>
-                                        </div>
-                                        <div class='card-expiry'>
-                                            <div class='card-expiry-label'>Expires</div>
-                                            <div class='card-expiry-date'>" + expireDate + @"</div>
-                                        </div>
-                                    </div>
-                                    <div class='card-actions'>
-                                        <button type='button' class='card-btn' onclick='openDeleteCardModal(""" + maskedCard + @""")' title='Delete'>🗑️</button>
-                                    </div>
-                                </div>";
-                        }
-                    }
-                    else
-                    {
-                        cardsHtml = "<div style='text-align: center; padding: 40px 20px; color: var(--muted);'><div style='font-size: 48px; margin-bottom: 16px;'>💳</div><div>No credit cards added yet</div></div>";
-                    }
-
-                    reader.Close();
-                    conn.Close();
-                }
-
-                // Inject cards HTML into page
-                string escapedHtml = cardsHtml.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "");
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "loadCards",
-                    "document.getElementById('creditCardsGrid').innerHTML = \"" + escapedHtml + "\";", true);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error loading credit cards: " + ex.Message);
             }
         }
 
@@ -333,145 +263,6 @@ namespace Week1_Practical1.SuperAdmin
             }
         }
 
-        protected void btnAddCard_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string adminEmail = Session["AdminEmail"].ToString();
-                string cardName = txtCardName.Text.Trim();
-                string cardNumber = txtCardNumber.Text.Trim().Replace(" ", "").Replace("-", "");
-                string expireDate = txtCardExpiry.Text.Trim();
-                string cvv = txtCardCVV.Text.Trim();
-
-                // Validation
-                if (string.IsNullOrEmpty(cardName) || string.IsNullOrEmpty(cardNumber) ||
-                    string.IsNullOrEmpty(expireDate) || string.IsNullOrEmpty(cvv))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Please fill in all credit card fields.', false);", true);
-                    return;
-                }
-
-                if (!System.Text.RegularExpressions.Regex.IsMatch(cardNumber, @"^\d{13,19}$"))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Invalid card number. Must be 13-19 digits.', false);", true);
-                    return;
-                }
-
-                if (!System.Text.RegularExpressions.Regex.IsMatch(expireDate, @"^\d{2}/\d{2}$"))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('Expiry date must be in MM/YY format.', false);", true);
-                    return;
-                }
-
-                if (!System.Text.RegularExpressions.Regex.IsMatch(cvv, @"^\d{3,4}$"))
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                        "showMessage('CVV must be 3-4 digits.', false);", true);
-                    return;
-                }
-
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    // Update admin's credit card info
-                    SqlCommand cmd = new SqlCommand(
-                        @"UPDATE Admins SET 
-                          CardNumber = @cardNumber, 
-                          CardName = @cardName, 
-                          ExpireDate = @expireDate, 
-                          CVV = @cvv
-                          WHERE Email = @email", conn);
-
-                    cmd.Parameters.AddWithValue("@cardNumber", cardNumber);
-                    cmd.Parameters.AddWithValue("@cardName", cardName);
-                    cmd.Parameters.AddWithValue("@expireDate", expireDate);
-                    cmd.Parameters.AddWithValue("@cvv", cvv);
-                    cmd.Parameters.AddWithValue("@email", adminEmail);
-
-                    try
-                    {
-                        conn.Open();
-                        int result = cmd.ExecuteNonQuery();
-                        conn.Close();
-
-                        if (result > 0)
-                        {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
-                                "showMessage('Credit card added successfully!', true);", true);
-
-                            ClearCardForm();
-                            LoadCreditCards();
-
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
-                                "setTimeout(function() { closeAddCardModal(); }, 1000);", true);
-                        }
-                        else
-                        {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                                "showMessage('Failed to add card. No records updated.', false);", true);
-                        }
-                    }
-                    catch (SqlException sqlEx)
-                    {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                            "showMessage('Error adding card: " + sqlEx.Message.Replace("'", "\\'") + "', false);", true);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                    "showMessage('Error: " + ex.Message.Replace("'", "\\'") + "', false);", true);
-            }
-        }
-
-        protected void btnConfirmDeleteCard_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string adminEmail = Session["AdminEmail"].ToString();
-
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    SqlCommand cmd = new SqlCommand(
-                        @"UPDATE Admins SET CardNumber = NULL, CardName = NULL, ExpireDate = NULL, CVV = NULL
-                          WHERE Email = @email", conn);
-
-                    cmd.Parameters.AddWithValue("@email", adminEmail);
-
-                    try
-                    {
-                        conn.Open();
-                        int result = cmd.ExecuteNonQuery();
-                        conn.Close();
-
-                        if (result > 0)
-                        {
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
-                                "showMessage('Credit card deleted successfully!', true);", true);
-
-                            LoadCreditCards();
-
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
-                                "setTimeout(function() { closeDeleteCardModal(); }, 500);", true);
-                        }
-                    }
-                    catch (SqlException sqlEx)
-                    {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                            "showMessage('Error deleting card: " + sqlEx.Message.Replace("'", "\\'") + "', false);", true);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "error",
-                    "showMessage('Error: " + ex.Message.Replace("'", "\\'") + "', false);", true);
-            }
-        }
-
         protected void btnDeletePhoto_Click(object sender, EventArgs e)
         {
             try
@@ -551,6 +342,7 @@ namespace Week1_Practical1.SuperAdmin
                     "alert('Error: " + ex.Message.Replace("'", "\\'") + "');", true);
             }
         }
+
         private bool DeleteAdminAccount(string email)
         {
             try
@@ -572,14 +364,6 @@ namespace Week1_Practical1.SuperAdmin
                 System.Diagnostics.Debug.WriteLine("Error deleting account: " + ex.Message);
                 return false;
             }
-        }
-
-        private void ClearCardForm()
-        {
-            txtCardName.Text = "";
-            txtCardNumber.Text = "";
-            txtCardExpiry.Text = "";
-            txtCardCVV.Text = "";
         }
 
         private string GetInitials(string name)
