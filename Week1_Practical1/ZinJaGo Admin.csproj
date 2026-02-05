@@ -111,7 +111,6 @@
     <Content Include="SuperAdmin\ReportsAnalytics.aspx" />
     <Content Include="SuperAdmin\SProfile.aspx" />
     <Content Include="SuperAdmin\SuperCupon.aspx" />
-    <Content Include="SuperAdmin\SystemSettings.aspx" />
     <Content Include="SuperAdmin\ZinJaGODashboard.aspx" />
     <Content Include="test.aspx" />
     <Content Include="WarehouseManagement.aspx" />
@@ -310,13 +309,6 @@
     </Compile>
     <Compile Include="SuperAdmin\SuperCupon.aspx.designer.cs">
       <DependentUpon>SuperCupon.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="SuperAdmin\SystemSettings.aspx.cs">
-      <DependentUpon>SystemSettings.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="SuperAdmin\SystemSettings.aspx.designer.cs">
-      <DependentUpon>SystemSettings.aspx</DependentUpon>
     </Compile>
     <Compile Include="SuperAdmin\ZinJaGODashboard.aspx.cs">
       <DependentUpon>ZinJaGODashboard.aspx</DependentUpon>

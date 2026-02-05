@@ -144,7 +144,6 @@
                         <li role="menuitem"><a href="ZinJaGODashboard.aspx"><span class="icon">🏠</span><span class="label">ZinJaGO Dashboard</span></a></li>
                         <li role="menuitem"><a href="SuperCupon.aspx"><span class="icon">🏷️</span><span class="label">Coupon</span></a></li>
                         <li role="menuitem"><a href="ReportsAnalytics.aspx"><span class="icon">📦</span><span class="label">Reports Analytics</span></a></li>
-                        <li role="menuitem"><a href="SystemSettings.aspx"><span class="icon">👥</span><span class="label">System Settings</span></a></li>
                     </ul>
                 </div>
                 <div class="menu-section">
