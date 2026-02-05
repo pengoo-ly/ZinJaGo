@@ -109,5 +109,50 @@ namespace Week1_Practical1
                 Response.Write("<script>alert('Failed to delete courier.');</script>");
             }
         }
+
+        protected void btnSearchCourier_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string keyword = txtSearchCourier.Text.Trim();
+                string query = "SELECT * FROM Couriers WHERE CourierName LIKE @Keyword ORDER BY CourierID";
+
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Keyword", "%" + keyword + "%");
+                    conn.Open();
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    DataTable dt = new DataTable();
+                    dt.Load(dr);
+
+                    gvCourier.DataSource = dt;
+                    gvCourier.DataBind();
+                }
+            }
+            catch 
+            {
+                Response.Write("<script>alert('Failed to search couriers.');</script>");
+            }
+        }
+
+        protected void btnTogglePartnered_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = (LinkButton)sender;
+            int courierID = Convert.ToInt32(btn.CommandArgument);
+
+            string query = "UPDATE Couriers SET IsPartnered = CASE WHEN IsPartnered = 1 THEN 0 ELSE 1 END WHERE CourierID = @CourierID";
+            using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@CourierID", courierID);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            BindGrid(); // rebind GridView
+        }
+
     }
 }

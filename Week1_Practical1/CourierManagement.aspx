@@ -28,6 +28,9 @@
 
             </asp:Panel>
         <br />
+    <div class="panel-style">
+        <asp:TextBox ID="txtSearchCourier" runat="server" CssClass="textbox" Placeholder="Search courier..."></asp:TextBox>
+        <asp:Button ID="btnSearchCourier" runat="server" Text="🔍 Search" CssClass="btn-add" OnClick="btnSearchCourier_Click" />
 
         <asp:GridView ID="gvCourier" runat="server"
                 CssClass="gridview-style"
@@ -44,10 +47,27 @@
                     <asp:BoundField DataField="ContactNumber" HeaderText="Contact" />
                     <asp:BoundField DataField="Email" HeaderText="Email" />
                     <asp:BoundField DataField="TrackingURL" HeaderText="Tracking URL" />
-                    <asp:CheckBoxField DataField="IsPartnered" HeaderText="Partnered" />
+                    <asp:TemplateField HeaderText="Partnered">
+                        <ItemTemplate>
+                            <asp:Label ID="lblPartnered" runat="server" Text='<%# (bool)Eval("IsPartnered") ? "Active" : "Inactive" %>' CssClass='<%# (bool)Eval("IsPartnered") ? "status-badge approved" : "status-badge rejected" %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Toggle Partnered">
+                        <ItemTemplate>
+                            <asp:LinkButton ID="btnTogglePartnered" 
+                                            runat="server" 
+                                            Text="Toggle" 
+                                            CommandArgument='<%# Eval("CourierID") %>' 
+                                            OnClick="btnTogglePartnered_Click" 
+                                            CssClass="btn-add">
+                            </asp:LinkButton>
+                        </ItemTemplate>
+                    </asp:TemplateField>
 
-                    <asp:CommandField ShowEditButton="true" ShowDeleteButton="true" />
+
+                    <asp:CommandField ShowEditButton="true" ShowDeleteButton="true" CancelText="🚫" DeleteText="❌" EditText="✏️" UpdateText="✔️" />
                 </Columns>
             <HeaderStyle CssClass="gv-header"></HeaderStyle>
             </asp:GridView>
+        </div>
 </asp:Content>
