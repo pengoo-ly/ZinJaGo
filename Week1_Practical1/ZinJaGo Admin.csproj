@@ -211,6 +211,7 @@
       <DependentUpon>Guess_the_number.aspx</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Category.cs" />
+    <Compile Include="Helpers\Courier.cs" />
     <Compile Include="Helpers\Cupon.cs" />
     <Compile Include="Helpers\Customer.cs" />
     <Compile Include="Helpers\DbLogger.cs" />
