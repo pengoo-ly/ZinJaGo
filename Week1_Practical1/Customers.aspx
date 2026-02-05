@@ -524,10 +524,10 @@
                     <button type="button" class="period-btn active" data-period="week">This week</button>
                     <button type="button" class="period-btn" data-period="month">Last week</button>
 
-                    <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    <asp:DropDownList ID="ddlYear" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="status-dropdown">
                     </asp:DropDownList>
 
-                    <asp:DropDownList ID="ddlMonth" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="form-select">
+                    <asp:DropDownList ID="ddlMonth" runat="server" AutoPostBack="true" OnSelectedIndexChanged="FilterChart" CssClass="status-dropdown">
                     </asp:DropDownList>
                 </div>
             </div>

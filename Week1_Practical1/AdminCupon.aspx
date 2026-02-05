@@ -576,7 +576,26 @@
                 <asp:BoundField DataField="DiscountValue" HeaderText="Discount" />
                 <asp:BoundField DataField="CoinCost" HeaderText="Coin Cost" />
                 <asp:BoundField DataField="ExpiryDate" HeaderText="Expiry Date" DataFormatString="{0:dd-MM-yyyy}" />
-                <asp:BoundField DataField="Status" HeaderText="Status" />
+                <asp:TemplateField HeaderText="Status">
+                    <ItemTemplate>
+                        <span class="badge 
+                            <%# GetCouponStatus(
+                                    Convert.ToDateTime(Eval("ExpiryDate")),
+                                    Eval("Status").ToString()
+                                ) == "Active" ? "badge-active" :
+                                GetCouponStatus(
+                                    Convert.ToDateTime(Eval("ExpiryDate")),
+                                    Eval("Status").ToString()
+                                ) == "Expired" ? "badge-expired" :
+                                "badge-inactive" %>">
+
+                            <%# GetCouponStatus(
+                                    Convert.ToDateTime(Eval("ExpiryDate")),
+                                    Eval("Status").ToString()
+                                ) %>
+                        </span>
+                    </ItemTemplate>
+                </asp:TemplateField>
 
                 <asp:CommandField ButtonType="Button" InsertVisible="False" ShowDeleteButton="True" ShowEditButton="True" CausesValidation="False" >
 
