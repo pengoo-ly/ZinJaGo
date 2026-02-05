@@ -105,17 +105,16 @@
     <Content Include="App_Data\ZinJaGoDB_log.ldf">
       <DependentUpon>ZinJaGoDB.mdf</DependentUpon>
     </Content>
-    <Content Include="Guess_the_number.aspx" />
+    <Content Include="Customer\Guess_the_number.aspx" />
     <Content Include="SuperAdmin\AdminRole.aspx" />
     <Content Include="SuperAdmin\ControlAuthority.aspx" />
     <Content Include="SuperAdmin\ReportsAnalytics.aspx" />
     <Content Include="SuperAdmin\SProfile.aspx" />
     <Content Include="SuperAdmin\SuperCupon.aspx" />
     <Content Include="SuperAdmin\ZinJaGODashboard.aspx" />
-    <Content Include="test.aspx" />
     <Content Include="WarehouseManagement.aspx" />
     <Content Include="Web.config" />
-    <Content Include="Snake_Game.aspx" />
+    <Content Include="Customer\Snake_Game.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddProducts.aspx.cs">
@@ -202,11 +201,11 @@
     <Compile Include="AdminPasswordReset.aspx.designer.cs">
       <DependentUpon>AdminPasswordReset.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Guess_the_number.aspx.cs">
+    <Compile Include="Customer\Guess_the_number.aspx.cs">
       <DependentUpon>Guess_the_number.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Guess_the_number.aspx.designer.cs">
+    <Compile Include="Customer\Guess_the_number.aspx.designer.cs">
       <DependentUpon>Guess_the_number.aspx</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Category.cs" />
@@ -317,18 +316,11 @@
     <Compile Include="SuperAdmin\ZinJaGODashboard.aspx.designer.cs">
       <DependentUpon>ZinJaGODashboard.aspx</DependentUpon>
     </Compile>
-    <Compile Include="test.aspx.cs">
-      <DependentUpon>test.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="test.aspx.designer.cs">
-      <DependentUpon>test.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Snake_Game.aspx.cs">
+    <Compile Include="Customer\Snake_Game.aspx.cs">
       <DependentUpon>Snake_Game.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Snake_Game.aspx.designer.cs">
+    <Compile Include="Customer\Snake_Game.aspx.designer.cs">
       <DependentUpon>Snake_Game.aspx</DependentUpon>
     </Compile>
     <Compile Include="WarehouseManagement.aspx.cs">
