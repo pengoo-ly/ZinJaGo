@@ -12,7 +12,12 @@
     --text: #000000; /* main text */
     --card: #F8F0E3; /* cards, logos */
     --shadow: 0 1px 3px rgba(0,0,0,.06);
-    --button: #EAF8E7 /* buttons */
+    --button: #EAF8E7; /* buttons */
+    --status-approved: #22c55e;
+    --status-rejected: #ef4444;
+    --status-processed: #3b82f6;
+    --status-text: #ffffff;
+    --status-pending: #f59e0b;
 }
 
 .dark {
@@ -25,6 +30,11 @@
     --muted: #aeb8c2;
     --text: #e6eef6;
     --card: #0b1520;
+    --status-pending: #fbbf24; /* softer amber */
+    --status-approved: #4ade80; /* softer green */
+    --status-rejected: #f87171; /* softer red */
+    --status-processed: #60a5fa; /* softer blue */
+    --status-text: #0f172a;
 }
 
 html, body {
@@ -829,3 +839,132 @@ body {
     .dark .textbox::placeholder {
         color: var(--muted);
     }
+
+.dashboard-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+    .dashboard-tabs .tab-btn {
+        background: var(--card);
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 999px;
+        padding: 6px 16px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+        font-size: 14px;
+        color: var(--text);
+    }
+
+        .dashboard-tabs .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+.tab-content {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+}
+
+/* Repeater logistics row */
+#logistics-tab .list-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+    #logistics-tab .list-row:hover {
+        background: rgba(79,163,146,0.08);
+    }
+
+/* Logistics header row */
+#logistics-tab .list-header {
+    font-weight: 600;
+    background-color: rgba(79,163,146,0.1);
+    border-bottom: 2px solid var(--accent);
+}
+/* Responsive chart height */
+#revenueChart {
+    width: 100%;
+    max-height: 300px; /* reduce the huge height */
+}
+
+.table-search input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--status-text);
+}
+
+    .status-badge.pending {
+        background: var(--status-pending);
+    }
+
+    .status-badge.approved {
+        background: var(--status-approved);
+    }
+
+    .status-badge.rejected {
+        background: var(--status-rejected);
+    }
+
+    .status-badge.processed {
+        background: var(--status-processed);
+    }
+
+.status-dropdown {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--muted);
+    font-size: 14px;
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--text);
+    background-color: var(--card);
+    outline: none;
+    appearance: none; /* removes default arrow */
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 10px;
+}
+
+.dark .status-dropdown {
+    background-color: var(--card);
+    color: var(--text);
+    border: 1px solid var(--muted);
+}
+/* Status-specific styles */
+.status-dropdown.processed {
+    background-color: var(--status-processed);
+    color: var(--status-text);
+}
+
+.status-dropdown.pending {
+    background-color: var(--status-pending);
+    color: var(--status-text);
+}
+
+.status-dropdown.approved {
+    background-color: var(--status-approved);
+    color: var(--status-text);
+}
+
+.status-dropdown.rejected {
+    background-color: var(--status-rejected);
+    color: var(--status-text);
+}
+
