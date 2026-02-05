@@ -193,6 +193,30 @@ namespace Week1_Practical1.Helpers
 
             return list;
         }
+        public List<string> GetDeliveryStatuses()
+        {
+            List<string> statuses = new List<string>();
+
+            string query = @"
+                SELECT DISTINCT StatusUpdate
+                FROM DeliveryTracking
+                ORDER BY StatusUpdate";
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    statuses.Add(dr["StatusUpdate"].ToString());
+                }
+            }
+
+            return statuses;
+        }
+
 
     }
 }

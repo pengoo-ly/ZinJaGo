@@ -25,24 +25,23 @@ namespace Week1_Practical1
             if (!IsPostBack)
             {
                 BindDeliveryGrid();
-                ddlStatus.SelectedValue = "Packed";
+                LoadStatusDropdown();
             }
 
         }
-        protected void Page_PreRender(object sender, EventArgs e)
+        private void LoadStatusDropdown()
         {
-            ddlStatus.CssClass = "status-dropdown";
-        }
-        protected void ddlStatus_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ddlStatus.CssClass = "status-dropdown " + GetStatusClass(ddlStatus.SelectedValue);
+            ddlStatus.Items.Clear();
+            ddlStatus.Items.Add(new ListItem("-- All --", ""));
+
+            var statuses = delivery.GetDeliveryStatuses();
+
+            foreach (string status in statuses)
+            {
+                ddlStatus.Items.Add(new ListItem(status, status));
+            }
         }
 
-
-        protected void Page_Init(object sender, EventArgs e)
-        {
-            this.PreRender += Page_PreRender;
-        }
 
         private void BindDeliveryGrid()
         {

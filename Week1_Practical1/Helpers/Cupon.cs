@@ -245,5 +245,26 @@ namespace Week1_Practical1.Helpers
             }
             return nextID;
         }
+        public void AutoExpireCoupons()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connStr))
+                using (SqlCommand cmd = new SqlCommand(@"
+                    UPDATE Vouchers
+                    SET Status = 'Inactive'
+                    WHERE ExpiryDate < CAST(GETDATE() AS DATE)
+                      AND Status = 'Active'", conn))
+                {
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch
+            {
+                // silent fail – we don’t want admin page to crash
+            }
+        }
+
     }
 }

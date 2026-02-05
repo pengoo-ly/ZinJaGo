@@ -22,6 +22,8 @@ namespace Week1_Practical1
 
             if (!IsPostBack)
             {
+                Cupon c = new Cupon();
+                c.AutoExpireCoupons();
                 LoadCoupons();
                 LoadStatistics();
             }
@@ -33,7 +35,13 @@ namespace Week1_Practical1
             gvCoupons.DataSource = new Cupon().GetCouponsByAdmin(adminId);
             gvCoupons.DataBind();
         }
+        protected string GetCouponStatus(DateTime expiryDate, string status)
+        {
+            if (expiryDate.Date < DateTime.Today)
+                return "Expired";
 
+            return status;
+        }
 
         private void LoadStatistics()
         {
