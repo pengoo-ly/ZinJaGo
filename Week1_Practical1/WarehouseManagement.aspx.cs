@@ -51,6 +51,18 @@ namespace EcommerceWebsite
                     BindGridView();
                     SetActiveFilterButton(btnAllWarehouses);
                 }
+                else
+                {
+                    // On postback, restore the filtered data from session
+                    if (Session["WarehouseData"] != null)
+                    {
+                        _warehouseData = (List<WarehouseItem>)Session["WarehouseData"];
+                        _filteredData = (List<WarehouseItem>)Session["FilteredData"];
+                        _currentPage = int.Parse(ViewState["CurrentPage"]?.ToString() ?? "1");
+                        BindMetrics();
+                        BindGridView();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -70,24 +82,32 @@ namespace EcommerceWebsite
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     // Load inventory from database - Products owned by this admin
+                    // Also get warehouse info from InventoryTransactions and OrderShipments
                     string query = @"
-                        SELECT 
+                        SELECT DISTINCT
                             p.ProductID AS SKU,
                             p.ProductName,
-                            w.WarehouseName,
+                            ISNULL(w.WarehouseName, 'Main Warehouse') AS WarehouseName,
                             ISNULL(p.StockQuantity, 0) AS Quantity,
-                            50 AS ReorderLevel,  -- Default reorder level
+                            50 AS ReorderLevel,
                             CASE 
                                 WHEN p.StockQuantity <= 0 THEN 'Out of Stock'
                                 WHEN p.StockQuantity <= 50 THEN 'Low Stock'
                                 ELSE 'In Stock'
                             END AS Status,
-                            ISNULL(FORMAT(p.DateCreated, 'yyyy-MM-dd'), CAST(GETDATE() AS DATE)) AS LastMovement,
-                            'Warehouse A' AS Location
+                            ISNULL(FORMAT(MAX(it.TransactionDate), 'yyyy-MM-dd'), CAST(GETDATE() AS DATE)) AS LastMovement,
+                            ISNULL(w.Address, 'Warehouse A') AS Location
                         FROM Products p
-                        LEFT JOIN Warehouses w ON 1=1
+                        LEFT JOIN InventoryTransactions it ON p.ProductID = it.ProductID
+                        LEFT JOIN Warehouses w ON it.WarehouseID = w.WarehouseID
                         WHERE p.AdminID = @AdminID
-                        ORDER BY p.ProductID";
+                        GROUP BY 
+                            p.ProductID,
+                            p.ProductName,
+                            p.StockQuantity,
+                            w.WarehouseName,
+                            w.Address
+                        ORDER BY p.ProductName ASC";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -106,96 +126,32 @@ namespace EcommerceWebsite
                                     Quantity = Convert.ToInt32(reader["Quantity"]),
                                     ReorderLevel = Convert.ToInt32(reader["ReorderLevel"]),
                                     Status = reader["Status"].ToString(),
-                                    LastMovement = reader["LastMovement"].ToString(),
-                                    Location = reader["Location"].ToString()
+                                    LastMovement = reader["LastMovement"] != DBNull.Value ? reader["LastMovement"].ToString() : DateTime.Now.ToString("yyyy-MM-dd"),
+                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : "Warehouse A"
                                 });
                             }
                         }
                     }
                 }
 
-                // If no data from database, use sample data for demonstration
-                if (_warehouseData.Count == 0)
-                {
-                    LoadSampleData();
-                }
-
-                // Initialize filtered data with all data
+                // Initialize filtered data with all data (empty list if no products for this admin)
                 _filteredData = new List<WarehouseItem>(_warehouseData);
                 CurrentFilter = "All";
+
+                // Store data in session for postback operations
+                Session["WarehouseData"] = _warehouseData;
+                Session["FilteredData"] = _filteredData;
+                ViewState["CurrentPage"] = 1;
             }
             catch (Exception ex)
             {
                 DbLogger.Log("Error loading warehouse data: " + ex.Message);
-                LoadSampleData();
+                // Don't load sample data on error - keep warehouse empty for this admin
+                _warehouseData = new List<WarehouseItem>();
+                _filteredData = new List<WarehouseItem>();
+                Session["WarehouseData"] = _warehouseData;
+                Session["FilteredData"] = _filteredData;
             }
-        }
-
-        /// <summary>
-        /// Load sample warehouse data for demonstration
-        /// </summary>
-        private void LoadSampleData()
-        {
-            _warehouseData = new List<WarehouseItem>
-            {
-                new WarehouseItem
-                {
-                    SKU = "SKU-001",
-                    ProductName = "Wireless Bluetooth Headphones",
-                    WarehouseName = "Main Warehouse",
-                    Quantity = 245,
-                    ReorderLevel = 50,
-                    Status = "In Stock",
-                    LastMovement = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"),
-                    Location = "Aisle A-12"
-                },
-                new WarehouseItem
-                {
-                    SKU = "SKU-002",
-                    ProductName = "USB-C Charging Cable",
-                    WarehouseName = "Distribution Center",
-                    Quantity = 15,
-                    ReorderLevel = 100,
-                    Status = "Low Stock",
-                    LastMovement = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd"),
-                    Location = "Aisle B-05"
-                },
-                new WarehouseItem
-                {
-                    SKU = "SKU-003",
-                    ProductName = "Mobile Phone Case",
-                    WarehouseName = "Regional Warehouse",
-                    Quantity = 0,
-                    ReorderLevel = 75,
-                    Status = "Out of Stock",
-                    LastMovement = DateTime.Now.AddDays(-5).ToString("yyyy-MM-dd"),
-                    Location = "Aisle C-08"
-                },
-                new WarehouseItem
-                {
-                    SKU = "SKU-004",
-                    ProductName = "Portable Power Bank",
-                    WarehouseName = "Main Warehouse",
-                    Quantity = 120,
-                    ReorderLevel = 40,
-                    Status = "In Stock",
-                    LastMovement = DateTime.Now.ToString("yyyy-MM-dd"),
-                    Location = "Aisle A-18"
-                },
-                new WarehouseItem
-                {
-                    SKU = "SKU-005",
-                    ProductName = "Screen Protector Set",
-                    WarehouseName = "Distribution Center",
-                    Quantity = 38,
-                    ReorderLevel = 50,
-                    Status = "Low Stock",
-                    LastMovement = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd"),
-                    Location = "Aisle B-02"
-                }
-            };
-
-            _filteredData = new List<WarehouseItem>(_warehouseData);
         }
 
         /// <summary>
@@ -283,11 +239,21 @@ namespace EcommerceWebsite
         /// </summary>
         protected void FilterWarehouses_Click(object sender, EventArgs e)
         {
-            _filteredData = new List<WarehouseItem>(_warehouseData);
-            _currentPage = 1;
-            CurrentFilter = "All";
-            SetActiveFilterButton(btnAllWarehouses);
-            BindGridView();
+            try
+            {
+                _filteredData = new List<WarehouseItem>(_warehouseData);
+                _currentPage = 1;
+                CurrentFilter = "All";
+                Session["FilteredData"] = _filteredData;
+                ViewState["CurrentPage"] = _currentPage;
+                SetActiveFilterButton(btnAllWarehouses);
+                BindMetrics();
+                BindGridView();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error filtering warehouses: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -295,11 +261,28 @@ namespace EcommerceWebsite
         /// </summary>
         protected void FilterLowStock_Click(object sender, EventArgs e)
         {
-            _filteredData = _warehouseData.Where(x => x.Status == "Low Stock" || x.Status == "Out of Stock").ToList();
-            _currentPage = 1;
-            CurrentFilter = "LowStock";
-            SetActiveFilterButton(btnLowStock);
-            BindGridView();
+            try
+            {
+                if (_warehouseData != null && _warehouseData.Count > 0)
+                {
+                    _filteredData = _warehouseData.Where(x => x.Status == "Low Stock" || x.Status == "Out of Stock").ToList();
+                }
+                else
+                {
+                    _filteredData = new List<WarehouseItem>();
+                }
+                _currentPage = 1;
+                CurrentFilter = "LowStock";
+                Session["FilteredData"] = _filteredData;
+                ViewState["CurrentPage"] = _currentPage;
+                SetActiveFilterButton(btnLowStock);
+                BindMetrics();
+                BindGridView();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error filtering low stock: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -307,19 +290,36 @@ namespace EcommerceWebsite
         /// </summary>
         protected void FilterMovements_Click(object sender, EventArgs e)
         {
-            DateTime threeDaysAgo = DateTime.Now.AddDays(-3);
-            _filteredData = _warehouseData.Where(x =>
+            try
             {
-                if (DateTime.TryParse(x.LastMovement, out DateTime movementDate))
+                DateTime threeDaysAgo = DateTime.Now.AddDays(-3);
+                if (_warehouseData != null && _warehouseData.Count > 0)
                 {
-                    return movementDate >= threeDaysAgo;
+                    _filteredData = _warehouseData.Where(x =>
+                    {
+                        if (DateTime.TryParse(x.LastMovement, out DateTime movementDate))
+                        {
+                            return movementDate >= threeDaysAgo;
+                        }
+                        return false;
+                    }).ToList();
                 }
-                return false;
-            }).ToList();
-            _currentPage = 1;
-            CurrentFilter = "Movements";
-            SetActiveFilterButton(btnMovements);
-            BindGridView();
+                else
+                {
+                    _filteredData = new List<WarehouseItem>();
+                }
+                _currentPage = 1;
+                CurrentFilter = "Movements";
+                Session["FilteredData"] = _filteredData;
+                ViewState["CurrentPage"] = _currentPage;
+                SetActiveFilterButton(btnMovements);
+                BindMetrics();
+                BindGridView();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error filtering movements: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -338,10 +338,34 @@ namespace EcommerceWebsite
         /// </summary>
         protected void SortTable_Click(object sender, EventArgs e)
         {
-            // Sort by quantity descending
-            _filteredData = _filteredData.OrderByDescending(x => x.Quantity).ToList();
-            _currentPage = 1;
-            BindGridView();
+            try
+            {
+                // Check if currently sorted ascending or descending
+                bool currentlySortedAsc = ViewState["SortAsc"] != null && (bool)ViewState["SortAsc"];
+                
+                if (currentlySortedAsc)
+                {
+                    // Sort descending
+                    _filteredData = _filteredData.OrderByDescending(x => x.Quantity).ToList();
+                    ViewState["SortAsc"] = false;
+                }
+                else
+                {
+                    // Sort ascending
+                    _filteredData = _filteredData.OrderBy(x => x.Quantity).ToList();
+                    ViewState["SortAsc"] = true;
+                }
+
+                _currentPage = 1;
+                Session["FilteredData"] = _filteredData;
+                ViewState["CurrentPage"] = _currentPage;
+                BindMetrics();
+                BindGridView();
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error sorting table: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -359,10 +383,18 @@ namespace EcommerceWebsite
         /// </summary>
         protected void PreviousPage_Click(object sender, EventArgs e)
         {
-            if (_currentPage > 1)
+            try
             {
-                _currentPage--;
-                BindGridView();
+                if (_currentPage > 1)
+                {
+                    _currentPage--;
+                    ViewState["CurrentPage"] = _currentPage;
+                    BindGridView();
+                }
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error navigating to previous page: " + ex.Message);
             }
         }
 
@@ -371,11 +403,19 @@ namespace EcommerceWebsite
         /// </summary>
         protected void NextPage_Click(object sender, EventArgs e)
         {
-            int totalPages = _filteredData.Count > 0 ? (int)Math.Ceiling((double)_filteredData.Count / PAGE_SIZE) : 1;
-            if (_currentPage < totalPages)
+            try
             {
-                _currentPage++;
-                BindGridView();
+                int totalPages = _filteredData.Count > 0 ? (int)Math.Ceiling((double)_filteredData.Count / PAGE_SIZE) : 1;
+                if (_currentPage < totalPages)
+                {
+                    _currentPage++;
+                    ViewState["CurrentPage"] = _currentPage;
+                    BindGridView();
+                }
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Log("Error navigating to next page: " + ex.Message);
             }
         }
     }
