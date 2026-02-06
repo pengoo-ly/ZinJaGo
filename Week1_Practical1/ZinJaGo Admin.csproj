@@ -114,6 +114,7 @@
     <Content Include="Customer\CustomerPasswordReset.aspx" />
     <Content Include="Customers.aspx" />
     <Content Include="Customer\CustomerSignup.aspx" />
+    <Content Include="Customer\test.aspx" />
     <Content Include="DeliveryTrackingAdmin.aspx" />
     <Content Include="AdminPasswordReset.aspx" />
     <Content Include="Global.asax" />
@@ -270,6 +271,13 @@
     <Compile Include="Customer\Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
+    <Compile Include="Customer\test.aspx.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\test.aspx.designer.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+    </Compile>
     <Compile Include="DeliveryTrackingAdmin.aspx.cs">
       <DependentUpon>DeliveryTrackingAdmin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -352,13 +360,6 @@
     </Compile>
     <Compile Include="ReturnManagement.aspx.designer.cs">
       <DependentUpon>ReturnManagement.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Site.Mobile.Master.cs">
-      <DependentUpon>Site.Mobile.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Site.Mobile.Master.designer.cs">
-      <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
     <Compile Include="SuperAdmin\AdminRole.aspx.cs">
       <DependentUpon>AdminRole.aspx</DependentUpon>
@@ -451,7 +452,6 @@
     <Content Include="Content\bootstrap.rtl.min.css.map" />
     <None Include="packages.config" />
     <Content Include="SuperAdmin\SuperAdmin.Master" />
-    <Content Include="Site.Mobile.Master" />
     <Content Include="Scripts\bootstrap.min.js.map" />
     <Content Include="Scripts\bootstrap.js.map" />
     <Content Include="Scripts\bootstrap.esm.min.js.map" />

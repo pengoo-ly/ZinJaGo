@@ -14,5 +14,10 @@ namespace Week1_Practical1.Customer
 		{
 
 		}
-	}
+
+        protected void ImageBtn_Searchlogo_Click(object sender, ImageClickEventArgs e)
+        {
+
+        }
+    }
 }
