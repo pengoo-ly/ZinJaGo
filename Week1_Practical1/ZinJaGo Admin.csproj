@@ -113,6 +113,7 @@
     <Content Include="Profile.aspx" />
     <Content Include="ResetPassword.aspx" />
     <Content Include="ReturnManagement.aspx" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Styles\superadmin.css" />
     <Content Include="Styles\admin.css" />
     <Content Include="AdminDashboard.aspx" />
