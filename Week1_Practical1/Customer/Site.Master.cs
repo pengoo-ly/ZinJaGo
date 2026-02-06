@@ -4,14 +4,15 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Week1_Practical1.App_Start;
 
 namespace Week1_Practical1.Customer
 {
-    public partial class Site : System.Web.UI.MasterPage
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
+	public partial class Site : System.Web.UI.MasterPage
+	{
+		protected void Page_Load(object sender, EventArgs e)
+		{
 
-        }
-    }
+		}
+	}
 }

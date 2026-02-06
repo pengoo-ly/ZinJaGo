@@ -8,7 +8,7 @@ using System.Configuration;
 
 namespace Week1_Practical1.Helpers
 {
-    public class Customer
+    public class CustomerHelper
     {
         public int UserID { get; set; }
         public string Username { get; set; }
@@ -19,9 +19,9 @@ namespace Week1_Practical1.Helpers
 
         string cs = ConfigurationManager.ConnectionStrings["ZinJaGoDBContext"].ConnectionString;
 
-        public List<Customer> GetCustomersByAdmin(int adminId)
+        public List<CustomerHelper> GetCustomersByAdmin(int adminId)
         {
-            List<Customer> list = new List<Customer>();
+            List<CustomerHelper> list = new List<CustomerHelper>();
 
             try
             {
@@ -51,7 +51,7 @@ namespace Week1_Practical1.Helpers
 
                     while (dr.Read())
                     {
-                        list.Add(new Customer
+                        list.Add(new CustomerHelper
                         {
                             UserID = Convert.ToInt32(dr["UserID"]),
                             Username = dr["Username"].ToString(),

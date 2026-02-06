@@ -1,19 +1,481 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Week1_Practical1.Customer.Site" %>
+<%@ Import Namespace="System.Web.Optimization" %>
 
 <!DOCTYPE html>
 
 <html>
 <head runat="server">
-    <title></title>
-    <asp:ContentPlaceHolder ID="head" runat="server">
-    </asp:ContentPlaceHolder>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZinJaGO</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="Content/Site.css" rel="stylesheet" />
+
+<asp:PlaceHolder runat="server">
+    <%: Scripts.Render("~/bundles/modernizr") %>
+</asp:PlaceHolder>
+
+<webopt:bundlereference runat="server" path="~/Content/css" />
+<link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f8f0e3;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
+        background-color: #f8f0e3;
+    }
+
+    /* Navbar Styles */
+    nav.navbar {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background-color: #4FA392 !important;
+        height: auto;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-container {
+        width: 100%;
+        background-color: #4FA392;
+        padding: 12px 20px;
+    }
+
+    .navbar-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* Top Bar - Settings & Navigation */
+    .navbar-top-bar {
+        background-color: #4FA392;
+        padding: 8px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+    }
+
+    .navbar-top-left {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .navbar-top-left a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .navbar-top-left a:hover {
+        opacity: 0.8;
+    }
+
+    .navbar-top-right {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .navbar-top-right a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .navbar-top-right a:hover {
+        opacity: 0.8;
+    }
+
+    .language-selector {
+        color: white;
+    }
+
+    .logo-section {
+        flex-shrink: 0;
+    }
+
+    #img_logo {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .search-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-grow: 1;
+        max-width: 600px;
+    }
+
+    #tb_SearchBar {
+        width: 100%;
+        height: 40px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    #ImageBtn_Searchlogo {
+        width: 40px;
+        height: 40px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    #ImageBtn_Searchlogo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .profile-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0;
+    }
+
+    #ImageButton1 {
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    #ImageButton1 img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    #profileDropdown img {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        width: 100%;
+        padding: 30px 15px;
+        background-color: #f8f0e3;
+    }
+
+    .container {
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Footer Styles */
+    footer {
+        width: 100%;
+        background-color: #E0CCB1;
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+
+    .footer-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .footer-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .footer-column {
+        vertical-align: top;
+        padding: 12px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+    }
+
+    .footer-column h3 {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+
+    .footer-column p {
+        margin: 8px 0;
+    }
+
+    .footer-column a {
+        display: block;
+        margin: 6px 0;
+        text-decoration: none;
+        color: #333;
+        font-size: 13px;
+    }
+
+    .footer-column a:hover {
+        text-decoration: underline;
+    }
+
+    .footer-logo-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .footer-logo {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .footer-logo-text {
+        font-size: 12px;
+        color: #333;
+    }
+
+    .footer-copyright {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        border-top: 1px solid #d4c5a9;
+        font-size: 12px;
+        color: #666;
+        margin-top: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .navbar-content {
+            flex-wrap: wrap;
+        }
+
+        .search-section {
+            order: 3;
+            flex-basis: 100%;
+            margin-top: 10px;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .navbar-top-bar {
+            flex-direction: column;
+            gap: 8px;
+            padding: 6px 12px;
+        }
+
+        .navbar-top-left,
+        .navbar-top-right {
+            justify-content: center;
+            gap: 10px;
+            font-size: 10px;
+        }
+
+        .navbar-content {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-section {
+            order: 3;
+            flex-basis: 100%;
+            margin-top: 10px;
+            max-width: 100%;
+        }
+
+        .profile-section {
+            order: 2;
+        }
+
+        .footer-table {
+            display: block;
+        }
+
+        .footer-column {
+            display: block;
+            width: 100% !important;
+            padding: 8px;
+        }
+
+        .footer-column h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+    }
+</style>
 </head>
 <body>
-    <form id="form1" runat="server">
-        <div>
-            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+    <form runat="server">
+
+    <!-- Top Navigation Bar -->
+    <div class="navbar-top-bar">
+        <div class="navbar-top-left">
+            <a href="#">FAQ</a>
+            <a href="#">Follow us</a>
+            <a href="#">Notifications</a>
+        </div>
+        <div class="navbar-top-right">
+            <span style="color: white;">English</span>
+            <a href="#">Help</a>
+            <a href="#">Sign Up</a>
+            <a href="#">Login</a>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-content">
+                <!-- Logo -->
+                <div class="logo-section">
+                    <img id="img_logo" 
+                         alt="ZinJaGO Logo" 
+                         src="Boulevard-modified-removebg-preview.png" />
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-section">
+                    <asp:TextBox ID="tb_SearchBar" runat="server" placeholder="Search..." />
+                    <asp:ImageButton ID="ImageBtn_Searchlogo" runat="server" 
+                        ImageUrl="https://www.pngitem.com/pimgs/m/147-1477376_mobile-terminal-search-bar-icon-search-bar-png.png"
+                        OnClick="ImageBtn_Searchlogo_Click" />
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <asp:ImageButton ID="ImageButton1" runat="server" 
+                        ImageUrl="https://www.pngfind.com/pngs/b/143-1434613_cart-icon-png.png" />
+                    
+                    <a class="d-flex align-items-center dropdown-toggle" href="#" id="profileDropdown"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="file:///C:/Users/hsiuy/Downloads/profile-icon-white-3.jpg" alt="Profile" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                <p>&nbsp;</p>
             </asp:ContentPlaceHolder>
         </div>
-    </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <table class="footer-table">
+                <tr>
+                    <!-- Customer Service -->
+                    <td class="footer-column" style="width: 25%;">
+                        <h3>Customer Service</h3>
+                        <asp:HyperLink ID="HyperLink_HowToBuy" runat="server" Font-Underline="False">How To Buy</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_HowToSell" runat="server" Font-Underline="False">How To Sell</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_ReturnAndRefund" runat="server" Font-Underline="False">Return And Refund</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_PaymentMethod" runat="server" Font-Underline="False">Payment Method</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_ContactUs" runat="server" Font-Underline="False">Contact Us</asp:HyperLink>
+                    </td>
+
+                    <!-- About ZinJaGO -->
+                    <td class="footer-column" style="width: 25%;">
+                        <h3>About ZinJaGO</h3>
+                        <asp:HyperLink ID="HyperLink_AboutUs" runat="server" Font-Underline="False">About Us</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_Sustainability" runat="server" Font-Underline="False">Sustainability Efforts</asp:HyperLink>
+                        <asp:HyperLink ID="HyperLink_Policies" runat="server" Font-Underline="False">Policies</asp:HyperLink>
+                    </td>
+
+                    <!-- Payment -->
+                    <td class="footer-column" style="width: 25%;">
+                        <h3>Payment</h3>
+                        <div class="footer-logo-group">
+                            <img src="https://1000logos.net/wp-content/uploads/2017/06/VISA-Logo.jpg" alt="VISA" class="footer-logo" />
+                            <span class="footer-logo-text">VISA</span>
+                        </div>
+                        <div class="footer-logo-group">
+                            <asp:Image ID="Img_Mastercard" runat="server" CssClass="footer-logo" 
+                                ImageUrl="Screenshot 2025-12-06 114957.png" />
+                            <span class="footer-logo-text">Mastercard</span>
+                        </div>
+                        <h3 style="margin-top: 12px; margin-bottom: 10px;">Logistics</h3>
+                        <div class="footer-logo-group">
+                            <img src="https://lever-client-logos.s3.us-west-2.amazonaws.com/349d214b-6dbf-4715-a732-1c058969b861-1721379729505.png" 
+                                 alt="Ninja Van" class="footer-logo" />
+                            <span class="footer-logo-text">Ninja Van</span>
+                        </div>
+                        <div class="footer-logo-group">
+                            <img src="https://www.minichart.com.sg/wp-content/uploads/2025/03/Singapore-Post-Ltd-1.png" 
+                                 alt="Singapore Post" class="footer-logo" />
+                            <span class="footer-logo-text">Singapore Post</span>
+                        </div>
+                    </td>
+
+                    <!-- Follow Us -->
+                    <td class="footer-column" style="width: 25%;">
+                        <h3>Follow Us</h3>
+                        <div class="footer-logo-group">
+                            <img src="https://1000logos.net/wp-content/uploads/2017/02/Emblem-Instagram.jpg" alt="Instagram" class="footer-logo" />
+                            <span class="footer-logo-text">Instagram</span>
+                        </div>
+                        <div class="footer-logo-group">
+                            <img src="https://1000logos.net/wp-content/uploads/2017/02/Facebook-Logosu.png" alt="Facebook" class="footer-logo" />
+                            <span class="footer-logo-text">Facebook</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="footer-copyright">
+                © 2025 ZinJaGO. All Rights Reserved. | Country & Region: Singapore
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</form>
 </body>
 </html>

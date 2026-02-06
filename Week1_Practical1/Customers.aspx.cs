@@ -23,7 +23,7 @@ namespace Week1_Practical1
                 }
 
                 int adminId = Convert.ToInt32(Session["AdminID"]);
-                Customer cust = new Customer();
+                CustomerHelper cust = new CustomerHelper();
                 LoadStats(cust, adminId);
                 LoadTable(cust, adminId);
                 LoadChartByMonth(cust, adminId, DateTime.Now.Year, DateTime.Now.Month);
@@ -36,7 +36,7 @@ namespace Week1_Practical1
             int year = int.Parse(ddlYear.SelectedValue);
             int month = int.Parse(ddlMonth.SelectedValue);
 
-            Customer cust = new Customer();
+            CustomerHelper cust = new CustomerHelper();
             LoadChartByMonth(cust, adminId, year, month);
         }
         private void BindYearMonth()
@@ -65,7 +65,7 @@ namespace Week1_Practical1
             ddlMonth.SelectedValue = DateTime.Now.Month.ToString();
         }
 
-        private void LoadStats(Customer cust, int adminId)
+        private void LoadStats(CustomerHelper cust, int adminId)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Week1_Practical1
             }
         }
 
-        private void LoadTable(Customer cust, int adminId)
+        private void LoadTable(CustomerHelper cust, int adminId)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Week1_Practical1
             }
         }
 
-        private void LoadChart(Customer cust, int adminId)
+        private void LoadChart(CustomerHelper cust, int adminId)
         {
             try
             {
@@ -118,7 +118,7 @@ namespace Week1_Practical1
             }
         }
 
-        private void LoadChartByMonth(Customer cust, int adminId, int year, int month)
+        private void LoadChartByMonth(CustomerHelper cust, int adminId, int year, int month)
         {
             try
             {
