@@ -236,83 +236,112 @@ namespace Week1_Practical1.SuperAdmin
         }
         void LoadTopCategories()
         {
-            using (SqlConnection con = new SqlConnection(cs))
+            try
             {
-                SqlDataAdapter da = new SqlDataAdapter(@"
-            SELECT TOP 5 C.CategoryName,
-                   SUM(OI.Quantity * OI.UnitPrice) Revenue
-            FROM Categories C
-            JOIN Products P ON C.CategoryID = P.CategoryID
-            JOIN OrderItems OI ON P.ProductID = OI.ProductID
-            JOIN Orders O ON OI.OrderID = O.OrderID
-            WHERE O.PaymentStatus = 'Paid'
-            GROUP BY C.CategoryName
-            ORDER BY Revenue DESC", con);
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(@"
+                SELECT TOP 5 C.CategoryName,
+                       SUM(OI.Quantity * OI.UnitPrice) Revenue
+                FROM Categories C
+                JOIN Products P ON C.CategoryID = P.CategoryID
+                JOIN OrderItems OI ON P.ProductID = OI.ProductID
+                JOIN Orders O ON OI.OrderID = O.OrderID
+                WHERE O.PaymentStatus = 'Paid'
+                GROUP BY C.CategoryName
+                ORDER BY Revenue DESC", con);
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
 
-                rptTopCategories.DataSource = dt;
-                rptTopCategories.DataBind();
+                    rptTopCategories.DataSource = dt;
+                    rptTopCategories.DataBind();
+                }
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to load top categories.');</script>");
             }
         }
         void LoadTopProducts()
         {
-            using (SqlConnection con = new SqlConnection(cs))
+            try
             {
-                SqlDataAdapter da = new SqlDataAdapter(@"
-            SELECT TOP 5 P.ProductName,
-                   SUM(OI.Quantity) QtySold,
-                   SUM(OI.Quantity * OI.UnitPrice) Revenue
-            FROM Products P
-            JOIN OrderItems OI ON P.ProductID = OI.ProductID
-            JOIN Orders O ON OI.OrderID = O.OrderID
-            WHERE O.PaymentStatus = 'Paid'
-            GROUP BY P.ProductName
-            ORDER BY Revenue DESC", con);
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(@"
+                SELECT TOP 5 P.ProductName,
+                       SUM(OI.Quantity) QtySold,
+                       SUM(OI.Quantity * OI.UnitPrice) Revenue
+                FROM Products P
+                JOIN OrderItems OI ON P.ProductID = OI.ProductID
+                JOIN Orders O ON OI.OrderID = O.OrderID
+                WHERE O.PaymentStatus = 'Paid'
+                GROUP BY P.ProductName
+                ORDER BY Revenue DESC", con);
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
 
-                rptTopProducts.DataSource = dt;
-                rptTopProducts.DataBind();
+                    rptTopProducts.DataSource = dt;
+                    rptTopProducts.DataBind();
+                }
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to load top products.');</script>");
             }
         }
         void LoadTopCustomers()
         {
-            using (SqlConnection con = new SqlConnection(cs))
+            try
             {
-                SqlDataAdapter da = new SqlDataAdapter(@"
-            SELECT TOP 5 U.Username,
-                   SUM(O.TotalAmount) TotalSpent
-            FROM Orders O
-            JOIN Users U ON O.UserID = U.UserID
-            WHERE O.PaymentStatus = 'Paid'
-            GROUP BY U.Username
-            ORDER BY TotalSpent DESC", con);
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(@"
+                SELECT TOP 5 U.Username,
+                       SUM(O.TotalAmount) TotalSpent
+                FROM Orders O
+                JOIN Users U ON O.UserID = U.UserID
+                WHERE O.PaymentStatus = 'Paid'
+                GROUP BY U.Username
+                ORDER BY TotalSpent DESC", con);
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
 
-                rptTopCustomers.DataSource = dt;
-                rptTopCustomers.DataBind();
+                    rptTopCustomers.DataSource = dt;
+                    rptTopCustomers.DataBind();
+                }
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to load top customers.');</script>");
             }
         }
 
         void LoadAuditTrail()
         {
-            using (SqlConnection con = new SqlConnection(cs))
+            try
             {
-                SqlDataAdapter da = new SqlDataAdapter(@"
-            SELECT TOP 10 A.AdminName, AT.Action, AT.DateTime
-            FROM AuditTrail AT
-            JOIN Admins A ON AT.AdminID = A.AdminID
-            ORDER BY AT.DateTime DESC", con);
+                using (SqlConnection con = new SqlConnection(cs))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(@"
+                SELECT TOP 10 A.AdminName, AT.Action, AT.DateTime
+                FROM AuditTrail AT
+                JOIN Admins A ON AT.AdminID = A.AdminID
+                ORDER BY AT.DateTime DESC", con);
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                rptAudit.DataSource = dt;
-                rptAudit.DataBind();
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    rptAudit.DataSource = dt;
+                    rptAudit.DataBind();
+                }
+            }
+            catch
+            {
+                Response.Write("<script>alert('Failed to load audit trail.');</script>");
             }
         }
         string ExecuteScalar(SqlConnection con, string q)
