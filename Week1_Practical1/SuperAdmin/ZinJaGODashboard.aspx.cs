@@ -24,6 +24,9 @@ namespace Week1_Practical1.SuperAdmin
                     Response.Redirect("~/Login.aspx");
                     return;
                 }
+                if (!IsPostBack)
+                {
+                }
             }
             catch (Exception ex)
             {
