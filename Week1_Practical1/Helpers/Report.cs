@@ -180,6 +180,38 @@ namespace Week1_Practical1.Helpers
                 return result == DBNull.Value ? 0 : Convert.ToDecimal(result);
             }
         }
+        public DataTable GetRevenueByAdmin(int adminId)
+        {
+            string sql = @"
+        SELECT 
+            a.AdminName,
+            SUM(oi.Quantity * oi.UnitPrice) AS Revenue
+        FROM Products p
+        INNER JOIN OrderItems oi ON p.ProductID = oi.ProductID
+        INNER JOIN Admins a ON p.AdminID = a.AdminID
+        WHERE a.AdminID = @AdminID
+        GROUP BY a.AdminName";
+
+            return ExecuteTable(sql, new SqlParameter("@AdminID", adminId));
+        }
+        public DataTable CompareAdminsRevenue(DateTime start, DateTime end)
+        {
+            string sql = @"
+        SELECT 
+            a.AdminName,
+            SUM(oi.Quantity * oi.UnitPrice) AS Revenue
+        FROM OrderItems oi
+        INNER JOIN Products p ON oi.ProductID = p.ProductID
+        INNER JOIN Admins a ON p.AdminID = a.AdminID
+        WHERE oi.PurchaseDate BETWEEN @Start AND @End
+        GROUP BY a.AdminName
+        ORDER BY Revenue DESC";
+
+            return ExecuteTable(sql,
+                new SqlParameter("@Start", start),
+                new SqlParameter("@End", end));
+        }
+
 
     }
 }

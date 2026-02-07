@@ -51,6 +51,42 @@ namespace Week1_Practical1.SuperAdmin
         protected global::System.Web.UI.WebControls.Label lblAOV;
 
         /// <summary>
+        /// hfRevenueLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfRevenueLabels;
+
+        /// <summary>
+        /// hfRevenueData control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfRevenueData;
+
+        /// <summary>
+        /// hfStatusLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfStatusLabels;
+
+        /// <summary>
+        /// hfStatusData control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfStatusData;
+
+        /// <summary>
         /// gvCategoryRevenue control.
         /// </summary>
         /// <remarks>
@@ -76,5 +112,14 @@ namespace Week1_Practical1.SuperAdmin
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnExportCsv;
+
+        /// <summary>
+        /// btnExportPdf control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnExportPdf;
     }
 }

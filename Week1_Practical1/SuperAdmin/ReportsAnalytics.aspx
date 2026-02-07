@@ -27,6 +27,12 @@
             </div>
         </div>
         <br />
+        <asp:HiddenField ID="hfRevenueLabels" runat="server" />
+        <asp:HiddenField ID="hfRevenueData" runat="server" />
+
+        <asp:HiddenField ID="hfStatusLabels" runat="server" />
+        <asp:HiddenField ID="hfStatusData" runat="server" />
+        <br />
         <!-- CHART PLACEHOLDERS -->
         <div class="dashboard-panel">
             <h3>Revenue Trends</h3>
@@ -60,9 +66,43 @@
                 Text="Export CSV"
                 CssClass="btn-add"
                 OnClick="btnExportCsv_Click" />
+            <asp:Button ID="btnExportPdf" runat="server"
+                Text="Export PDF"
+                CssClass="btn-add"
+                OnClick="btnExportPdf_Click" />
         </div>
 
     </div>
-    
+
+    <script>
+    // Revenue Line Chart
+    const revenueCtx = document.getElementById('revenueChart');
+
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: document.getElementById('<%= hfRevenueLabels.ClientID %>').value.split(','),
+            datasets: [{
+                label: 'Revenue',
+                data: document.getElementById('<%= hfRevenueData.ClientID %>').value.split(','),
+                tension: 0.4,
+                fill: false
+            }]
+        }
+    });
+
+    // Order Status Pie Chart
+    const statusCtx = document.getElementById('orderStatusChart');
+
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: document.getElementById('<%= hfStatusLabels.ClientID %>').value.split(','),
+            datasets: [{
+                data: document.getElementById('<%= hfStatusData.ClientID %>').value.split(',')
+            }]
+        }
+    });
+    </script>
 
 </asp:Content>
