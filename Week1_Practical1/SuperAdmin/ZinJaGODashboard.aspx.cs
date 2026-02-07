@@ -32,6 +32,10 @@ namespace Week1_Practical1.SuperAdmin
                     LoadOrderStatusChart();
                     LoadTopAdmins();
                     LoadAuditTrail();
+                    LoadTopCategories();
+                    LoadTopProducts();
+                    LoadTopCustomers();
+
                 }
             }
             catch (Exception ex)
@@ -140,9 +144,6 @@ namespace Week1_Practical1.SuperAdmin
                 RevenueData = "[" + string.Join(",", data) + "]";
             }
         }
-
-
-
         void LoadOrderStatusChart()
         {
             int year = int.Parse(ddlOrderYear.SelectedValue);
@@ -189,7 +190,70 @@ namespace Week1_Practical1.SuperAdmin
                 rptTopAdmins.DataBind();
             }
         }
+        void LoadTopCategories()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                SqlDataAdapter da = new SqlDataAdapter(@"
+            SELECT TOP 5 C.CategoryName,
+                   SUM(OI.Quantity * OI.UnitPrice) Revenue
+            FROM Categories C
+            JOIN Products P ON C.CategoryID = P.CategoryID
+            JOIN OrderItems OI ON P.ProductID = OI.ProductID
+            JOIN Orders O ON OI.OrderID = O.OrderID
+            WHERE O.PaymentStatus = 'Paid'
+            GROUP BY C.CategoryName
+            ORDER BY Revenue DESC", con);
 
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                rptTopCategories.DataSource = dt;
+                rptTopCategories.DataBind();
+            }
+        }
+        void LoadTopProducts()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                SqlDataAdapter da = new SqlDataAdapter(@"
+            SELECT TOP 5 P.ProductName,
+                   SUM(OI.Quantity) QtySold,
+                   SUM(OI.Quantity * OI.UnitPrice) Revenue
+            FROM Products P
+            JOIN OrderItems OI ON P.ProductID = OI.ProductID
+            JOIN Orders O ON OI.OrderID = O.OrderID
+            WHERE O.PaymentStatus = 'Paid'
+            GROUP BY P.ProductName
+            ORDER BY Revenue DESC", con);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                rptTopProducts.DataSource = dt;
+                rptTopProducts.DataBind();
+            }
+        }
+        void LoadTopCustomers()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                SqlDataAdapter da = new SqlDataAdapter(@"
+            SELECT TOP 5 U.Username,
+                   SUM(O.TotalAmount) TotalSpent
+            FROM Orders O
+            JOIN Users U ON O.UserID = U.UserID
+            WHERE O.PaymentStatus = 'Paid'
+            GROUP BY U.Username
+            ORDER BY TotalSpent DESC", con);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                rptTopCustomers.DataSource = dt;
+                rptTopCustomers.DataBind();
+            }
+        }
 
         void LoadAuditTrail()
         {

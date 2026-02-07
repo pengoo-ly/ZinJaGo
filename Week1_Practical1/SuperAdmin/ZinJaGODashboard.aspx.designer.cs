@@ -78,6 +78,33 @@ namespace Week1_Practical1.SuperAdmin
         protected global::System.Web.UI.WebControls.Repeater rptTopAdmins;
 
         /// <summary>
+        /// rptTopCategories control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptTopCategories;
+
+        /// <summary>
+        /// rptTopProducts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptTopProducts;
+
+        /// <summary>
+        /// rptTopCustomers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptTopCustomers;
+
+        /// <summary>
         /// rptAudit control.
         /// </summary>
         /// <remarks>
