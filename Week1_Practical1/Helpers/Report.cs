@@ -58,7 +58,8 @@ namespace Week1_Practical1.Helpers
                 FROM OrderItems oi
                 INNER JOIN Products p ON oi.ProductID = p.ProductID
                 INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                WHERE oi.PurchaseDate BETWEEN @Start AND @End
+                INNER JOIN Orders o ON oi.OrderID = o.OrderID
+                WHERE o.OrderDate BETWEEN @Start AND @End
                 GROUP BY c.CategoryName
                 ORDER BY Revenue DESC";
 
@@ -66,6 +67,7 @@ namespace Week1_Practical1.Helpers
                 new SqlParameter("@Start", start),
                 new SqlParameter("@End", end));
         }
+
 
         public DataTable GetTopProductsByYear(int year)
         {
@@ -90,8 +92,18 @@ namespace Week1_Practical1.Helpers
                    FROM Orders
                    WHERE YEAR(OrderDate) = @Year";
 
-            return ExecuteScalarDecimal(sql, new SqlParameter("@Year", year));
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Year", year);
+                conn.Open();
+                object result = cmd.ExecuteScalar();
+                conn.Close();
+
+                return result == DBNull.Value ? 0 : Convert.ToDecimal(result);
+            }
         }
+
 
 
         public DataTable GetNewVsRepeatCustomers()
@@ -174,21 +186,6 @@ namespace Week1_Practical1.Helpers
             return dt;
         }
 
-        private decimal ExecuteScalarDecimal(string sql, params SqlParameter[] param)
-        {
-            using (SqlConnection conn = new SqlConnection(_connStr))
-            using (SqlCommand cmd = new SqlCommand(sql, conn))
-            {
-                if (param != null)
-                    cmd.Parameters.AddRange(param);
-
-                conn.Open();
-                object result = cmd.ExecuteScalar();
-                conn.Close();
-
-                return result == DBNull.Value ? 0 : Convert.ToDecimal(result);
-            }
-        }
         public DataTable GetRevenueByAdmin(int adminId)
         {
             string sql = @"
@@ -222,12 +219,22 @@ namespace Week1_Practical1.Helpers
         }
         public decimal GetTotalRevenueByYear(int year)
         {
-            string sql = @"SELECT MONTH(OrderDate), SUM(TotalAmount)
-                FROM Orders
-                WHERE YEAR(OrderDate) = @Year";
+            string sql = @"SELECT ISNULL(SUM(TotalAmount),0)
+                   FROM Orders
+                   WHERE YEAR(OrderDate) = @Year";
 
-            return ExecuteScalarDecimal(sql, new SqlParameter("@Year", year));
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Year", year);
+                conn.Open();
+                object result = cmd.ExecuteScalar();
+                conn.Close();
+
+                return result == DBNull.Value ? 0 : Convert.ToDecimal(result);
+            }
         }
+
 
         public int GetTotalOrdersByYear(int year)
         {
@@ -257,8 +264,34 @@ namespace Week1_Practical1.Helpers
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
         }
+        public DataTable GetRevenueByMonthFromItems(int year)
+        {
+            string sql = @"
+        SELECT MONTH(o.OrderDate) AS Month,
+               SUM(oi.Quantity * oi.UnitPrice) AS Revenue
+        FROM Orders o
+        INNER JOIN OrderItems oi ON o.OrderID = oi.OrderID
+        WHERE YEAR(o.OrderDate) = @Year
+        GROUP BY MONTH(o.OrderDate)
+        ORDER BY Month";
 
+            return ExecuteTable(sql, new SqlParameter("@Year", year));
+        }
 
+        public DataTable GetNewVsRepeatCustomersByPeriod(DateTime start, DateTime end)
+        {
+            string sql = @"
+        SELECT 
+            CASE WHEN COUNT(o.OrderID) = 1 THEN 'New' ELSE 'Repeat' END AS CustomerType,
+            COUNT(*) AS Total
+        FROM Orders o
+        WHERE o.OrderDate BETWEEN @Start AND @End
+        GROUP BY o.UserID";
+
+            return ExecuteTable(sql,
+                new SqlParameter("@Start", start),
+                new SqlParameter("@End", end));
+        }
 
     }
 }

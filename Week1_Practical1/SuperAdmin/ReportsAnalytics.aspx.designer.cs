@@ -69,6 +69,33 @@ namespace Week1_Practical1.SuperAdmin
         protected global::System.Web.UI.WebControls.Label lblAOV;
 
         /// <summary>
+        /// lblNewCustomers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNewCustomers;
+
+        /// <summary>
+        /// lblRepeatCustomers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRepeatCustomers;
+
+        /// <summary>
+        /// lblCompletionRate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCompletionRate;
+
+        /// <summary>
         /// hfRevenueLabels control.
         /// </summary>
         /// <remarks>
@@ -105,6 +132,24 @@ namespace Week1_Practical1.SuperAdmin
         protected global::System.Web.UI.WebControls.HiddenField hfStatusData;
 
         /// <summary>
+        /// hfCustomerLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfCustomerLabels;
+
+        /// <summary>
+        /// hfCustomerData control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfCustomerData;
+
+        /// <summary>
         /// gvCategoryRevenue control.
         /// </summary>
         /// <remarks>
@@ -112,6 +157,24 @@ namespace Week1_Practical1.SuperAdmin
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView gvCategoryRevenue;
+
+        /// <summary>
+        /// hfCategoryLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfCategoryLabels;
+
+        /// <summary>
+        /// hfCategoryData control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfCategoryData;
 
         /// <summary>
         /// gvTopProducts control.

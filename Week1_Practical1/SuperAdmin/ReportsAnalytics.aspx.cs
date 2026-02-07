@@ -33,11 +33,46 @@ namespace Week1_Practical1.SuperAdmin
             if (!int.TryParse(ddlYear.SelectedValue, out int year))
                 year = DateTime.Now.Year;
 
-            lblTotalRevenue.Text = "$" + rpt.GetTotalRevenueByYear(year).ToString("N2");
+            DateTime start = new DateTime(year, 1, 1);
+            DateTime end = new DateTime(year, 12, 31);
+
+            DataTable topProducts = rpt.GetTopProductsByYear(year);
+            decimal totalRevenue = topProducts.AsEnumerable()
+                                              .Sum(r => r.Field<decimal>("Revenue"));
+
+            lblTotalRevenue.Text = "$" + totalRevenue.ToString("N2");
             lblTotalOrders.Text = rpt.GetTotalOrdersByYear(year).ToString();
             lblCompletedOrders.Text = rpt.GetCompletedOrdersByYear(year).ToString();
-            lblAOV.Text = "$" + rpt.GetAverageOrderValueByYear(year).ToString("N2");
+            decimal averageOrderValue = totalRevenue / Math.Max(1, rpt.GetTotalOrdersByYear(year));
+            lblAOV.Text = "$" + averageOrderValue.ToString("N2");
+            int totalOrders = rpt.GetTotalOrdersByYear(year);
+            int completedOrders = rpt.GetCompletedOrdersByYear(year);
+            decimal completionRate = totalOrders > 0 ? (decimal)completedOrders / totalOrders * 100 : 0;
 
+            lblCompletionRate.Text = completionRate.ToString("N2") + "%";
+            int selectedMonth = int.TryParse(ddlMonth.SelectedValue, out int m) ? m : 0;
+            DateTime startDate = selectedMonth > 0
+                                 ? new DateTime(year, selectedMonth, 1)
+                                 : new DateTime(year, 1, 1);
+
+            DateTime endDate = selectedMonth > 0
+                               ? new DateTime(year, selectedMonth, DateTime.DaysInMonth(year, selectedMonth))
+                               : new DateTime(year, 12, 31);
+
+            DataTable customerData = rpt.GetNewVsRepeatCustomersByPeriod(startDate, endDate);
+
+            int newCustomers = customerData.AsEnumerable()
+                                           .Count(r => r.Field<string>("CustomerType") == "New");
+            int repeatCustomers = customerData.AsEnumerable()
+                                              .Count(r => r.Field<string>("CustomerType") == "Repeat");
+
+            lblNewCustomers.Text = newCustomers.ToString();
+            lblRepeatCustomers.Text = repeatCustomers.ToString();
+            hfCustomerLabels.Value = "New,Repeat";
+            hfCustomerData.Value = newCustomers + "," + repeatCustomers;
+            DataTable categoryRevenue = rpt.GetRevenueByCategory(start, end);
+            gvCategoryRevenue.DataSource = categoryRevenue;
+            gvCategoryRevenue.DataBind();
             gvTopProducts.DataSource = rpt.GetTopProductsByYear(year);
             gvTopProducts.DataBind();
         }
@@ -104,41 +139,60 @@ namespace Week1_Practical1.SuperAdmin
         }
         private void LoadCharts()
         {
+            // --- Get year & month safely ---
             if (!int.TryParse(ddlYear.SelectedValue, out int year))
                 year = DateTime.Now.Year;
 
             if (!int.TryParse(ddlMonth.SelectedValue, out int month))
                 month = 0;
 
-            DataTable revenue = rpt.GetRevenueByMonth(year);
+            // --- Revenue Chart ---
+            DataTable revenue = rpt.GetRevenueByMonthFromItems(year);
 
+            DataTable categoryRevenue = rpt.GetRevenueByCategory(
+                new DateTime(year, 1, 1),
+                new DateTime(year, 12, 31)
+            );
+
+            hfCategoryLabels.Value = string.Join(",",
+                categoryRevenue.AsEnumerable().Select(r => r["CategoryName"].ToString())
+            );
+            hfCategoryData.Value = string.Join(",",
+                categoryRevenue.AsEnumerable().Select(r => r["Revenue"].ToString())
+            );
+
+
+            // Filter by month if selected
             if (month > 0)
             {
                 var rows = revenue.AsEnumerable()
                                   .Where(r => r.Field<int>("Month") == month);
-
                 revenue = rows.Any() ? rows.CopyToDataTable() : revenue.Clone();
             }
 
+            // Fill hidden fields
             hfRevenueLabels.Value = string.Join(",",
                 revenue.AsEnumerable()
                        .Select(r => new DateTime(2000, r.Field<int>("Month"), 1).ToString("MMM"))
             );
 
             hfRevenueData.Value = string.Join(",",
-                revenue.AsEnumerable().Select(r => r["Revenue"].ToString())
+                revenue.AsEnumerable()
+                       .Select(r => r["Revenue"].ToString())
             );
 
-            DataTable status = rpt.GetTopProductsByYear(year);
+            // --- Order Status Chart ---
+            DataTable status = rpt.GetOrderStatusBreakdownByYear(year);
 
             hfStatusLabels.Value = string.Join(",",
-                status.Rows.Cast<DataRow>().Select(r => r["ShippingStatus"].ToString())
+                status.AsEnumerable().Select(r => r["ShippingStatus"].ToString())
             );
 
             hfStatusData.Value = string.Join(",",
-                status.Rows.Cast<DataRow>().Select(r => r["Total"].ToString())
+                status.AsEnumerable().Select(r => r["Total"].ToString())
             );
         }
+
         protected void btnExportPdf_Click(object sender, EventArgs e)
         {
             int year = DateTime.Now.Year;

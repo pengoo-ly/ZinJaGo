@@ -48,6 +48,19 @@
                 <h6>Average Order Value</h6>
                 <asp:Label ID="lblAOV" runat="server" />
             </div>
+            <div class="card">
+                <h6>New Customers</h6>
+                <asp:Label ID="lblNewCustomers" runat="server" />
+            </div>
+
+            <div class="card">
+                <h6>Repeat Customers</h6>
+                <asp:Label ID="lblRepeatCustomers" runat="server" />
+            </div>
+            <div class="card">
+                <h6>Completion Rate</h6>
+                <asp:Label ID="lblCompletionRate" runat="server" />
+            </div>
 
         </div>
 
@@ -57,6 +70,8 @@
 
         <asp:HiddenField ID="hfStatusLabels" runat="server" />
         <asp:HiddenField ID="hfStatusData" runat="server" />
+        <asp:HiddenField ID="hfCustomerLabels" runat="server" />
+        <asp:HiddenField ID="hfCustomerData" runat="server" />
         <br />
         <!-- CHART PLACEHOLDERS -->
         <div class="dashboard-panel">
@@ -65,11 +80,25 @@
         </div>
         <br />
         <div class="dashboard-panel">
+            <h3>New vs Repeat Customers</h3>
+            <canvas id="customerChart" style="width:100%; max-height:300px;"></canvas>
+        </div>
+        <br />
+        <div class="dashboard-panel">
             <h3>Category Revenue</h3>
             <asp:GridView ID="gvCategoryRevenue"
                 runat="server"
                 CssClass="gridview-style"
-                AutoGenerateColumns="true" />
+                AutoGenerateColumns="true" >
+                <HeaderStyle CssClass="gv-header" />
+            </asp:GridView>
+        </div>
+        <br />
+        <div class="dashboard-panel">
+            <h3>Top Categories Revenue</h3>
+            <canvas id="categoryChart" ></canvas>
+            <asp:HiddenField ID="hfCategoryLabels" runat="server" />
+            <asp:HiddenField ID="hfCategoryData" runat="server" />
         </div>
         <br />
         <div class="dashboard-panel">
@@ -77,7 +106,9 @@
             <asp:GridView ID="gvTopProducts"
                 runat="server"
                 CssClass="gridview-style"
-                AutoGenerateColumns="true" />
+                AutoGenerateColumns="true" >
+                <HeaderStyle CssClass="gv-header" />
+            </asp:GridView>
         </div>
         <br />
         <div class="dashboard-panel">
@@ -143,7 +174,48 @@
                         }]
                     }
                 });
-            }
+        }
+
+        const custLabelsEl = document.getElementById('<%= hfCustomerLabels.ClientID %>');
+        const custDataEl = document.getElementById('<%= hfCustomerData.ClientID %>');
+        const custCanvas = document.getElementById('customerChart');
+
+        if (custLabelsEl && custDataEl && custCanvas &&
+            custLabelsEl.value && custDataEl.value) {
+            new Chart(custCanvas, {
+                type: 'pie',
+                data: {
+                    labels: custLabelsEl.value.split(','),
+                    datasets: [{
+                        data: custDataEl.value.split(',')
+                    }]
+                }
+            });
+        }
+        const catLabelsEl = document.getElementById('<%= hfCategoryLabels.ClientID %>');
+        const catDataEl = document.getElementById('<%= hfCategoryData.ClientID %>');
+        const catCanvas = document.getElementById('categoryChart');
+
+        if (catLabelsEl && catDataEl && catCanvas &&
+            catLabelsEl.value && catDataEl.value) {
+            new Chart(catCanvas, {
+                type: 'bar',
+                data: {
+                    labels: catLabelsEl.value.split(','),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: catDataEl.value.split(',')
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // horizontal bars
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+        }
     </script>
 
 

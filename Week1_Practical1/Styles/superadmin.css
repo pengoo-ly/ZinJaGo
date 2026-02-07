@@ -972,4 +972,7 @@ body {
     width: 100%;
     max-height: 300px;
 }
-
+#customerChart {
+    width: 100%;
+    max-height: 300px; /* same as other charts */
+}
