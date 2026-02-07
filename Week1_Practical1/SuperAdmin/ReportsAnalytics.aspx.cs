@@ -13,6 +13,7 @@ namespace Week1_Practical1.SuperAdmin
 {
     public partial class ReportsAnalytics : System.Web.UI.Page
     {
+        Report rpt = new Report();
         protected void Page_Load(object sender, EventArgs e)
         {
 
