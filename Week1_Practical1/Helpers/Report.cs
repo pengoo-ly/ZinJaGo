@@ -67,7 +67,7 @@ namespace Week1_Practical1.Helpers
                 new SqlParameter("@End", end));
         }
 
-        public DataTable GetTopProducts()
+        public DataTable GetTopProductsByYear(int year)
         {
             string sql = @"
                 SELECT TOP 10
@@ -76,16 +76,23 @@ namespace Week1_Practical1.Helpers
                     SUM(oi.Quantity * oi.UnitPrice) AS Revenue
                 FROM OrderItems oi
                 INNER JOIN Products p ON oi.ProductID = p.ProductID
+                INNER JOIN Orders o ON oi.OrderID = o.OrderID
+                WHERE YEAR(o.OrderDate) = @Year
                 GROUP BY p.ProductName
                 ORDER BY Revenue DESC";
 
-            return ExecuteTable(sql);
+            return ExecuteTable(sql, new SqlParameter("@Year", year));
         }
-        public decimal GetAverageOrderValue()
+
+        public decimal GetAverageOrderValueByYear(int year)
         {
-            string sql = "SELECT AVG(TotalAmount) FROM Orders";
-            return ExecuteScalarDecimal(sql);
+            string sql = @"SELECT AVG(TotalAmount)
+                   FROM Orders
+                   WHERE YEAR(OrderDate) = @Year";
+
+            return ExecuteScalarDecimal(sql, new SqlParameter("@Year", year));
         }
+
 
         public DataTable GetNewVsRepeatCustomers()
         {
@@ -128,15 +135,17 @@ namespace Week1_Practical1.Helpers
             return ExecuteTable(sql);
         }
 
-        public DataTable GetOrderStatusBreakdown()
+        public DataTable GetOrderStatusBreakdownByYear(int year)
         {
             string sql = @"
                 SELECT ShippingStatus, COUNT(*) AS Total
                 FROM Orders
+                WHERE YEAR(OrderDate) = @Year
                 GROUP BY ShippingStatus";
 
-            return ExecuteTable(sql);
+            return ExecuteTable(sql, new SqlParameter("@Year", year));
         }
+
         public DataTable GetOrdersByDateRange(DateTime start, DateTime end)
         {
             string sql = @"
@@ -211,6 +220,44 @@ namespace Week1_Practical1.Helpers
                 new SqlParameter("@Start", start),
                 new SqlParameter("@End", end));
         }
+        public decimal GetTotalRevenueByYear(int year)
+        {
+            string sql = @"SELECT MONTH(OrderDate), SUM(TotalAmount)
+                FROM Orders
+                WHERE YEAR(OrderDate) = @Year";
+
+            return ExecuteScalarDecimal(sql, new SqlParameter("@Year", year));
+        }
+
+        public int GetTotalOrdersByYear(int year)
+        {
+            string sql = @"SELECT COUNT(*) FROM Orders
+                   WHERE YEAR(OrderDate) = @Year";
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Year", year);
+                conn.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        public int GetCompletedOrdersByYear(int year)
+        {
+            string sql = @"SELECT COUNT(*) FROM Orders
+                   WHERE YEAR(OrderDate) = @Year
+                   AND ShippingStatus = 'Completed'";
+
+            using (SqlConnection conn = new SqlConnection(_connStr))
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Year", year);
+                conn.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
 
 
     }

@@ -15,31 +15,49 @@ namespace Week1_Practical1.SuperAdmin
     {
 
         /// <summary>
-        /// txtStart control.
+        /// ddlYear control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtStart;
+        protected global::System.Web.UI.WebControls.DropDownList ddlYear;
 
         /// <summary>
-        /// txtEnd control.
+        /// ddlMonth control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEnd;
+        protected global::System.Web.UI.WebControls.DropDownList ddlMonth;
 
         /// <summary>
-        /// btnApply control.
+        /// lblTotalRevenue control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnApply;
+        protected global::System.Web.UI.WebControls.Label lblTotalRevenue;
+
+        /// <summary>
+        /// lblTotalOrders control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTotalOrders;
+
+        /// <summary>
+        /// lblCompletedOrders control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCompletedOrders;
 
         /// <summary>
         /// lblAOV control.

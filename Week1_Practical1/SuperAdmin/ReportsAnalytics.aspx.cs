@@ -11,6 +11,7 @@ using Week1_Practical1.Helpers;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
+using ListItem = System.Web.UI.WebControls.ListItem;
 
 namespace Week1_Practical1.SuperAdmin
 {
@@ -21,34 +22,67 @@ namespace Week1_Practical1.SuperAdmin
         {
             if (!IsPostBack)
             {
+                BindYearMonth();
                 LoadDashboard();
                 LoadCharts();
+
             }
         }
         private void LoadDashboard()
         {
-            lblAOV.Text = "$" + rpt.GetAverageOrderValue().ToString("0.00");
+            if (!int.TryParse(ddlYear.SelectedValue, out int year))
+                year = DateTime.Now.Year;
 
-            gvTopProducts.DataSource = rpt.GetTopProducts();
+            lblTotalRevenue.Text = "$" + rpt.GetTotalRevenueByYear(year).ToString("N2");
+            lblTotalOrders.Text = rpt.GetTotalOrdersByYear(year).ToString();
+            lblCompletedOrders.Text = rpt.GetCompletedOrdersByYear(year).ToString();
+            lblAOV.Text = "$" + rpt.GetAverageOrderValueByYear(year).ToString("N2");
+
+            gvTopProducts.DataSource = rpt.GetTopProductsByYear(year);
             gvTopProducts.DataBind();
         }
-
-        protected void btnApply_Click(object sender, EventArgs e)
+        private void BindYearMonth()
         {
-            DateTime start = DateTime.Parse(txtStart.Text);
-            DateTime end = DateTime.Parse(txtEnd.Text);
+            ddlYear.Items.Clear();
+            ddlMonth.Items.Clear();
 
-            gvCategoryRevenue.DataSource =
-                rpt.GetRevenueByCategory(start, end);
-            gvCategoryRevenue.DataBind();
+            int currentYear = DateTime.Now.Year;
+
+            // ---- YEAR ----
+            for (int y = currentYear; y >= currentYear - 5; y--)
+            {
+                ddlYear.Items.Add(new ListItem(y.ToString(), y.ToString()));
+            }
+
+            // ✅ Select current year by default
+            ddlYear.SelectedValue = currentYear.ToString();
+
+            // ---- MONTH ----
+            ddlMonth.Items.Add(new ListItem("All Months", "0"));
+
+            for (int m = 1; m <= 12; m++)
+            {
+                ddlMonth.Items.Add(
+                    new ListItem(
+                        new DateTime(2000, m, 1).ToString("MMMM"),
+                        m.ToString()
+                    )
+                );
+            }
+
+            // ✅ Default = All Months
+            ddlMonth.SelectedValue = "0";
         }
+
 
         protected void btnExportCsv_Click(object sender, EventArgs e)
         {
-            DateTime start = DateTime.Parse(txtStart.Text);
-            DateTime end = DateTime.Parse(txtEnd.Text);
+            int year = int.Parse(ddlYear.SelectedValue);
 
-            DataTable dt = rpt.GetOrdersByDateRange(start, end);
+            DataTable dt = rpt.GetOrdersByDateRange(
+                new DateTime(year, 1, 1),
+                new DateTime(year, 12, 31)
+            );
 
             Response.Clear();
             Response.ContentType = "text/csv";
@@ -70,56 +104,93 @@ namespace Week1_Practical1.SuperAdmin
         }
         private void LoadCharts()
         {
-            // Revenue (current year)
-            DataTable revenue = rpt.GetRevenueByMonth(DateTime.Now.Year);
+            if (!int.TryParse(ddlYear.SelectedValue, out int year))
+                year = DateTime.Now.Year;
 
-            hfRevenueLabels.Value = string.Join(",", revenue.Rows
-                .Cast<DataRow>().Select(r => "M" + r["Month"]));
+            if (!int.TryParse(ddlMonth.SelectedValue, out int month))
+                month = 0;
 
-            hfRevenueData.Value = string.Join(",", revenue.Rows
-                .Cast<DataRow>().Select(r => r["Revenue"]));
+            DataTable revenue = rpt.GetRevenueByMonth(year);
 
-            // Order status
-            DataTable status = rpt.GetOrderStatusBreakdown();
+            if (month > 0)
+            {
+                var rows = revenue.AsEnumerable()
+                                  .Where(r => r.Field<int>("Month") == month);
 
-            hfStatusLabels.Value = string.Join(",", status.Rows
-                .Cast<DataRow>().Select(r => r["ShippingStatus"]));
+                revenue = rows.Any() ? rows.CopyToDataTable() : revenue.Clone();
+            }
 
-            hfStatusData.Value = string.Join(",", status.Rows
-                .Cast<DataRow>().Select(r => r["Total"]));
+            hfRevenueLabels.Value = string.Join(",",
+                revenue.AsEnumerable()
+                       .Select(r => new DateTime(2000, r.Field<int>("Month"), 1).ToString("MMM"))
+            );
+
+            hfRevenueData.Value = string.Join(",",
+                revenue.AsEnumerable().Select(r => r["Revenue"].ToString())
+            );
+
+            DataTable status = rpt.GetTopProductsByYear(year);
+
+            hfStatusLabels.Value = string.Join(",",
+                status.Rows.Cast<DataRow>().Select(r => r["ShippingStatus"].ToString())
+            );
+
+            hfStatusData.Value = string.Join(",",
+                status.Rows.Cast<DataRow>().Select(r => r["Total"].ToString())
+            );
         }
-
         protected void btnExportPdf_Click(object sender, EventArgs e)
         {
-            DateTime start = DateTime.Parse(txtStart.Text);
-            DateTime end = DateTime.Parse(txtEnd.Text);
+            int year = DateTime.Now.Year;
 
-            DataTable dt = rpt.GetOrdersByDateRange(start, end);
-
-            Document doc = new Document(PageSize.A4, 20, 20, 20, 20);
+            Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
             MemoryStream ms = new MemoryStream();
             PdfWriter.GetInstance(doc, ms);
 
             doc.Open();
-            doc.Add(new Paragraph("Orders Report"));
-            doc.Add(new Paragraph($"From {start:d} to {end:d}\n\n"));
 
-            PdfPTable table = new PdfPTable(dt.Columns.Count);
+            Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+            Font headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+            Font bodyFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
 
-            foreach (DataColumn col in dt.Columns)
-                table.AddCell(new Phrase(col.ColumnName));
+            doc.Add(new Paragraph("Annual Revenue Report", titleFont));
+            doc.Add(new Paragraph($"Year: {year}\n\n", bodyFont));
 
-            foreach (DataRow row in dt.Rows)
+            doc.Add(new Paragraph($"Total Revenue: ${rpt.GetTotalRevenueByYear(year):N2}", bodyFont));
+            doc.Add(new Paragraph($"Total Orders: {rpt.GetTotalOrdersByYear(year)}", bodyFont));
+            doc.Add(new Paragraph($"Average Order Value: ${rpt.GetTopProductsByYear(year):N2}\n\n", bodyFont));
+
+            DataTable orders = rpt.GetOrdersByDateRange(
+                new DateTime(year, 1, 1),
+                new DateTime(year, 12, 31));
+
+            PdfPTable table = new PdfPTable(orders.Columns.Count);
+            table.WidthPercentage = 100;
+
+            foreach (DataColumn col in orders.Columns)
+            {
+                PdfPCell cell = new PdfPCell(new Phrase(col.ColumnName, headerFont));
+                cell.BackgroundColor = BaseColor.LIGHT_GRAY;
+                table.AddCell(cell);
+            }
+
+            foreach (DataRow row in orders.Rows)
                 foreach (var item in row.ItemArray)
-                    table.AddCell(new Phrase(item.ToString()));
+                    table.AddCell(new Phrase(item.ToString(), bodyFont));
 
             doc.Add(table);
             doc.Close();
 
             Response.ContentType = "application/pdf";
-            Response.AddHeader("content-disposition", "attachment;filename=report.pdf");
+            Response.AddHeader("content-disposition", "attachment;filename=AnnualReport.pdf");
             Response.BinaryWrite(ms.ToArray());
             Response.End();
+        }
+
+        protected void ddlFilter_Changed(object sender, EventArgs e)
+        {
+            LoadDashboard();
+            LoadCharts();
         }
     }
 }

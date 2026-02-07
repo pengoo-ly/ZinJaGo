@@ -10,22 +10,47 @@
 
         <h2 class="page-title">Reports & Analytics</h2>
 
-        <!-- FILTERS -->
+        <!-- YEAR / MONTH FILTERS -->
         <div class="dashboard-panel">
-            <asp:Label Text="Date Range:" runat="server" />
-            <asp:TextBox ID="txtStart" CssClass="textbox" runat="server" TextMode="Date" />
-            <asp:TextBox ID="txtEnd" CssClass="textbox" runat="server" TextMode="Date" />
-            <asp:Button ID="btnApply" runat="server" CssClass="btn-add"
-                Text="Apply Filters" OnClick="btnApply_Click" />
+            <asp:Label Text="Year:" runat="server" />
+            <asp:DropDownList ID="ddlYear" runat="server"
+                CssClass="textbox"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlFilter_Changed" />
+
+            <asp:Label Text="Month:" runat="server" Style="margin-left:15px;" />
+            <asp:DropDownList ID="ddlMonth" runat="server"
+                CssClass="textbox"
+                AutoPostBack="true"
+                OnSelectedIndexChanged="ddlFilter_Changed" />
         </div>
+
         <br />
         <!-- KPI CARDS -->
-        <div class="dashboard-panel">
+        <div class="dashboard-panel kpi-grid">
+
+            <div class="card">
+                <h6>Total Revenue (Year)</h6>
+                <asp:Label ID="lblTotalRevenue" runat="server" />
+            </div>
+
+            <div class="card">
+                <h6>Total Orders</h6>
+                <asp:Label ID="lblTotalOrders" runat="server" />
+            </div>
+
+            <div class="card">
+                <h6>Completed Orders</h6>
+                <asp:Label ID="lblCompletedOrders" runat="server" />
+            </div>
+
             <div class="card">
                 <h6>Average Order Value</h6>
                 <asp:Label ID="lblAOV" runat="server" />
             </div>
+
         </div>
+
         <br />
         <asp:HiddenField ID="hfRevenueLabels" runat="server" />
         <asp:HiddenField ID="hfRevenueData" runat="server" />
@@ -75,34 +100,51 @@
     </div>
 
     <script>
-    // Revenue Line Chart
-    const revenueCtx = document.getElementById('revenueChart');
+        // ===== Revenue Chart (Year → Monthly) =====
+        const revLabelsEl = document.getElementById('<%= hfRevenueLabels.ClientID %>');
+        const revDataEl = document.getElementById('<%= hfRevenueData.ClientID %>');
+        const revCanvas = document.getElementById('revenueChart');
 
-    new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: document.getElementById('<%= hfRevenueLabels.ClientID %>').value.split(','),
-            datasets: [{
-                label: 'Revenue',
-                data: document.getElementById('<%= hfRevenueData.ClientID %>').value.split(','),
-                tension: 0.4,
-                fill: false
-            }]
+        if (revLabelsEl && revDataEl && revCanvas &&
+            revLabelsEl.value && revDataEl.value) {
+
+            new Chart(revCanvas, {
+                type: 'bar',   // 👈 better for monthly revenue
+                data: {
+                    labels: revLabelsEl.value.split(','),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revDataEl.value.split(',')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
         }
-    });
 
-    // Order Status Pie Chart
-    const statusCtx = document.getElementById('orderStatusChart');
+        // ===== Order Status Pie Chart (KEEP THIS) =====
+        const statusLabelsEl = document.getElementById('<%= hfStatusLabels.ClientID %>');
+        const statusDataEl = document.getElementById('<%= hfStatusData.ClientID %>');
+            const statusCanvas = document.getElementById('orderStatusChart');
 
-    new Chart(statusCtx, {
-        type: 'pie',
-        data: {
-            labels: document.getElementById('<%= hfStatusLabels.ClientID %>').value.split(','),
-            datasets: [{
-                data: document.getElementById('<%= hfStatusData.ClientID %>').value.split(',')
-            }]
-        }
-    });
+            if (statusLabelsEl && statusDataEl && statusCanvas &&
+                statusLabelsEl.value && statusDataEl.value) {
+
+                new Chart(statusCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: statusLabelsEl.value.split(','),
+                        datasets: [{
+                            data: statusDataEl.value.split(',')
+                        }]
+                    }
+                });
+            }
     </script>
+
 
 </asp:Content>
